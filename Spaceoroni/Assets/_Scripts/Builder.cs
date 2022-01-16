@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Builder : MonoBehaviour
 {
+    int x;
+    int y;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -14,5 +17,10 @@ public class Builder : MonoBehaviour
     void Update()
     {
         
+    }
+
+    void FindPossiblerMoves()
+    {
+
     }
 }
