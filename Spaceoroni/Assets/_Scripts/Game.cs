@@ -12,6 +12,7 @@ public class Game : MonoBehaviour
     void Start()
     {
         Board = new int[5,5];
+        NewGame();
     }
 
     // Update is called once per frame
@@ -44,6 +45,7 @@ public class Game : MonoBehaviour
         Player2.PlaceBuilder(2);
     }
 
+    //set board back to 0
     void ClearBoard()
     {
         foreach(int i : Board){
@@ -51,8 +53,17 @@ public class Game : MonoBehaviour
         }
     }
 
-    void BuildLevel(int x, int y)
+    //increase a location to 0
+    bool BuildLevel(int x, int y)
     {
-        Board[x][y] = Board[x][y] + 1;
+        if(Board[x][y] < 4)
+        {
+            Board[x][y] = Board[x][y] + 1;
+        }
+        else
+        {
+            return false;
+        }
+        return true;
     }
 }
