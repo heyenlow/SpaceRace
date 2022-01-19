@@ -174,9 +174,9 @@ public class Game //: MonoBehaviour
     public string getAllPossibleMoves(Coordinate c)
     {
         string allMoves = "";
-        for(int i = -1; i < 1; ++i)
+        for(int i = -1; i <= 1; ++i)
         {
-            for (int j = -1; j < 1; ++j)
+            for (int j = -1; j <= 1; ++j)
             {
                 Coordinate test = new Coordinate(c.x + i, c.y + j);
                 if (Coordinate.inBounds(test) && Board[test.x, test.y] <= (Board[c.x,c.y] + 1) && locationClearOfAllBuilders(test))
@@ -185,15 +185,16 @@ public class Game //: MonoBehaviour
                 }
             }
         }
+        Console.WriteLine("All possible moves: " + allMoves);
         return allMoves;
     }
 
     public string getAllPossibleBuilds(Coordinate c)
     {
         string allBuilds = "";
-        for (int i = -1; i < 1; ++i)
+        for (int i = -1; i <= 1; ++i)
         {
-            for (int j = -1; j < 1; ++j)
+            for (int j = -1; j <= 1; ++j)
             {
                 Coordinate test = new Coordinate(c.x + i, c.y + j);
                 if (Coordinate.inBounds(test) && Board[test.x, test.y] < 4 && locationClearOfAllBuilders(test))
@@ -202,6 +203,7 @@ public class Game //: MonoBehaviour
                 }
             }
         }
+        Console.WriteLine("All possible builds: " + allBuilds);
         return allBuilds;
     }
 }
