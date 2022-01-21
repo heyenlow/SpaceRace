@@ -34,23 +34,19 @@ public class Player : MonoBehaviour
         Build();
     }
 
-    //select one of the two builders
+    
     void SelectBuilder()
     {
 
     }
 
-    //move the selected builder to osne of the possible locations
     void Move()
     {
 
     }
 
-    //build from one of the possible squares
     void Build()
     {
-        //select coords of a square to build on
-        int x,y;
-        Game.BuildLevel(x,y);
+
     }
 }

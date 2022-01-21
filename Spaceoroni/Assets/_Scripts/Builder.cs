@@ -6,7 +6,7 @@ public class Builder : MonoBehaviour
 {
     int x;
     int y;
-
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -19,14 +19,7 @@ public class Builder : MonoBehaviour
         
     }
 
-    //look at surrounding squares and return all spots that are in bounds and one level up
     void FindPossiblerMoves()
-    {
-
-    }
-
-    //look at surrounding squares and return all spots below 4
-    void FindPossibleBuilds()
     {
 
     }
