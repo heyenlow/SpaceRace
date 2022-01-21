@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using SpaceConsole1;
-//using UnityEngine;
+using UnityEngine;
 
-public class Builder// : MonoBehaviour
+public class Builder : MonoBehaviour
 {
-    Coordinate coord = new Coordinate();
+    int x;
+    int y;
 
     // Start is called before the first frame update
     void Start()
@@ -19,14 +19,15 @@ public class Builder// : MonoBehaviour
         
     }
 
-    public void move(Coordinate c)
+    //look at surrounding squares and return all spots that are in bounds and one level up
+    void FindPossiblerMoves()
     {
-        coord.x = c.x;
-        coord.y = c.y;
+
     }
 
-    public string getLocation()
+    //look at surrounding squares and return all spots below 4
+    void FindPossibleBuilds()
     {
-        return Coordinate.coordToString(coord);
+
     }
 }

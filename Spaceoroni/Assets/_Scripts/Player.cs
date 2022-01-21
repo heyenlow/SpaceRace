@@ -1,26 +1,17 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using SpaceConsole1;
-//using UnityEngine;
+using UnityEngine;
 
-public class Player //: MonoBehaviour
+public class Player : MonoBehaviour
 {
 
     Builder Builder1;
     Builder Builder2;
-    public string name { get; set; }
-
-    public Player(string n)
-    {
-        name = n;
-    }
 
     // Start is called before the first frame update
-    public void Start()
+    void Start()
     {
-        Builder1 = new Builder();
-        Builder2 = new Builder();
+        
     }
 
     // Update is called once per frame
@@ -30,33 +21,36 @@ public class Player //: MonoBehaviour
     }
 
     //used to place builders at the beginning of the game
-    public void PlaceBuilder(int i, Coordinate c)
+    void PlaceBuilder(int i)
     {
-        switch (i)
-        {
-            case 1:
-                Builder1.move(c);
-                break;
-            case 2:
-                Builder2.move(c);
-                break;
-        }
+
     }
 
-    public void moveBuidler(Coordinate from, Coordinate to)
+    //manages what goes on during the normal turn
+    void Turn()
     {
-        if(Builder1.getLocation() == Coordinate.coordToString(from))
-        {
-            Builder1.move(to);
-        }
-        else if (Builder2.getLocation() == Coordinate.coordToString(from))
-        {
-            Builder2.move(to);
-        }
+        SelectBuilder();
+        Move();
+        Build();
     }
 
-    public string getBuilderLocations()
+    //select one of the two builders
+    void SelectBuilder()
     {
-        return (Builder1.getLocation() + Builder2.getLocation());
+
+    }
+
+    //move the selected builder to osne of the possible locations
+    void Move()
+    {
+
+    }
+
+    //build from one of the possible squares
+    void Build()
+    {
+        //select coords of a square to build on
+        int x,y;
+        Game.BuildLevel(x,y);
     }
 }
