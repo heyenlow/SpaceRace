@@ -41,6 +41,7 @@ namespace SpaceConsole1
 
         public static bool inBounds(Coordinate c)
         {
+            Console.wr
             return (c.x < 5 && c.x > -1) && (c.y < 5 && c.y > -1);
         }
 
