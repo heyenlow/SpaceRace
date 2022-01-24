@@ -8,6 +8,8 @@ public class Game : MonoBehaviour
     public Material highlight;
 
     int[,] Board;
+    public GameObject Player1Object;
+    public GameObject Player2Object;
     Player Player1;
     Player Player2;
     Player Winner;
@@ -16,8 +18,10 @@ public class Game : MonoBehaviour
     {
         Winner = null;
         Board = new int[5, 5];
-        Player1 = GameObject.Find("Player1").GetComponent<Player>();
-        Player2 = GameObject.Find("Player2").GetComponent<Player>();
+        Player1 = Player1Object.GetComponent<Player>();
+        Player2 = Player2Object.GetComponent<Player>();
+        Debug.Log(Player1Object.GetComponent<Player>());
+        Debug.Log(Player1);
         NewGame();
     }
 
@@ -49,20 +53,21 @@ public class Game : MonoBehaviour
     {
         PlaceBuilder(Player1, 1);
         PlaceBuilder(Player2, 1);
-        PlaceBuilder(Player1, 2);
         PlaceBuilder(Player2, 2);
+        PlaceBuilder(Player1, 2);
     }
 
     public void PlaceBuilder(Player p, int i)
     {
-        string s;
+        string s = "A1";
+        /*
         do
         {
             Console.Write(p.name + ", Place Builder " + i + ": ");
             s = Console.ReadLine().ToUpper();
         }
         while (getAllBuildersString().Contains(s) || !Coordinate.inBounds(Coordinate.stringToCoord(s)));
-
+        */
         p.PlaceBuilder(i, Coordinate.stringToCoord(s));
     }
 

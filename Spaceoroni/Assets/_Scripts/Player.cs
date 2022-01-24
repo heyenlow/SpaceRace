@@ -15,14 +15,14 @@ public class Player : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    public void Start()
+    void Start()
     {
         setBuilders();
     }
 
     Tuple<Builder, Builder> setBuilders()
     {
-        var PlayerBuilders = GameObject.FindGameObjectsWithTag(this.tag);
+        var PlayerBuilders = GameObject.FindGameObjectsWithTag(this.gameObject.tag);
         GameObject builder1 = new GameObject();
         GameObject builder2 = new GameObject();
 
@@ -30,6 +30,7 @@ public class Player : MonoBehaviour
         {
             if (g.name == "Builder1") builder1 = g;
             if (g.name == "Builder2") builder2 = g;
+        Debug.Log(g.name);
         }
         return new Tuple<Builder, Builder>(builder1.GetComponent<Builder>(), builder2.GetComponent<Builder>());
     }
@@ -43,6 +44,7 @@ public class Player : MonoBehaviour
     //used to place builders at the beginning of the game
     public void PlaceBuilder(int i, Coordinate c)
     {
+        Debug.Log(Builder.Item1.name + " " + Builder.Item2.name);
         switch (i)
         {
             case 1:
