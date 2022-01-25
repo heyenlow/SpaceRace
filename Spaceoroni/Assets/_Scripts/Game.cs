@@ -13,6 +13,14 @@ public class Game : MonoBehaviour
     Player Player1;
     Player Player2;
     Player Winner;
+    public float Speed;
+
+    [Header("Test Objects")]
+
+
+    GameObject movingBuilder;
+    Vector3 newLocation;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,17 +28,30 @@ public class Game : MonoBehaviour
         Board = new int[5, 5];
         Player1 = Player1Object.GetComponent<Player>();
         Player2 = Player2Object.GetComponent<Player>();
-        Debug.Log(Player1Object.GetComponent<Player>());
-        Debug.Log(Player1);
         NewGame();
     }
 
     // Update is called once per frame
     void Update()
     {
+       
+        if (movingBuilder != null)
+        {
+            movingBuilder.transform.position = Vector3.MoveTowards(movingBuilder.transform.position, newLocation, Speed * Time.deltaTime);
 
+            if (movingBuilder.transform.position == newLocation) movingBuilder = null;
+        }
     }
     
+    void moveToNewSquare(GameObject GamePiece, GameObject Square)
+    {
+        Vector3 heightDiff = new Vector3(0, GamePiece.transform.position.y - Square.transform.position.y, 0);
+        newLocation = Square.transform.position + heightDiff;
+        movingBuilder = GamePiece;
+        //Vector3 v3 = new Vector3((float)0.001, 0, 0);
+        //camera.transform.Translate(v3);
+    }
+
     void NewGame()
     {
         ClearBoard();
@@ -57,7 +78,9 @@ public class Game : MonoBehaviour
 
     public void PlaceBuilder(Player p, int i)
     {
+        Debug.Log(p + " on " + i);
         string s = "A1";
+
         /*
         do
         {
@@ -195,5 +218,10 @@ public class Game : MonoBehaviour
         {
             GameObject.Find(coord).GetComponent<Renderer>().material = highlight;
         }
+    }
+
+    public void recieveLocationClick(string s)
+    {
+        Debug.Log("Controller: " + s);
     }
 }

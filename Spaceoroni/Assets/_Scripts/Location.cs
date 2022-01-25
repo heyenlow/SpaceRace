@@ -5,13 +5,15 @@ using UnityEngine.EventSystems;
 
 public class Location : MonoBehaviour
 {
-    public Material highlightMaterial1;
-    private Material startMaterial;
+    Color highlightMaterial;
+    Game gameController;
+    Material startMaterial;
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Hello");
-        startMaterial = GetComponent<Renderer>().material;
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<Game>();
+        startMaterial = this.GetComponent<Renderer>().material;
+        highlightMaterial = new Color(98, 136, 147);
     }
 
     // Update is called once per frame
@@ -20,26 +22,21 @@ public class Location : MonoBehaviour
         
     }
 
-    public void changeMesh(Material highlightMaterial)
+    private void OnMouseOver()
     {
-        Debug.Log("ChangeMesh()");
-
-        GetComponent<Renderer>().material = highlightMaterial;
+        GetComponent<Renderer>().material.color = highlightMaterial;
+        
     }
 
-    public void OnPointerClick(PointerEventData pointerEventData)
+    private void OnMouseExit()
     {
-        GetComponent<Renderer>().material = highlightMaterial1;
-
-        //Output to console the clicked GameObject's name and the following message. You can replace this with your own actions for when clicking the GameObject.
-        Debug.Log(name + " Game Object Clicked!");
+        GetComponent<Renderer>().material = startMaterial;
     }
 
     void OnMouseDown()
     {
-        GetComponent<Renderer>().material = highlightMaterial1;
-
         //Output to console the clicked GameObject's name and the following message. You can replace this with your own actions for when clicking the GameObject.
         Debug.Log(name + " Game Object Clicked!");
+        gameController.recieveLocationClick(this.name);
     }
 }

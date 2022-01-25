@@ -7,6 +7,10 @@ public class Player : MonoBehaviour
 {
 
     Tuple<Builder, Builder> Builder;
+    public GameObject Builder1GameObject;
+    public GameObject Builder2GameObject;
+    Builder Builder1;
+    Builder Builder2;
     public string name { get; set; }
 
     public Player(string n)
@@ -17,22 +21,10 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        setBuilders();
-    }
+        Builder1 = Builder1GameObject.GetComponent<Builder>();
+        Builder2 = Builder2GameObject.GetComponent<Builder>();
+        Debug.Log(Builder1.name + " ------ " + Builder2.name);
 
-    Tuple<Builder, Builder> setBuilders()
-    {
-        var PlayerBuilders = GameObject.FindGameObjectsWithTag(this.gameObject.tag);
-        GameObject builder1 = new GameObject();
-        GameObject builder2 = new GameObject();
-
-        foreach(GameObject g in PlayerBuilders)
-        {
-            if (g.name == "Builder1") builder1 = g;
-            if (g.name == "Builder2") builder2 = g;
-        Debug.Log(g.name);
-        }
-        return new Tuple<Builder, Builder>(builder1.GetComponent<Builder>(), builder2.GetComponent<Builder>());
     }
 
     // Update is called once per frame
@@ -44,32 +36,33 @@ public class Player : MonoBehaviour
     //used to place builders at the beginning of the game
     public void PlaceBuilder(int i, Coordinate c)
     {
-        Debug.Log("Builders: " + Builder.Item1.name + " " + Builder.Item2.name);
+        Debug.Log(Builder1.name + " ------ " + Builder2.name);
+        Debug.Log(Coordinate.coordToString(c));
         switch (i)
         {
             case 1:
-                Builder.Item1.move(c);
+                Builder1.move(c);
                 break;
             case 2:
-                Builder.Item2.move(c);
+                Builder2.move(c);
                 break;
         }
     }
 
     public void moveBuidler(Coordinate from, Coordinate to)
     {
-        if (Builder.Item1.getLocation() == Coordinate.coordToString(from))
+        if (Builder1.getLocation() == Coordinate.coordToString(from))
         {
-            Builder.Item2.move(to);
+            Builder1.move(to);
         }
-        else if (Builder.Item2.getLocation() == Coordinate.coordToString(from))
+        else if (Builder2.getLocation() == Coordinate.coordToString(from))
         {
-            Builder.Item2.move(to);
+            Builder2.move(to);
         }
     }
 
     public string getBuilderLocations()
     {
-        return (Builder.Item1.getLocation() + Builder.Item2.getLocation());
+        return (Builder1.getLocation() + Builder1.getLocation());
     }
 }
