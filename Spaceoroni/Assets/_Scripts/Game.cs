@@ -31,8 +31,6 @@ public class Game : MonoBehaviour
 
     }
     
-    
-
     void NewGame()
     {
         ClearBoard();

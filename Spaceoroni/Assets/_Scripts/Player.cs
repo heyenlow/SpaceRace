@@ -44,7 +44,7 @@ public class Player : MonoBehaviour
     //used to place builders at the beginning of the game
     public void PlaceBuilder(int i, Coordinate c)
     {
-        Debug.Log(Builder.Item1.name + " " + Builder.Item2.name);
+        Debug.Log("Builders: " + Builder.Item1.name + " " + Builder.Item2.name);
         switch (i)
         {
             case 1:

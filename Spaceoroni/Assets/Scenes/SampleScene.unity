@@ -378,6 +378,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlight: {fileID: 2100000, guid: c61a80fdf44672f489232b8c33b0b88c, type: 2}
+  Player1Object: {fileID: 1659787303}
+  Player2Object: {fileID: 305133672}
 --- !u!4 &137313763
 Transform:
   m_ObjectHideFlags: 0
@@ -859,7 +861,7 @@ GameObject:
   - component: {fileID: 305133673}
   m_Layer: 0
   m_Name: Player2
-  m_TagString: Untagged
+  m_TagString: Player2
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1676,13 +1678,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.25237426, y: -0.48590443, z: 0.14892688, w: 0.82342273}
+  m_LocalPosition: {x: 7, y: 4, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 34.08, y: -61.09, z: 0}
 --- !u!1001 &1039055926
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2620,7 +2622,7 @@ GameObject:
   - component: {fileID: 1659787304}
   m_Layer: 0
   m_Name: Player1
-  m_TagString: Untagged
+  m_TagString: Player1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
