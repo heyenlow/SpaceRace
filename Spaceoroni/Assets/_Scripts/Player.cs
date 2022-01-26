@@ -54,7 +54,7 @@ public class Player : MonoBehaviour
 
     public string getBuilderLocations()
     {
-        return (Builder1.getLocation() + Builder1.getLocation());
+        return (Builder1.getLocation() + Builder2.getLocation());
     }
 
 }

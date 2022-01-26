@@ -501,7 +501,8 @@ MonoBehaviour:
   highlight: {fileID: 2100000, guid: c61a80fdf44672f489232b8c33b0b88c, type: 2}
   Player1Object: {fileID: 1659787303}
   Player2Object: {fileID: 305133672}
-  Speed: 1
+  Speed: 10
+  GameRunning: 0
 --- !u!4 &137313763
 Transform:
   m_ObjectHideFlags: 0

@@ -24,7 +24,7 @@ public class Game : MonoBehaviour
     GameObject movingBuilder;
     Vector3 newLocation;
     int waitToStart = 0;
-    bool GameRunning = false;
+    public bool GameRunning = false;
 
     // Start is called before the first frame update
     void Start()
@@ -39,7 +39,7 @@ public class Game : MonoBehaviour
     void Update()
     {
         //gotta wait for the other objects to be set
-        if (Input.GetKeyDown("space") && !GameRunning) NewGame();
+        if (Input.GetKeyDown("space") && !GameRunning) StartCoroutine(NewGame());
 
         if (movingBuilder != null)
         {
@@ -56,6 +56,7 @@ public class Game : MonoBehaviour
         GameRunning = true;
         ClearBoard();
         Board[2, 3] = 3;
+        yield return null;
         yield return StartCoroutine(PlaceBuilders());
         yield return StartCoroutine(RunGame());
     }
@@ -175,13 +176,13 @@ public class Game : MonoBehaviour
             builderLocation = clickLocation;
             yield return new WaitForSeconds(1);
         }
-        Debug.Log("BuilderLocation: " + Coordinate.coordToString(builderLocation));
 
         //###################################################################
         //Where to?
         Coordinate moveLocation = null;
         if (builderLocation != null)
         {
+            Debug.Log("BuilderLocation: " + Coordinate.coordToString(builderLocation));
             List<string> allMoves = getAllPossibleMoves(builderLocation);
             highlightPossibleMoveLocations(allMoves);
             while (clickLocation == null)
@@ -191,13 +192,13 @@ public class Game : MonoBehaviour
             }
             p.moveBuidler(builderLocation, moveLocation);
         }
-        Debug.Log("MoveLocation: " + Coordinate.coordToString(moveLocation));
 
         //################################################################
         // get build location if not win
         Coordinate buildLocation = null;
         if (moveLocation != null && !isWin(moveLocation))
         {
+            Debug.Log("MoveLocation: " + Coordinate.coordToString(moveLocation));
             List<string> allBuilds = getAllPossibleBuilds(moveLocation);
             highlightPossibleMoveLocations(allBuilds);
             while (clickLocation == null)
@@ -207,7 +208,7 @@ public class Game : MonoBehaviour
             }
             BuildLevel(buildLocation);
         }
-        Debug.Log("BuildLocation: " + Coordinate.coordToString(buildLocation));
+        if(buildLocation != null) Debug.Log("BuildLocation: " + Coordinate.coordToString(buildLocation));
 
         yield return null;
 
@@ -303,6 +304,7 @@ public class Game : MonoBehaviour
 
     public bool isTurn(Coordinate c)
     {
+        Debug.Log(TurnPlayer.getBuilderLocations() + " " + Coordinate.coordToString(c));
         return TurnPlayer.getBuilderLocations().Contains(Coordinate.coordToString(c));
     }
 
