@@ -20,6 +20,7 @@ public class Game : MonoBehaviour
 
     GameObject movingBuilder;
     Vector3 newLocation;
+    int waitToStart = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -28,13 +29,15 @@ public class Game : MonoBehaviour
         Board = new int[5, 5];
         Player1 = Player1Object.GetComponent<Player>();
         Player2 = Player2Object.GetComponent<Player>();
-        NewGame();
     }
 
     // Update is called once per frame
     void Update()
     {
-       
+        //gotta wait for the other objects to be set
+        if (waitToStart >= 5000) NewGame();
+        else ++waitToStart;
+
         if (movingBuilder != null)
         {
             movingBuilder.transform.position = Vector3.MoveTowards(movingBuilder.transform.position, newLocation, Speed * Time.deltaTime);
@@ -212,16 +215,20 @@ public class Game : MonoBehaviour
     }
 
     //takes a list of possible moves and highlights the moves
-    void highlightPossibleMoveLocations(List<string> locations)
+    public void highlightPossibleMoveLocations(List<string> locations)
     {
         foreach (string coord in locations)
         {
             GameObject.Find(coord).GetComponent<Renderer>().material = highlight;
         }
     }
-
-    public void recieveLocationClick(string s)
+    public void highlightPossibleMoveLocations(Coordinate location)
     {
-        Debug.Log("Controller: " + s);
+       GameObject.Find(Coordinate.coordToString(location)).GetComponent<Renderer>().material = highlight;
+    }
+
+    public void recieveLocationClick(Coordinate location)
+    {
+        Debug.Log("Controller: " + Coordinate.coordToString(location));
     }
 }

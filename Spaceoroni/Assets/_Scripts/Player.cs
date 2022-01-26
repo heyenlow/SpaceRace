@@ -11,20 +11,12 @@ public class Player : MonoBehaviour
     public GameObject Builder2GameObject;
     Builder Builder1;
     Builder Builder2;
-    public string name { get; set; }
-
-    public Player(string n)
-    {
-        name = n;
-    }
 
     // Start is called before the first frame update
     void Start()
     {
         Builder1 = Builder1GameObject.GetComponent<Builder>();
         Builder2 = Builder2GameObject.GetComponent<Builder>();
-        Debug.Log(Builder1.name + " ------ " + Builder2.name);
-
     }
 
     // Update is called once per frame
@@ -36,8 +28,6 @@ public class Player : MonoBehaviour
     //used to place builders at the beginning of the game
     public void PlaceBuilder(int i, Coordinate c)
     {
-        Debug.Log(Builder1.name + " ------ " + Builder2.name);
-        Debug.Log(Coordinate.coordToString(c));
         switch (i)
         {
             case 1:

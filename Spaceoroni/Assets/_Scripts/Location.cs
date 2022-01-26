@@ -24,8 +24,8 @@ public class Location : MonoBehaviour
 
     private void OnMouseOver()
     {
-        GetComponent<Renderer>().material.color = highlightMaterial;
-        
+        //GetComponent<Renderer>().material.color = highlightMaterial;
+        gameController.highlightPossibleMoveLocations(Coordinate.stringToCoord(this.name));
     }
 
     private void OnMouseExit()
@@ -37,6 +37,6 @@ public class Location : MonoBehaviour
     {
         //Output to console the clicked GameObject's name and the following message. You can replace this with your own actions for when clicking the GameObject.
         Debug.Log(name + " Game Object Clicked!");
-        gameController.recieveLocationClick(this.name);
+        gameController.recieveLocationClick(Coordinate.stringToCoord(this.name));
     }
 }
