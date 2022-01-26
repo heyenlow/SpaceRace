@@ -231,4 +231,9 @@ public class Game : MonoBehaviour
     {
         Debug.Log("Controller: " + Coordinate.coordToString(location));
     }
+
+    public bool canHighlightBuilderPlacement(Coordinate c)
+    {
+        return !getAllBuildersString().Contains(Coordinate.coordToString(c));
+    }
 }
