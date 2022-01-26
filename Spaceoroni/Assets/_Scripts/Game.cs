@@ -13,14 +13,18 @@ public class Game : MonoBehaviour
     Player Player1;
     Player Player2;
     Player Winner;
+    Player TurnPlayer;
     public float Speed;
 
     [Header("Test Objects")]
 
+    bool highlightAll = false;
+    Coordinate clickLocation;
 
     GameObject movingBuilder;
     Vector3 newLocation;
     int waitToStart = 0;
+    bool GameRunning = false;
 
     // Start is called before the first frame update
     void Start()
@@ -35,8 +39,7 @@ public class Game : MonoBehaviour
     void Update()
     {
         //gotta wait for the other objects to be set
-        if (waitToStart >= 5000) NewGame();
-        else ++waitToStart;
+        if (Input.GetKeyDown("space") && !GameRunning) NewGame();
 
         if (movingBuilder != null)
         {
@@ -45,54 +48,98 @@ public class Game : MonoBehaviour
             if (movingBuilder.transform.position == newLocation) movingBuilder = null;
         }
     }
-    
-    void moveToNewSquare(GameObject GamePiece, GameObject Square)
-    {
-        Vector3 heightDiff = new Vector3(0, GamePiece.transform.position.y - Square.transform.position.y, 0);
-        newLocation = Square.transform.position + heightDiff;
-        movingBuilder = GamePiece;
-        //Vector3 v3 = new Vector3((float)0.001, 0, 0);
-        //camera.transform.Translate(v3);
-    }
 
-    void NewGame()
+
+    IEnumerator NewGame()
     {
+        Debug.Log("Starting New Game.");
+        GameRunning = true;
         ClearBoard();
-        PlaceBuilders();
-        RunGame();
+        Board[2, 3] = 3;
+        yield return StartCoroutine(PlaceBuilders());
+        yield return StartCoroutine(RunGame());
     }
-
-    void RunGame()
+    IEnumerator RunGame()
     {
         while (Winner == null)
         {
-            Turn(Player1);
-            if (Winner == null) Turn(Player2);
+            yield return StartCoroutine(Turn(Player1));
+            if (Winner == null) yield return StartCoroutine(Turn(Player2));
         }
+        yield return null;
     }
 
-    void PlaceBuilders()
+    public void moveToNewSquare(GameObject GamePiece, GameObject Square)
     {
-        PlaceBuilder(Player1, 1);
-        PlaceBuilder(Player2, 1);
-        PlaceBuilder(Player2, 2);
-        PlaceBuilder(Player1, 2);
+        Coordinate coordinateOfSquare = Coordinate.stringToCoord(Square.name);
+        //this next line will need to be adjusted for the height of each level object
+        Vector3 heightDiff = new Vector3(0, (GamePiece.transform.position.y - Square.transform.position.y) + (heightAtCoordinate(coordinateOfSquare)), 0);
+        newLocation = Square.transform.position + heightDiff;
+        movingBuilder = GamePiece;
     }
 
-    public void PlaceBuilder(Player p, int i)
+    //returns the board height at a given coordinate
+    float heightAtCoordinate(Coordinate c)
     {
-        Debug.Log(p + " on " + i);
-        string s = "A1";
+        const float gamePieceHeight = 0;
+        const float level0Height = (float)0.001;
+        const float level1Height = (float)5.0;
+        const float level2Height = (float)0.001;
+        const float level3Height = (float)0.001;
+        const float level4Height = (float)0.001;
 
-        /*
-        do
+        float newHeightToMoveTo = 0;
+
+        int BHeight = Board[c.x, c.y];
+        switch (BHeight)
         {
-            Console.Write(p.name + ", Place Builder " + i + ": ");
-            s = Console.ReadLine().ToUpper();
+            case 4:
+                newHeightToMoveTo += level4Height;
+                goto case 3;
+            case 3:
+                newHeightToMoveTo += level3Height;
+                goto case 2;
+            case 2:
+                newHeightToMoveTo += level2Height;
+                goto case 1;
+            case 1:
+                newHeightToMoveTo += level1Height;
+                goto case 0;
+            case 0:
+                newHeightToMoveTo += level0Height;
+                break;
         }
-        while (getAllBuildersString().Contains(s) || !Coordinate.inBounds(Coordinate.stringToCoord(s)));
-        */
-        p.PlaceBuilder(i, Coordinate.stringToCoord(s));
+        return newHeightToMoveTo;
+    }
+
+
+    IEnumerator PlaceBuilders()
+    {
+        yield return StartCoroutine(PlaceBuilder(Player1, 1));
+        yield return StartCoroutine(PlaceBuilder(Player2, 1));
+        yield return StartCoroutine(PlaceBuilder(Player2, 2));
+        yield return StartCoroutine(PlaceBuilder(Player1, 2));
+        yield return null;
+    }
+
+    private IEnumerator PlaceBuilder(Player p, int i)
+    {
+        Debug.Log("Player: " + p + " Placing builder: " + i);
+        Debug.Log("waiting for location.....");
+        highlightAll = true;
+        while (clickLocation == null)
+        {
+            yield return new WaitForSeconds(1);
+        }
+        if (clickLocation != null)
+        {
+            Debug.Log("new lovation is: " + Coordinate.coordToString(clickLocation));
+            p.PlaceBuilder(i, clickLocation);
+
+            clickLocation = null;
+            highlightAll = false;
+        }
+        yield return true;
     }
 
     //set board back to 0
@@ -118,41 +165,51 @@ public class Game : MonoBehaviour
         return Board[c.x, c.y] == 3;
     }
 
-    void Turn(Player p)
+    IEnumerator Turn(Player p)
     {
-        //which builder do you want to move
-        string builderLocation;
-        Console.Write("Builder Location: ");
-        do
+        Debug.Log(p + " Turn Start:");
+        TurnPlayer = p;
+        Coordinate builderLocation = null;
+        while (clickLocation == null)
         {
-            builderLocation = Console.ReadLine().ToUpper();
-        } while (!p.getBuilderLocations().Contains(builderLocation));
+            builderLocation = clickLocation;
+            yield return new WaitForSeconds(1);
+        }
+        Debug.Log("BuilderLocation: " + Coordinate.coordToString(builderLocation));
 
         //###################################################################
         //Where to?
-        string moveLocation;
-        List<string> allMoves = getAllPossibleMoves(Coordinate.stringToCoord(builderLocation));
-
-        Console.Write("New Location: ");
-        do
+        Coordinate moveLocation = null;
+        if (builderLocation != null)
         {
-            moveLocation = Console.ReadLine().ToUpper();
-        } while (!allMoves.Contains(moveLocation));
-        p.moveBuidler(Coordinate.stringToCoord(builderLocation), Coordinate.stringToCoord(moveLocation));
+            List<string> allMoves = getAllPossibleMoves(builderLocation);
+            highlightPossibleMoveLocations(allMoves);
+            while (clickLocation == null)
+            {
+                moveLocation = clickLocation;
+                yield return new WaitForSeconds(1);
+            }
+            p.moveBuidler(builderLocation, moveLocation);
+        }
+        Debug.Log("MoveLocation: " + Coordinate.coordToString(moveLocation));
 
         //################################################################
         // get build location if not win
-        if (!isWin(Coordinate.stringToCoord(moveLocation)))
+        Coordinate buildLocation = null;
+        if (moveLocation != null && !isWin(moveLocation))
         {
-            string buildLocation;
-            List<string> allBuilds = getAllPossibleBuilds(Coordinate.stringToCoord(moveLocation));
-            Console.Write("Build Location: ");
-            do
+            List<string> allBuilds = getAllPossibleBuilds(moveLocation);
+            highlightPossibleMoveLocations(allBuilds);
+            while (clickLocation == null)
             {
-                buildLocation = Console.ReadLine().ToUpper();
-            } while (!allBuilds.Contains(buildLocation));
-            BuildLevel(Coordinate.stringToCoord(buildLocation));
+                moveLocation = clickLocation;
+                yield return new WaitForSeconds(1);
+            }
+            BuildLevel(buildLocation);
         }
+        Debug.Log("BuildLocation: " + Coordinate.coordToString(buildLocation));
+
+        yield return null;
 
     }
 
@@ -229,11 +286,28 @@ public class Game : MonoBehaviour
 
     public void recieveLocationClick(Coordinate location)
     {
-        Debug.Log("Controller: " + Coordinate.coordToString(location));
+        clickLocation = location;
     }
 
-    public bool canHighlightBuilderPlacement(Coordinate c)
+    public void canHighlightBuilderPlacement(Coordinate c)
     {
-        return !getAllBuildersString().Contains(Coordinate.coordToString(c));
+        if(!getAllBuildersString().Contains(Coordinate.coordToString(c)) && highlightAll) 
+            GameObject.Find(Coordinate.coordToString(c)).GetComponent<Renderer>().material = highlight;
+
+    }
+
+    public GameObject findSquare(Coordinate c)
+    {
+        return GameObject.Find(Coordinate.coordToString(c));
+    }
+
+    public bool isTurn(Coordinate c)
+    {
+        return TurnPlayer.getBuilderLocations().Contains(Coordinate.coordToString(c));
+    }
+
+    public Material getHighlightMat()
+    {
+        return highlight;
     }
 }

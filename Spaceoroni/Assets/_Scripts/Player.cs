@@ -28,6 +28,7 @@ public class Player : MonoBehaviour
     //used to place builders at the beginning of the game
     public void PlaceBuilder(int i, Coordinate c)
     {
+        Debug.Log("Player moving builder to the new location");
         switch (i)
         {
             case 1:
@@ -55,4 +56,5 @@ public class Player : MonoBehaviour
     {
         return (Builder1.getLocation() + Builder1.getLocation());
     }
+
 }
