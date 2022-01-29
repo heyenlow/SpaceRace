@@ -6,6 +6,7 @@ using UnityEngine;
 public class Game : MonoBehaviour
 {
     public Material highlight;
+    public Material possibleHighlight;
 
     int[,] Board;
     public GameObject Player1Object;
@@ -49,15 +50,14 @@ public class Game : MonoBehaviour
         }
     }
 
-
     IEnumerator NewGame()
     {
         Debug.Log("Starting New Game.");
         GameRunning = true;
         ClearBoard();
-        Board[2, 3] = 3;
         yield return null;
         yield return StartCoroutine(PlaceBuilders());
+        Debug.Log("Done Placing Builders");
         yield return StartCoroutine(RunGame());
     }
     IEnumerator RunGame()
@@ -65,7 +65,7 @@ public class Game : MonoBehaviour
         while (Winner == null)
         {
             yield return StartCoroutine(Turn(Player1));
-            if (Winner == null) yield return StartCoroutine(Turn(Player2));
+
         }
         yield return null;
     }
@@ -134,7 +134,7 @@ public class Game : MonoBehaviour
         }
         if (clickLocation != null)
         {
-            Debug.Log("new lovation is: " + Coordinate.coordToString(clickLocation));
+            Debug.Log("new location is: " + Coordinate.coordToString(clickLocation));
             p.PlaceBuilder(i, clickLocation);
 
             clickLocation = null;
@@ -159,6 +159,8 @@ public class Game : MonoBehaviour
     void BuildLevel(Coordinate c)
     {
         Board[c.x, c.y] += 1;
+        GameObject level = GameObject.Find(Coordinate.coordToString(c));
+        level.transform.GetChild(Board[c.x,c.y] - 1).gameObject.SetActive(true);
     }
 
     bool isWin(Coordinate c)
@@ -173,9 +175,10 @@ public class Game : MonoBehaviour
         Coordinate builderLocation = null;
         while (clickLocation == null)
         {
-            builderLocation = clickLocation;
             yield return new WaitForSeconds(1);
         }
+        builderLocation = clickLocation;
+        clickLocation = null;
 
         //###################################################################
         //Where to?
@@ -184,34 +187,55 @@ public class Game : MonoBehaviour
         {
             Debug.Log("BuilderLocation: " + Coordinate.coordToString(builderLocation));
             List<string> allMoves = getAllPossibleMoves(builderLocation);
-            highlightPossibleMoveLocations(allMoves);
+
             while (clickLocation == null)
             {
-                moveLocation = clickLocation;
+                highlightPossibleMoveLocations(allMoves);
+                Debug.Log("Waiting for move");
                 yield return new WaitForSeconds(1);
             }
+
+            moveLocation = clickLocation;
+            clickLocation = null;
             p.moveBuidler(builderLocation, moveLocation);
         }
 
         //################################################################
         // get build location if not win
+
         Coordinate buildLocation = null;
         if (moveLocation != null && !isWin(moveLocation))
         {
             Debug.Log("MoveLocation: " + Coordinate.coordToString(moveLocation));
             List<string> allBuilds = getAllPossibleBuilds(moveLocation);
-            highlightPossibleMoveLocations(allBuilds);
+            
             while (clickLocation == null)
             {
-                moveLocation = clickLocation;
+                highlightPossibleMoveLocations(allBuilds);
                 yield return new WaitForSeconds(1);
             }
-            BuildLevel(buildLocation);
+            moveLocation = clickLocation;
+            clickLocation = null;
+
+            Debug.Log("Built");
+            //BuildLevel(buildLocation);
         }
-        if(buildLocation != null) Debug.Log("BuildLocation: " + Coordinate.coordToString(buildLocation));
+            
+        if(buildLocation != null)
+        {
+            Debug.Log("BuildLocation: " + Coordinate.coordToString(buildLocation));
+        }
 
-        yield return null;
-
+        //Run next players' turn
+        if(p == Player1)
+        {
+            yield return StartCoroutine(Turn(Player2));
+        }
+        else
+        {
+            yield return StartCoroutine(Turn(Player1));
+        }
+       
     }
 
     // MARKED FOR DEPRECATION ?
@@ -277,12 +301,13 @@ public class Game : MonoBehaviour
     {
         foreach (string coord in locations)
         {
-            GameObject.Find(coord).GetComponent<Renderer>().material = highlight;
+            GameObject.Find(coord).GetComponent<Renderer>().material = possibleHighlight;
         }
     }
+
     public void highlightPossibleMoveLocations(Coordinate location)
     {
-       GameObject.Find(Coordinate.coordToString(location)).GetComponent<Renderer>().material = highlight;
+       GameObject.Find(Coordinate.coordToString(location)).GetComponent<Renderer>().material = possibleHighlight;
     }
 
     public void recieveLocationClick(Coordinate location)
@@ -304,7 +329,6 @@ public class Game : MonoBehaviour
 
     public bool isTurn(Coordinate c)
     {
-        Debug.Log(TurnPlayer.getBuilderLocations() + " " + Coordinate.coordToString(c));
         return TurnPlayer.getBuilderLocations().Contains(Coordinate.coordToString(c));
     }
 
