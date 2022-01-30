@@ -158,6 +158,7 @@ public class Game : MonoBehaviour
     //increase a location to 0
     void BuildLevel(Coordinate c)
     {
+        Debug.Log(c);
         Board[c.x, c.y] += 1;
         GameObject level = GameObject.Find(Coordinate.coordToString(c));
         level.transform.GetChild(Board[c.x,c.y] - 1).gameObject.SetActive(true);
@@ -170,72 +171,72 @@ public class Game : MonoBehaviour
 
     IEnumerator Turn(Player p)
     {
-        Debug.Log(p + " Turn Start:");
         TurnPlayer = p;
         Coordinate builderLocation = null;
+        Coordinate moveLocation = null;
+        Coordinate buildLocation = null;
+
+    //Select Builder
+        clickLocation = null;   //Reset click
         while (clickLocation == null)
         {
             yield return new WaitForSeconds(1);
         }
         builderLocation = clickLocation;
+
+
         clickLocation = null;
+        List<string> allMoves = getAllPossibleMoves(builderLocation);
 
-        //###################################################################
-        //Where to?
-        Coordinate moveLocation = null;
-        if (builderLocation != null)
+    //Move Builder
+        while (clickLocation == null)
         {
-            Debug.Log("BuilderLocation: " + Coordinate.coordToString(builderLocation));
-            List<string> allMoves = getAllPossibleMoves(builderLocation);
-
-            while (clickLocation == null)
-            {
-                highlightPossibleMoveLocations(allMoves);
-                Debug.Log("Waiting for move");
-                yield return new WaitForSeconds(1);
-            }
-
-            moveLocation = clickLocation;
-            clickLocation = null;
-            p.moveBuidler(builderLocation, moveLocation);
+            highlightPossibleMoveLocations(allMoves);
+            Debug.Log("Waiting for move");
+            yield return new WaitForSeconds(1);
         }
 
-        //################################################################
-        // get build location if not win
+        moveLocation = clickLocation;
+        Debug.Log(moveLocation);
+        p.moveBuidler(builderLocation, moveLocation);
 
-        Coordinate buildLocation = null;
-        if (moveLocation != null && !isWin(moveLocation))
-        {
-            Debug.Log("MoveLocation: " + Coordinate.coordToString(moveLocation));
-            List<string> allBuilds = getAllPossibleBuilds(moveLocation);
-            
-            while (clickLocation == null)
-            {
-                highlightPossibleMoveLocations(allBuilds);
-                yield return new WaitForSeconds(1);
-            }
-            moveLocation = clickLocation;
-            clickLocation = null;
 
-            Debug.Log("Built");
-            //BuildLevel(buildLocation);
-        }
-            
-        if(buildLocation != null)
+    //Check win
+        if (isWin(moveLocation))
         {
-            Debug.Log("BuildLocation: " + Coordinate.coordToString(buildLocation));
-        }
-
-        //Run next players' turn
-        if(p == Player1)
-        {
-            yield return StartCoroutine(Turn(Player2));
+            //TODO: Endgame function
+            Debug.Log("WIN!!!");
         }
         else
         {
-            yield return StartCoroutine(Turn(Player1));
+            if (moveLocation != null)
+            {
+                //Build Block
+                clickLocation = null;
+                List<string> allBuilds = getAllPossibleBuilds(moveLocation);
+
+                while (clickLocation == null)
+                {
+                    highlightPossibleMoveLocations(allBuilds);
+                    yield return new WaitForSeconds(1);
+                }
+                buildLocation = clickLocation;
+                BuildLevel(buildLocation);
+
+
+                //Next Players turn
+                if (p == Player1)
+                {
+                    yield return StartCoroutine(Turn(Player2));
+                }
+                else
+                {
+                    yield return StartCoroutine(Turn(Player1));
+                }
+            }
+
+            
         }
-       
     }
 
     // MARKED FOR DEPRECATION ?
