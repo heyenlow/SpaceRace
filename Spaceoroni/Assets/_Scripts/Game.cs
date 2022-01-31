@@ -82,12 +82,13 @@ public class Game : MonoBehaviour
     //returns the board height at a given coordinate
     float heightAtCoordinate(Coordinate c)
     {
+        //The Scale Y * 2 of the level object
         const float gamePieceHeight = 0;
-        const float level0Height = (float)0.001;
-        const float level1Height = (float)5.0;
-        const float level2Height = (float)0.001;
-        const float level3Height = (float)0.001;
-        const float level4Height = (float)0.001;
+        const float level0Height = (float)0.0001;
+        const float level1Height = (float)0.5;
+        const float level2Height = (float)0.4;
+        const float level3Height = (float)0.3;
+        const float level4Height = (float)0.000;
 
         float newHeightToMoveTo = 0;
 
@@ -110,6 +111,7 @@ public class Game : MonoBehaviour
                 newHeightToMoveTo += level0Height;
                 break;
         }
+        Debug.Log(BHeight  + " " + newHeightToMoveTo);
         return newHeightToMoveTo;
     }
 
@@ -189,15 +191,15 @@ public class Game : MonoBehaviour
         List<string> allMoves = getAllPossibleMoves(builderLocation);
 
     //Move Builder
+        Debug.Log("Waiting for move");
         while (clickLocation == null)
         {
             highlightPossibleMoveLocations(allMoves);
-            Debug.Log("Waiting for move");
             yield return new WaitForSeconds(1);
         }
 
         moveLocation = clickLocation;
-        Debug.Log(moveLocation);
+        Debug.Log(Coordinate.coordToString(moveLocation));
         p.moveBuidler(builderLocation, moveLocation);
 
 
