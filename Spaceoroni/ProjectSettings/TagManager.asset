@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Player2
   - Player1
+  - Square
   layers:
   - Default
   - TransparentFX

@@ -36,7 +36,10 @@ public class Builder : MonoBehaviour
 
     private void OnMouseOver()
     {
-        if (gameController.GameRunning && gameController.isTurn(coord)) GetComponent<Renderer>().material = gameController.getHighlightMat();
+        if (gameController.isHighlightObj(this.gameObject))
+        {
+            GetComponent<Renderer>().material = gameController.getHighlightMat();
+        }
     }
 
     private void OnMouseExit()
@@ -48,6 +51,6 @@ public class Builder : MonoBehaviour
     void OnMouseDown()
     {
         //Output to console the clicked GameObject's name and the following message. You can replace this with your own actions for when clicking the GameObject.
-        if(gameController.GameRunning && gameController.isTurn(coord)) gameController.recieveLocationClick(coord);
+        if(gameController.isHighlightObj(this.gameObject)) gameController.recieveLocationClick(coord);
     }
 }

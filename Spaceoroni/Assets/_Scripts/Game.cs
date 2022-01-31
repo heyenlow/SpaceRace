@@ -19,13 +19,12 @@ public class Game : MonoBehaviour
 
     [Header("Test Objects")]
 
-    bool highlightAll = false;
+    private List<GameObject> highlightedObjects = new List<GameObject>();
     Coordinate clickLocation;
 
     GameObject movingBuilder;
     Vector3 newLocation;
-    int waitToStart = 0;
-    public bool GameRunning = false;
+    private bool GameRunning = false;
 
     // Start is called before the first frame update
     void Start()
@@ -55,6 +54,21 @@ public class Game : MonoBehaviour
         Debug.Log("Starting New Game.");
         GameRunning = true;
         ClearBoard();
+        
+        BuildLevel(Coordinate.stringToCoord("E1"));
+
+        BuildLevel(Coordinate.stringToCoord("E2"));
+        BuildLevel(Coordinate.stringToCoord("E2"));
+
+        BuildLevel(Coordinate.stringToCoord("E3"));
+        BuildLevel(Coordinate.stringToCoord("E3"));
+        BuildLevel(Coordinate.stringToCoord("E3"));
+
+        BuildLevel(Coordinate.stringToCoord("E4"));
+        BuildLevel(Coordinate.stringToCoord("E4"));
+        BuildLevel(Coordinate.stringToCoord("E4"));
+        BuildLevel(Coordinate.stringToCoord("E4"));
+
         yield return null;
         yield return StartCoroutine(PlaceBuilders());
         Debug.Log("Done Placing Builders");
@@ -74,7 +88,7 @@ public class Game : MonoBehaviour
     {
         Coordinate coordinateOfSquare = Coordinate.stringToCoord(Square.name);
         //this next line will need to be adjusted for the height of each level object
-        Vector3 heightDiff = new Vector3(0, (GamePiece.transform.position.y - Square.transform.position.y) + (heightAtCoordinate(coordinateOfSquare)), 0);
+        Vector3 heightDiff = new Vector3(0, (heightAtCoordinate(coordinateOfSquare)), 0);
         newLocation = Square.transform.position + heightDiff;
         movingBuilder = GamePiece;
     }
@@ -83,8 +97,8 @@ public class Game : MonoBehaviour
     float heightAtCoordinate(Coordinate c)
     {
         //The Scale Y * 2 of the level object
-        const float gamePieceHeight = 0;
-        const float level0Height = (float)0.0001;
+        const float gamepeiceHeight = (float) 0.35;
+        const float level0Height = (float)0.5001;
         const float level1Height = (float)0.5;
         const float level2Height = (float)0.4;
         const float level3Height = (float)0.3;
@@ -108,13 +122,12 @@ public class Game : MonoBehaviour
                 newHeightToMoveTo += level1Height;
                 goto case 0;
             case 0:
+                newHeightToMoveTo += gamepeiceHeight;
                 newHeightToMoveTo += level0Height;
                 break;
         }
-        Debug.Log(BHeight  + " " + newHeightToMoveTo);
         return newHeightToMoveTo;
     }
-
 
     IEnumerator PlaceBuilders()
     {
@@ -129,7 +142,7 @@ public class Game : MonoBehaviour
     {
         Debug.Log("Player: " + p + " Placing builder: " + i);
         Debug.Log("waiting for location.....");
-        highlightAll = true;
+        addAllLocationsWithoutBuildersToHighlight();
         while (clickLocation == null)
         {
             yield return new WaitForSeconds(1);
@@ -140,13 +153,23 @@ public class Game : MonoBehaviour
             p.PlaceBuilder(i, clickLocation);
 
             clickLocation = null;
-            highlightAll = false;
+            highlightedObjects.Clear();
         }
         yield return true;
     }
 
+    private void addAllLocationsWithoutBuildersToHighlight()
+    {
+        var locations = GameObject.FindGameObjectsWithTag("Square");
+        var buildersLocations = getAllBuildersString();
+        foreach (var l in locations)
+        {
+            if (!buildersLocations.Contains(l.name)) { highlightedObjects.Add(l); }
+        }
+    }
+
     //set board back to 0
-    public void ClearBoard()
+    private void ClearBoard()
     {
         for (int i = 0; i < 5; ++i)
         {
@@ -180,27 +203,28 @@ public class Game : MonoBehaviour
 
     //Select Builder
         clickLocation = null;   //Reset click
+        highlightPlayersBuilder(TurnPlayer);
         while (clickLocation == null)
         {
             yield return new WaitForSeconds(1);
         }
         builderLocation = clickLocation;
-
-
         clickLocation = null;
+
+
         List<string> allMoves = getAllPossibleMoves(builderLocation);
 
     //Move Builder
         Debug.Log("Waiting for move");
         while (clickLocation == null)
         {
-            highlightPossibleMoveLocations(allMoves);
+            highlightAllPossibleMoveLocations(allMoves);
             yield return new WaitForSeconds(1);
         }
 
         moveLocation = clickLocation;
         Debug.Log(Coordinate.coordToString(moveLocation));
-        unHighlightPossibleMoveLocations(allMoves);
+        unhighlightAllPossibleMoveLocations(allMoves);
         p.moveBuidler(builderLocation, moveLocation);
 
 
@@ -217,14 +241,15 @@ public class Game : MonoBehaviour
                 //Build Block
                 clickLocation = null;
                 List<string> allBuilds = getAllPossibleBuilds(moveLocation);
+                List<GameObject> allBuildLevels = getAllPossibleBuildLevels(allBuilds);
 
                 while (clickLocation == null)
                 {
-                    highlightPossibleMoveLocations(allBuilds);
+                    highlightAllPossibleBuildLocations(allBuildLevels);
                     yield return new WaitForSeconds(1);
                 }
                 buildLocation = clickLocation;
-                unHighlightPossibleMoveLocations(allBuilds);
+                unhighlightAllPossibleBuildLocations(allBuildLevels);
                 BuildLevel(buildLocation);
 
 
@@ -301,38 +326,74 @@ public class Game : MonoBehaviour
         return allBuilds;
     }
 
+    public List<GameObject> getAllPossibleBuildLevels(List<string> locations)
+    {
+        List<GameObject> Levels = new List<GameObject>();
+        foreach (string coord in locations)
+        {
+            Coordinate c = Coordinate.stringToCoord(coord);
+            int height = Board[c.x, c.y];
+            GameObject level = GameObject.Find(coord).transform.GetChild(height).gameObject;
+            Levels.Add(level);
+        }
+        return Levels;
+    }
     //takes a list of possible moves and highlights the moves
-    public void highlightPossibleMoveLocations(List<string> locations)
+
+    private void highlightPossibleMoveLocations(Coordinate location)
+    {
+        GameObject obj = GameObject.Find(Coordinate.coordToString(location));
+        obj.GetComponent<Renderer>().material = possibleHighlight;
+        highlightedObjects.Add(obj);
+    }
+    private void highlightAllPossibleMoveLocations(List<string> locations)
     {
         foreach (string coord in locations)
         {
-            GameObject.Find(coord).GetComponent<Renderer>().material = possibleHighlight;
+            GameObject obj = GameObject.Find(coord);
+            obj.GetComponent<Renderer>().material = possibleHighlight;
+            highlightedObjects.Add(obj);
         }
     }
-
-    public void unHighlightPossibleMoveLocations(List<string> locations)
+    private void unhighlightAllPossibleMoveLocations(List<string> locations)
     {
         foreach (string coord in locations)
         {
-            GameObject.Find(coord).GetComponent<Location>().resetMaterial();
+            GameObject obj = GameObject.Find(coord);
+            obj.GetComponent<Location>().resetMaterial();
+            highlightedObjects.Remove(obj);
         }
     }
 
-    public void highlightPossibleMoveLocations(Coordinate location)
+    private void highlightAllPossibleBuildLocations(List<GameObject> Levels)
     {
-       GameObject.Find(Coordinate.coordToString(location)).GetComponent<Renderer>().material = possibleHighlight;
+        foreach (GameObject l in Levels)
+        {
+            l.SetActive(true);
+            l.GetComponent<Level>().makeOpaque();
+            highlightedObjects.Add(l);
+        }
+    }
+
+    private void unhighlightAllPossibleBuildLocations(List<GameObject> Levels)
+    {
+        foreach (GameObject l in Levels)
+        {
+            l.SetActive(false);
+            l.GetComponent<Level>().resetMaterial();
+            highlightedObjects.Remove(l);
+        }
+    }
+    private void highlightPlayersBuilder(Player p)
+    {
+        highlightedObjects.Add(p.Builder1GameObject);
+        highlightedObjects.Add(p.Builder2GameObject);
     }
 
     public void recieveLocationClick(Coordinate location)
     {
         clickLocation = location;
-    }
-
-    public void canHighlightBuilderPlacement(Coordinate c)
-    {
-        if(!getAllBuildersString().Contains(Coordinate.coordToString(c)) && highlightAll) 
-            GameObject.Find(Coordinate.coordToString(c)).GetComponent<Renderer>().material = highlight;
-
+        highlightedObjects.Clear();
     }
 
     public GameObject findSquare(Coordinate c)
@@ -348,5 +409,10 @@ public class Game : MonoBehaviour
     public Material getHighlightMat()
     {
         return highlight;
+    }
+
+    public bool isHighlightObj(GameObject obj)
+    {
+        return highlightedObjects.Contains(obj);
     }
 }

@@ -5,15 +5,16 @@ using UnityEngine.EventSystems;
 
 public class Location : MonoBehaviour
 {
-    Color highlightMaterial;
-    Game gameController;
-    Material startMaterial;
+    private Game gameController;
+    private Color startColor;
+    private Color highlightColor;
+    private Color originalColor;
     // Start is called before the first frame update
     void Start()
     {
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<Game>();
-        startMaterial = this.GetComponent<Renderer>().material;
-        highlightMaterial = new Color(98, 136, 147);
+        originalColor = this.GetComponent<Renderer>().material.color;
+        highlightColor = new Color(0, 145, 255);
     }
 
     // Update is called once per frame
@@ -25,22 +26,30 @@ public class Location : MonoBehaviour
     private void OnMouseOver()
     {
         //GetComponent<Renderer>().material.color = highlightMaterial;
-        gameController.canHighlightBuilderPlacement(Coordinate.stringToCoord(this.name));
+        if(gameController.isHighlightObj(this.gameObject)) 
+        {
+            if (GetComponent<Renderer>().material.color != highlightColor) { startColor = GetComponent<Renderer>().material.color; }
+            GetComponent<Renderer>().material.color = highlightColor;
+        }
     }
 
     private void OnMouseExit()
     {
-        GetComponent<Renderer>().material = startMaterial;
+        if (gameController.isHighlightObj(this.gameObject))
+        {
+            GetComponent<Renderer>().material.color = startColor;
+        }
     }
 
     void OnMouseDown()
     {
-        //Output to console the clicked GameObject's name and the following message. You can replace this with your own actions for when clicking the GameObject.
         gameController.recieveLocationClick(Coordinate.stringToCoord(this.name));
+        resetMaterial();
     }
 
     public void resetMaterial()
     {
-        this.GetComponent<Renderer>().material = startMaterial;
+        this.GetComponent<Renderer>().material.color = originalColor;
     }
+
 }

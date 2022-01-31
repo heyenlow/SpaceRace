@@ -36,7 +36,7 @@ public class Player : MonoBehaviour
                 break;
             case 2:
                 Builder2.move(c);
-                break;
+                break; 
         }
     }
 

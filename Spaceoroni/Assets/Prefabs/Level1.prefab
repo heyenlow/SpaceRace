@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1588175607866093470}
   - component: {fileID: 5315345706245745643}
   - component: {fileID: 4848255285146960150}
+  - component: {fileID: 3749479180760724820}
   m_Layer: 0
   m_Name: Level1
   m_TagString: Untagged
@@ -60,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: e751ee6c41b2d4f489606257066d76b2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -96,3 +97,15 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!114 &3749479180760724820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1297409924615648105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3b665ccb6a771c479c98374b3ad07a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
