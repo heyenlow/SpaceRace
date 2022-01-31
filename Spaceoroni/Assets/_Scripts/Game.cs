@@ -200,6 +200,7 @@ public class Game : MonoBehaviour
 
         moveLocation = clickLocation;
         Debug.Log(Coordinate.coordToString(moveLocation));
+        unHighlightPossibleMoveLocations(allMoves);
         p.moveBuidler(builderLocation, moveLocation);
 
 
@@ -223,6 +224,7 @@ public class Game : MonoBehaviour
                     yield return new WaitForSeconds(1);
                 }
                 buildLocation = clickLocation;
+                unHighlightPossibleMoveLocations(allBuilds);
                 BuildLevel(buildLocation);
 
 
@@ -305,6 +307,14 @@ public class Game : MonoBehaviour
         foreach (string coord in locations)
         {
             GameObject.Find(coord).GetComponent<Renderer>().material = possibleHighlight;
+        }
+    }
+
+    public void unHighlightPossibleMoveLocations(List<string> locations)
+    {
+        foreach (string coord in locations)
+        {
+            GameObject.Find(coord).GetComponent<Location>().resetMaterial();
         }
     }
 

@@ -38,4 +38,9 @@ public class Location : MonoBehaviour
         //Output to console the clicked GameObject's name and the following message. You can replace this with your own actions for when clicking the GameObject.
         gameController.recieveLocationClick(Coordinate.stringToCoord(this.name));
     }
+
+    public void resetMaterial()
+    {
+        this.GetComponent<Renderer>().material = startMaterial;
+    }
 }
