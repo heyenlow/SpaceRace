@@ -54,7 +54,7 @@ public class Game : MonoBehaviour
         Debug.Log("Starting New Game.");
         GameRunning = true;
         ClearBoard();
-        
+
         /*
         BuildLevel(Coordinate.stringToCoord("E1"));
 
