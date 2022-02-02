@@ -40,8 +40,11 @@ public class Level : MonoBehaviour
 
     void OnMouseDown()
     {
-        gameController.recieveLocationClick(Coordinate.stringToCoord(this.transform.parent.name));
-        resetMaterial();
+        if (gameController.isHighlightObj(this.gameObject))
+        {
+            gameController.recieveLocationClick(Coordinate.stringToCoord(this.transform.parent.name));
+            resetMaterial();
+        }
     }
 
     public void makeOpaque()

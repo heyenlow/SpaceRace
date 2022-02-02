@@ -43,8 +43,11 @@ public class Location : MonoBehaviour
 
     void OnMouseDown()
     {
-        gameController.recieveLocationClick(Coordinate.stringToCoord(this.name));
-        resetMaterial();
+        if (gameController.isHighlightObj(this.gameObject)) 
+        {
+            gameController.recieveLocationClick(Coordinate.stringToCoord(this.name));
+            resetMaterial();
+        }
     }
 
     public void resetMaterial()

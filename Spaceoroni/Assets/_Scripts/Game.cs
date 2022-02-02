@@ -55,6 +55,7 @@ public class Game : MonoBehaviour
         GameRunning = true;
         ClearBoard();
         
+        /*
         BuildLevel(Coordinate.stringToCoord("E1"));
 
         BuildLevel(Coordinate.stringToCoord("E2"));
@@ -68,6 +69,7 @@ public class Game : MonoBehaviour
         BuildLevel(Coordinate.stringToCoord("E4"));
         BuildLevel(Coordinate.stringToCoord("E4"));
         BuildLevel(Coordinate.stringToCoord("E4"));
+        */
 
         yield return null;
         yield return StartCoroutine(PlaceBuilders());
@@ -145,7 +147,7 @@ public class Game : MonoBehaviour
         addAllLocationsWithoutBuildersToHighlight();
         while (clickLocation == null)
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForEndOfFrame();
         }
         if (clickLocation != null)
         {
@@ -206,7 +208,7 @@ public class Game : MonoBehaviour
         highlightPlayersBuilder(TurnPlayer);
         while (clickLocation == null)
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForEndOfFrame();
         }
         builderLocation = clickLocation;
         clickLocation = null;
@@ -219,7 +221,7 @@ public class Game : MonoBehaviour
         while (clickLocation == null)
         {
             highlightAllPossibleMoveLocations(allMoves);
-            yield return new WaitForSeconds(1);
+            yield return new WaitForEndOfFrame();
         }
 
         moveLocation = clickLocation;
@@ -246,7 +248,7 @@ public class Game : MonoBehaviour
                 while (clickLocation == null)
                 {
                     highlightAllPossibleBuildLocations(allBuildLevels);
-                    yield return new WaitForSeconds(1);
+                    yield return new WaitForEndOfFrame();
                 }
                 buildLocation = clickLocation;
                 unhighlightAllPossibleBuildLocations(allBuildLevels);
