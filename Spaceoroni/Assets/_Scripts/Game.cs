@@ -16,7 +16,7 @@ public class Game : MonoBehaviour
     {
         Board = new int[5, 5];
         Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
-        Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
+        Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
         ClearBoard();
         StartCoroutine(PlayGameToEnd());
     }
@@ -24,8 +24,8 @@ public class Game : MonoBehaviour
     public bool processTurnString(Turn turn, IPlayer curPlayer, Game g)
     {
         //players already move the builders
-        if (curPlayer is Player){ }
-        else curPlayer.moveBuidler(turn.BuilderLocation, turn.MoveLocation, g);
+        curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
+        
        
         // If not over Where to build?
         if (!turn.isWin)
@@ -58,10 +58,15 @@ public class Game : MonoBehaviour
             {
                  yield return StartCoroutine(curPlayer.beginTurn(this));
             }
+            else
+            {
+                yield return new WaitForSeconds(2);
+            }
 
             // update the board with the current player's move
-            Debug.Log(curPlayer.getLastTurn().ToString());
-            processTurnString(curPlayer.getLastTurn(), curPlayer, this);
+            Turn t = curPlayer.getNextTurn();
+            Debug.Log(t.ToString());
+            processTurnString(t, curPlayer, this);
 
             if (won == true)
                 winner = curPlayer;
@@ -110,8 +115,8 @@ public class Game : MonoBehaviour
     private IEnumerator PlaceBuilders()
     {
         yield return StartCoroutine(Player1.PlaceBuilder(1, this));
-        yield return StartCoroutine(Player2.PlaceBuilder(1, this));
-        yield return StartCoroutine(Player2.PlaceBuilder(2, this));
+        Player2.PlaceBuilder(1, this);
+        Player2.PlaceBuilder(2, this);
         yield return StartCoroutine(Player1.PlaceBuilder(2, this));
         yield return null;
     }
@@ -220,11 +225,6 @@ public class Game : MonoBehaviour
     {
         clickLocation = location;
         HighlightManager.highlightedObjects.Clear();
-    }
-
-    public GameObject findSquare(Coordinate c)
-    {
-        return GameObject.Find(Coordinate.coordToString(c));
     }
 
 }

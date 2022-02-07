@@ -27,7 +27,6 @@ public class Player : IPlayer
 
     public new IEnumerator PlaceBuilder(int i, Game g)
     {
-        Debug.Log("Player: " + this.name + " Placing builder: " + i);
         g.addAllLocationsWithoutBuildersToHighlight();
         while (Game.clickLocation == null)
         {
@@ -38,7 +37,7 @@ public class Player : IPlayer
 
         if (moveLocation != null)
         {
-            moveBuidler(i == 1 ? Builder1.getLocation() : Builder2.getLocation(), moveLocation, g);
+            moveBuidler(i, moveLocation, g);
 
             HighlightManager.highlightedObjects.Clear();
         }
@@ -74,9 +73,8 @@ public class Player : IPlayer
         HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
 
         Coordinate oldLocation = currentTurn.BuilderLocation;
-
         //bug vvvv
-        moveBuidler(oldLocation, currentTurn.MoveLocation, g);
+        moveBuidler(getBuilderInt(oldLocation), currentTurn.MoveLocation, g);
 
     }
 

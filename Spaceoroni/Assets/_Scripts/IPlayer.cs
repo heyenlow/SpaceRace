@@ -18,28 +18,28 @@ public abstract class IPlayer : MonoBehaviour
     {
         return (Coordinate.coordToString(Builder1.getLocation()) + Coordinate.coordToString(Builder2.getLocation()));
     }
-    public void moveBuidler(Coordinate from, Coordinate to, Game g)
+    public void moveBuidler(int Builder, Coordinate to, Game g)
     {
-        ///buggg
-        if (Builder1.getLocation() == from)
-        {
-            Builder1.move(to, g);
-        }
-        else if (Builder2.getLocation() == from)
-        {
-            Builder2.move(to, g);
-        }
+        Builder builderToMove = Builder == 1 ? Builder1 : Builder2;
 
+        builderToMove.move(to, g);
     }
-
-    //places builders at 0,0 and 0,1 if not a player
-    public string PlaceBuilder(int i, Game g)
-    {
-        moveBuidler(i == 1 ? Builder1.getLocation() : Builder2.getLocation(), i == 1 ? new Coordinate(0,0) : new Coordinate(0,1), g);
-        return getBuilderLocations();
-    }
-    public Turn getLastTurn()
+    
+    public virtual Turn getNextTurn()
     {
         return turns[turns.Count - 1];
+    }
+
+    public virtual string PlaceBuilder(int v, Game game)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int getBuilderInt(Coordinate location)
+    {
+        Debug.Log(getBuilderLocations() + " " + Coordinate.coordToString(location));
+        if (Coordinate.Equals(Builder1.getLocation(),location)) return 1;
+        if (Coordinate.Equals(Builder2.getLocation(),location)) return 2;
+        throw new Exception("No builder at this location");
     }
 }

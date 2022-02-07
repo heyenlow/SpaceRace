@@ -45,4 +45,11 @@ public class Coordinate
     {
         return (c.x < 5 && c.x > -1) && (c.y < 5 && c.y > -1);
     }
+
+    public static bool Equals(Coordinate a, Coordinate b)
+    {
+        return a.x == b.x && a.y == b.y;
+    }
+
+   
 }
