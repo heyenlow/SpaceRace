@@ -23,7 +23,7 @@ public class Level : MonoBehaviour
     private void OnMouseOver()
     {
         //GetComponent<Renderer>().material.color = highlightMaterial;
-        if (gameController.isHighlightObj(this.gameObject))
+        if (HighlightManager.isHighlightObj(this.gameObject))
         {
             resetMaterial();
         }
@@ -32,7 +32,7 @@ public class Level : MonoBehaviour
 
     private void OnMouseExit()
     {
-        if (gameController.isHighlightObj(this.gameObject))
+        if (HighlightManager.isHighlightObj(this.gameObject))
         {
             makeOpaque();
         }
@@ -40,9 +40,9 @@ public class Level : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (gameController.isHighlightObj(this.gameObject))
+        if (HighlightManager.isHighlightObj(this.gameObject))
         {
-            gameController.recieveLocationClick(Coordinate.stringToCoord(this.transform.parent.name));
+            Game.recieveLocationClick(Coordinate.stringToCoord(this.transform.parent.name));
             resetMaterial();
         }
     }

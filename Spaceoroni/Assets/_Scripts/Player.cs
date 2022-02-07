@@ -3,14 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : IPlayer
 {
 
-    Tuple<Builder, Builder> Builder;
     public GameObject Builder1GameObject;
     public GameObject Builder2GameObject;
-    Builder Builder1;
-    Builder Builder2;
+
+    private Turn currentTurn;
+
 
     // Start is called before the first frame update
     void Start()
@@ -25,36 +25,105 @@ public class Player : MonoBehaviour
 
     }
 
-    //used to place builders at the beginning of the game
-    public void PlaceBuilder(int i, Coordinate c)
+    public new IEnumerator PlaceBuilder(int i, Game g)
     {
-        Debug.Log("Player moving builder to the new location");
-        switch (i)
+        Debug.Log("Player: " + this.name + " Placing builder: " + i);
+        g.addAllLocationsWithoutBuildersToHighlight();
+        while (Game.clickLocation == null)
         {
-            case 1:
-                Builder1.move(c);
-                break;
-            case 2:
-                Builder2.move(c);
-                break; 
+            yield return new WaitForEndOfFrame();
+        }
+        Coordinate moveLocation = Game.clickLocation;
+        Game.clickLocation = null;
+
+        if (moveLocation != null)
+        {
+            moveBuidler(i == 1 ? Builder1.getLocation() : Builder2.getLocation(), moveLocation, g);
+
+            HighlightManager.highlightedObjects.Clear();
+        }
+        yield return true;
+    }
+
+    public IEnumerator SelectBuilder()
+    {
+        //Select Builder
+        Game.clickLocation = null;   //Reset click
+        HighlightManager.highlightPlayersBuilder(this);
+        while (Game.clickLocation == null)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+        currentTurn.BuilderLocation = Game.clickLocation;
+        Game.clickLocation = null;
+    }
+
+    public IEnumerator chooseMove(Game g)
+    {
+        List<string> allMoves = g.getAllPossibleMoves(currentTurn.BuilderLocation);
+
+        while (Game.clickLocation == null)
+        {
+            HighlightManager.highlightAllPossibleMoveLocations(allMoves);
+            yield return new WaitForEndOfFrame();
+        }
+
+        currentTurn.MoveLocation = Game.clickLocation;
+        Game.clickLocation = null;
+
+        HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
+
+        Coordinate oldLocation = currentTurn.BuilderLocation;
+
+        //bug vvvv
+        moveBuidler(oldLocation, currentTurn.MoveLocation, g);
+
+    }
+
+    public IEnumerator chooseBuild(Game g)
+    {
+
+        //Build Block
+        Game.clickLocation = null;
+        List<string> allBuilds = g.getAllPossibleBuilds(currentTurn.MoveLocation);
+        List<GameObject> allBuildLevels = g.getAllPossibleBuildLevels(allBuilds);
+
+        while (Game.clickLocation == null)
+        {
+            HighlightManager.highlightAllPossibleBuildLocations(allBuildLevels);
+            yield return new WaitForEndOfFrame();
+        }
+        currentTurn.BuildLocation = Game.clickLocation;
+        Game.clickLocation = null;
+
+        HighlightManager.unhighlightAllPossibleBuildLocations(allBuildLevels);
+
+    }
+
+    public override IEnumerator beginTurn(Game g)
+    {
+        currentTurn = new Turn();
+        
+        // after activation choose a builder
+        yield return StartCoroutine(SelectBuilder());
+
+        // after choosing a builder, find the best square you can move to from it.
+        yield return StartCoroutine(chooseMove(g));
+
+
+        // after choosing a move, need to find the best square to build on. What do I do about this?
+        if (g.isWin(currentTurn.MoveLocation))
+        {
+            currentTurn.isWin = true;
+            turns.Add(currentTurn);
+            yield return null;
+        }
+        else
+        {
+            yield return StartCoroutine(chooseBuild(g));
+            turns.Add(currentTurn);
         }
     }
 
-    public void moveBuidler(Coordinate from, Coordinate to)
-    {
-        if (Builder1.getLocation() == Coordinate.coordToString(from))
-        {
-            Builder1.move(to);
-        }
-        else if (Builder2.getLocation() == Coordinate.coordToString(from))
-        {
-            Builder2.move(to);
-        }
-    }
-
-    public string getBuilderLocations()
-    {
-        return (Builder1.getLocation() + Builder2.getLocation());
-    }
 
 }

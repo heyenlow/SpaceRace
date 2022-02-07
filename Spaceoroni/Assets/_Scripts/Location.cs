@@ -26,7 +26,7 @@ public class Location : MonoBehaviour
     private void OnMouseOver()
     {
         //GetComponent<Renderer>().material.color = highlightMaterial;
-        if(gameController.isHighlightObj(this.gameObject)) 
+        if(HighlightManager.isHighlightObj(this.gameObject)) 
         {
             if (GetComponent<Renderer>().material.color != highlightColor) { startColor = GetComponent<Renderer>().material.color; }
             GetComponent<Renderer>().material.color = highlightColor;
@@ -35,7 +35,7 @@ public class Location : MonoBehaviour
 
     private void OnMouseExit()
     {
-        if (gameController.isHighlightObj(this.gameObject))
+        if (HighlightManager.isHighlightObj(this.gameObject))
         {
             GetComponent<Renderer>().material.color = startColor;
         }
@@ -43,9 +43,9 @@ public class Location : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (gameController.isHighlightObj(this.gameObject)) 
+        if (HighlightManager.isHighlightObj(this.gameObject)) 
         {
-            gameController.recieveLocationClick(Coordinate.stringToCoord(this.name));
+            Game.recieveLocationClick(Coordinate.stringToCoord(this.name));
             resetMaterial();
         }
     }

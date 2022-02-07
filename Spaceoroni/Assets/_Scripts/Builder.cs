@@ -5,40 +5,61 @@ using UnityEngine;
 public class Builder : MonoBehaviour
 {
     Coordinate coord = new Coordinate();
-    Game gameController;
     Material startMaterial;
+    GameObject movingBuilder;
+    Vector3 newLocation;
+    public float Speed = 5;
+
 
     // Start is called before the first frame update
     void Start()
     {
-        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<Game>();
         startMaterial = this.GetComponent<Renderer>().material;
-
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (movingBuilder != null)
+        {
+            movingBuilder.transform.position = Vector3.MoveTowards(movingBuilder.transform.position, newLocation, Speed * Time.deltaTime);
 
+            if (movingBuilder.transform.position == newLocation) movingBuilder = null;
+        }
     }
 
-    public void move(Coordinate c)
+    public void move(Coordinate c, Game g)
     {
-        gameController.moveToNewSquare(this.gameObject, gameController.findSquare(c)); //moves the object to the new square
+        moveBuilderToNewSquare(this.gameObject, findSquare(c), g); //moves the object to the new square
         coord.x = c.x;
         coord.y = c.y;
     }
 
-    public string getLocation()
+    public void moveBuilderToNewSquare(GameObject GamePiece, GameObject Square, Game g)
     {
-        return Coordinate.coordToString(coord);
+        Coordinate coordinateOfSquare = Coordinate.stringToCoord(Square.name);
+        //this next line will need to be adjusted for the height of each level object
+        Vector3 heightDiff = new Vector3(0, (g.heightAtCoordinate(coordinateOfSquare)), 0);
+        newLocation = Square.transform.position + heightDiff;
+        movingBuilder = GamePiece;
+    }
+
+    public GameObject findSquare(Coordinate c)
+    {
+        return GameObject.Find(Coordinate.coordToString(c));
+    }
+
+
+    public Coordinate getLocation()
+    {
+        return coord;
     }
 
     private void OnMouseOver()
     {
-        if (gameController.isHighlightObj(this.gameObject))
+        if (HighlightManager.isHighlightObj(this.gameObject))
         {
-            GetComponent<Renderer>().material = gameController.getHighlightMat();
+            GetComponent<Renderer>().material = HighlightManager.getHighlightMat();
         }
     }
 
@@ -51,6 +72,6 @@ public class Builder : MonoBehaviour
     void OnMouseDown()
     {
         //Output to console the clicked GameObject's name and the following message. You can replace this with your own actions for when clicking the GameObject.
-        if(gameController.isHighlightObj(this.gameObject)) gameController.recieveLocationClick(coord);
+        if(HighlightManager.isHighlightObj(this.gameObject)) Game.recieveLocationClick(coord);
     }
 }

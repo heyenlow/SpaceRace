@@ -5,101 +5,77 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
-    public Material highlight;
-    public Material possibleHighlight;
 
     int[,] Board;
-    public GameObject Player1Object;
-    public GameObject Player2Object;
     Player Player1;
-    Player Player2;
-    Player Winner;
-    Player TurnPlayer;
-    public float Speed;
+    IPlayer Player2;
 
-    [Header("Test Objects")]
+    public static Coordinate clickLocation;
 
-    private List<GameObject> highlightedObjects = new List<GameObject>();
-    Coordinate clickLocation;
-
-    GameObject movingBuilder;
-    Vector3 newLocation;
-    private bool GameRunning = false;
-
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        Winner = null;
         Board = new int[5, 5];
-        Player1 = Player1Object.GetComponent<Player>();
-        Player2 = Player2Object.GetComponent<Player>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        //gotta wait for the other objects to be set
-        if (Input.GetKeyDown("space") && !GameRunning) StartCoroutine(NewGame());
-
-        if (movingBuilder != null)
-        {
-            movingBuilder.transform.position = Vector3.MoveTowards(movingBuilder.transform.position, newLocation, Speed * Time.deltaTime);
-
-            if (movingBuilder.transform.position == newLocation) movingBuilder = null;
-        }
-    }
-
-    IEnumerator NewGame()
-    {
-        Debug.Log("Starting New Game.");
-        GameRunning = true;
+        Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
+        Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
         ClearBoard();
+        StartCoroutine(PlayGameToEnd());
+    }
 
-        /*
-        BuildLevel(Coordinate.stringToCoord("E1"));
+    public bool processTurnString(Turn turn, IPlayer curPlayer, Game g)
+    {
+        //players already move the builders
+        if (curPlayer is Player){ }
+        else curPlayer.moveBuidler(turn.BuilderLocation, turn.MoveLocation, g);
+       
+        // If not over Where to build?
+        if (!turn.isWin)
+        {
+            BuildLevel(turn.BuildLocation);
+        }
 
-        BuildLevel(Coordinate.stringToCoord("E2"));
-        BuildLevel(Coordinate.stringToCoord("E2"));
+        // build should be completed?
+        return true;
+    }
 
-        BuildLevel(Coordinate.stringToCoord("E3"));
-        BuildLevel(Coordinate.stringToCoord("E3"));
-        BuildLevel(Coordinate.stringToCoord("E3"));
-
-        BuildLevel(Coordinate.stringToCoord("E4"));
-        BuildLevel(Coordinate.stringToCoord("E4"));
-        BuildLevel(Coordinate.stringToCoord("E4"));
-        BuildLevel(Coordinate.stringToCoord("E4"));
-        */
+    public IEnumerator PlayGameToEnd()
+    {
+        IPlayer curPlayer;
+        IPlayer winner = null;
+        bool won = false;
 
         yield return null;
         yield return StartCoroutine(PlaceBuilders());
-        Debug.Log("Done Placing Builders");
-        yield return StartCoroutine(RunGame());
-    }
-    IEnumerator RunGame()
-    {
-        while (Winner == null)
+
+        // Play until we have a winner or tie?
+        for (int moveNum = 0; winner == null; moveNum++)
         {
-            yield return StartCoroutine(Turn(Player1));
+
+            // Determine who's turn it is.
+            curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
+
+            // string turn BUILDERMOVEBUILD string
+            if (curPlayer is Player)
+            {
+                 yield return StartCoroutine(curPlayer.beginTurn(this));
+            }
+
+            // update the board with the current player's move
+            Debug.Log(curPlayer.getLastTurn().ToString());
+            processTurnString(curPlayer.getLastTurn(), curPlayer, this);
+
+            if (won == true)
+                winner = curPlayer;
 
         }
-        yield return null;
+        yield return winner;
     }
 
-    public void moveToNewSquare(GameObject GamePiece, GameObject Square)
-    {
-        Coordinate coordinateOfSquare = Coordinate.stringToCoord(Square.name);
-        //this next line will need to be adjusted for the height of each level object
-        Vector3 heightDiff = new Vector3(0, (heightAtCoordinate(coordinateOfSquare)), 0);
-        newLocation = Square.transform.position + heightDiff;
-        movingBuilder = GamePiece;
-    }
 
     //returns the board height at a given coordinate
-    float heightAtCoordinate(Coordinate c)
+    public float heightAtCoordinate(Coordinate c)
     {
         //The Scale Y * 2 of the level object
-        const float gamepeiceHeight = (float) 0.35;
+        const float gamepeiceHeight = (float)0.35;
         const float level0Height = (float)0.5001;
         const float level1Height = (float)0.5;
         const float level2Height = (float)0.4;
@@ -131,42 +107,22 @@ public class Game : MonoBehaviour
         return newHeightToMoveTo;
     }
 
-    IEnumerator PlaceBuilders()
+    private IEnumerator PlaceBuilders()
     {
-        yield return StartCoroutine(PlaceBuilder(Player1, 1));
-        yield return StartCoroutine(PlaceBuilder(Player2, 1));
-        yield return StartCoroutine(PlaceBuilder(Player2, 2));
-        yield return StartCoroutine(PlaceBuilder(Player1, 2));
+        yield return StartCoroutine(Player1.PlaceBuilder(1, this));
+        yield return StartCoroutine(Player2.PlaceBuilder(1, this));
+        yield return StartCoroutine(Player2.PlaceBuilder(2, this));
+        yield return StartCoroutine(Player1.PlaceBuilder(2, this));
         yield return null;
     }
 
-    private IEnumerator PlaceBuilder(Player p, int i)
-    {
-        Debug.Log("Player: " + p + " Placing builder: " + i);
-        Debug.Log("waiting for location.....");
-        addAllLocationsWithoutBuildersToHighlight();
-        while (clickLocation == null)
-        {
-            yield return new WaitForEndOfFrame();
-        }
-        if (clickLocation != null)
-        {
-            Debug.Log("new location is: " + Coordinate.coordToString(clickLocation));
-            p.PlaceBuilder(i, clickLocation);
-
-            clickLocation = null;
-            highlightedObjects.Clear();
-        }
-        yield return true;
-    }
-
-    private void addAllLocationsWithoutBuildersToHighlight()
+    public void addAllLocationsWithoutBuildersToHighlight()
     {
         var locations = GameObject.FindGameObjectsWithTag("Square");
         var buildersLocations = getAllBuildersString();
         foreach (var l in locations)
         {
-            if (!buildersLocations.Contains(l.name)) { highlightedObjects.Add(l); }
+            if (!buildersLocations.Contains(l.name)) { HighlightManager.highlightedObjects.Add(l); }
         }
     }
 
@@ -183,104 +139,22 @@ public class Game : MonoBehaviour
     }
 
     //increase a location to 0
-    void BuildLevel(Coordinate c)
+    public void BuildLevel(Coordinate c)
     {
-        Debug.Log(c);
         Board[c.x, c.y] += 1;
         GameObject level = GameObject.Find(Coordinate.coordToString(c));
-        level.transform.GetChild(Board[c.x,c.y] - 1).gameObject.SetActive(true);
+        level.transform.GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
     }
 
-    bool isWin(Coordinate c)
+    public bool isWin(Coordinate c)
     {
         return Board[c.x, c.y] == 3;
-    }
-
-    IEnumerator Turn(Player p)
-    {
-        TurnPlayer = p;
-        Coordinate builderLocation = null;
-        Coordinate moveLocation = null;
-        Coordinate buildLocation = null;
-
-    //Select Builder
-        clickLocation = null;   //Reset click
-        highlightPlayersBuilder(TurnPlayer);
-        while (clickLocation == null)
-        {
-            yield return new WaitForEndOfFrame();
-        }
-        builderLocation = clickLocation;
-        clickLocation = null;
-
-
-        List<string> allMoves = getAllPossibleMoves(builderLocation);
-
-    //Move Builder
-        Debug.Log("Waiting for move");
-        while (clickLocation == null)
-        {
-            highlightAllPossibleMoveLocations(allMoves);
-            yield return new WaitForEndOfFrame();
-        }
-
-        moveLocation = clickLocation;
-        Debug.Log(Coordinate.coordToString(moveLocation));
-        unhighlightAllPossibleMoveLocations(allMoves);
-        p.moveBuidler(builderLocation, moveLocation);
-
-
-    //Check win
-        if (isWin(moveLocation))
-        {
-            //TODO: Endgame function
-            Debug.Log("WIN!!!");
-        }
-        else
-        {
-            if (moveLocation != null)
-            {
-                //Build Block
-                clickLocation = null;
-                List<string> allBuilds = getAllPossibleBuilds(moveLocation);
-                List<GameObject> allBuildLevels = getAllPossibleBuildLevels(allBuilds);
-
-                while (clickLocation == null)
-                {
-                    highlightAllPossibleBuildLocations(allBuildLevels);
-                    yield return new WaitForEndOfFrame();
-                }
-                buildLocation = clickLocation;
-                unhighlightAllPossibleBuildLocations(allBuildLevels);
-                BuildLevel(buildLocation);
-
-
-                //Next Players turn
-                if (p == Player1)
-                {
-                    yield return StartCoroutine(Turn(Player2));
-                }
-                else
-                {
-                    yield return StartCoroutine(Turn(Player1));
-                }
-            }
-
-            
-        }
-    }
-
-    // MARKED FOR DEPRECATION ?
-    Tuple<string, string> getAllBuilderLocations()
-    {
-        return new Tuple<string, string>(Player1.getBuilderLocations(), Player2.getBuilderLocations());
     }
 
     // PULLS 4 BUILDER LOCATIONS and returns string ie. A2B3C4D3
     string getAllBuildersString()
     {
-        var b = getAllBuilderLocations();
-        return b.Item1 + b.Item2;
+        return Player1.getBuilderLocations() + Player2.getBuilderLocations();
     }
 
     //makes sure there are no builders in that location
@@ -342,60 +216,10 @@ public class Game : MonoBehaviour
     }
     //takes a list of possible moves and highlights the moves
 
-    private void highlightPossibleMoveLocations(Coordinate location)
-    {
-        GameObject obj = GameObject.Find(Coordinate.coordToString(location));
-        obj.GetComponent<Renderer>().material = possibleHighlight;
-        highlightedObjects.Add(obj);
-    }
-    private void highlightAllPossibleMoveLocations(List<string> locations)
-    {
-        foreach (string coord in locations)
-        {
-            GameObject obj = GameObject.Find(coord);
-            obj.GetComponent<Renderer>().material = possibleHighlight;
-            highlightedObjects.Add(obj);
-        }
-    }
-    private void unhighlightAllPossibleMoveLocations(List<string> locations)
-    {
-        foreach (string coord in locations)
-        {
-            GameObject obj = GameObject.Find(coord);
-            obj.GetComponent<Location>().resetMaterial();
-            highlightedObjects.Remove(obj);
-        }
-    }
-
-    private void highlightAllPossibleBuildLocations(List<GameObject> Levels)
-    {
-        foreach (GameObject l in Levels)
-        {
-            l.SetActive(true);
-            l.GetComponent<Level>().makeOpaque();
-            highlightedObjects.Add(l);
-        }
-    }
-
-    private void unhighlightAllPossibleBuildLocations(List<GameObject> Levels)
-    {
-        foreach (GameObject l in Levels)
-        {
-            l.SetActive(false);
-            l.GetComponent<Level>().resetMaterial();
-            highlightedObjects.Remove(l);
-        }
-    }
-    private void highlightPlayersBuilder(Player p)
-    {
-        highlightedObjects.Add(p.Builder1GameObject);
-        highlightedObjects.Add(p.Builder2GameObject);
-    }
-
-    public void recieveLocationClick(Coordinate location)
+    public static void recieveLocationClick(Coordinate location)
     {
         clickLocation = location;
-        highlightedObjects.Clear();
+        HighlightManager.highlightedObjects.Clear();
     }
 
     public GameObject findSquare(Coordinate c)
@@ -403,18 +227,4 @@ public class Game : MonoBehaviour
         return GameObject.Find(Coordinate.coordToString(c));
     }
 
-    public bool isTurn(Coordinate c)
-    {
-        return TurnPlayer.getBuilderLocations().Contains(Coordinate.coordToString(c));
-    }
-
-    public Material getHighlightMat()
-    {
-        return highlight;
-    }
-
-    public bool isHighlightObj(GameObject obj)
-    {
-        return highlightedObjects.Contains(obj);
-    }
 }
