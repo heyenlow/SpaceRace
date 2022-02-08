@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
-
     int[,] Board;
     Player Player1;
     IPlayer Player2;
@@ -74,7 +73,6 @@ public class Game : MonoBehaviour
         }
         yield return winner;
     }
-
 
     //returns the board height at a given coordinate
     public float heightAtCoordinate(Coordinate c)

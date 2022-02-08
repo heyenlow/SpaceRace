@@ -37,7 +37,6 @@ public abstract class IPlayer : MonoBehaviour
 
     public int getBuilderInt(Coordinate location)
     {
-        Debug.Log(getBuilderLocations() + " " + Coordinate.coordToString(location));
         if (Coordinate.Equals(Builder1.getLocation(),location)) return 1;
         if (Coordinate.Equals(Builder2.getLocation(),location)) return 2;
         throw new Exception("No builder at this location");

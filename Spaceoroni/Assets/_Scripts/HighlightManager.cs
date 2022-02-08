@@ -2,23 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HighlightManager : MonoBehaviour
+public static class HighlightManager
 {
     public static List<GameObject> highlightedObjects = new List<GameObject>();
     private static Material highlight;
     private static Material possibleHighlight;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public static void highlightPossibleMoveLocations(Coordinate location)
     {

@@ -30,4 +30,9 @@ public class Turn
     {
         return Coordinate.coordToString(BuilderLocation) + Coordinate.coordToString(MoveLocation) + Coordinate.coordToString(BuildLocation);
     }
+
+    public Turn(string s) 
+    {
+        new Turn(Coordinate.stringToCoord(s.Substring(0, 2)), Coordinate.stringToCoord(s.Substring(2, 2)), Coordinate.stringToCoord(s.Substring(4, 2)));
+    }
 }

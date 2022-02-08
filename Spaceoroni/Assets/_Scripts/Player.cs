@@ -8,9 +8,7 @@ public class Player : IPlayer
 
     public GameObject Builder1GameObject;
     public GameObject Builder2GameObject;
-
     private Turn currentTurn;
-
 
     // Start is called before the first frame update
     void Start()
@@ -72,9 +70,8 @@ public class Player : IPlayer
 
         HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
 
-        Coordinate oldLocation = currentTurn.BuilderLocation;
         //bug vvvv
-        moveBuidler(getBuilderInt(oldLocation), currentTurn.MoveLocation, g);
+        moveBuidler(getBuilderInt(currentTurn.BuilderLocation), currentTurn.MoveLocation, g);
 
     }
 
@@ -122,6 +119,5 @@ public class Player : IPlayer
             turns.Add(currentTurn);
         }
     }
-
 
 }
