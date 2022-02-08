@@ -8,22 +8,27 @@ public static class GameSettings
     {
         Multiplayer,
         Singleplayer,
-        Tutorial
+        Tutorial,
+        NotSet
     };
 
     public enum AIDifficulty
     {
         Easy,
         Med,
-        Hard
+        Hard,
+        NotSet
     };
     public enum NetworkMode
     {
         Host,
-        Join
+        Join,
+        NotSet
     };
 
     public static GameType gameType { get; set; }
     public static AIDifficulty difficulty { get; set; }
     public static NetworkMode netMode { get; set; }
+
+    public static void setGameModeTutorial() { gameType = GameType.Tutorial; }
 }

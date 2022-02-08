@@ -20,6 +20,12 @@ public class Game : MonoBehaviour
         StartCoroutine(PlayGameToEnd());
     }
 
+    //will get called by the main menu
+    public void startGame()
+    {
+
+    }
+
     public bool processTurnString(Turn turn, IPlayer curPlayer, Game g)
     {
         //players already move the builders

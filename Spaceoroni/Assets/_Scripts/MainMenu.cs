@@ -1,31 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+
 
 public class MainMenu : MonoBehaviour
 {
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start(){
         
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update(){
         
     }
 
-    public void HowToPlay(){
-        SceneManager.LoadScene("Scene1");
-    }
-    
+    public void setGameModeTutorial() { GameSettings.gameType = GameSettings.GameType.Tutorial; }
+    public void setGameModeSinglePlayer() { GameSettings.gameType = GameSettings.GameType.Singleplayer; }
+    public void setGameModeMultiplayer() { GameSettings.gameType = GameSettings.GameType.Multiplayer; }
+    public void GameModeClear() { GameSettings.gameType = GameSettings.GameType.Singleplayer; }
 
-    public void Play(){
-        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCamera();
-    }
 
+    //move the camera
+    //start the game
+    public void Play()
+    {
+        
+    }
     public void QuitButton(){
         Debug.Log("Quit");
         Application.Quit();
