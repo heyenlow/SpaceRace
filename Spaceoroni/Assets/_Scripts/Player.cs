@@ -58,20 +58,35 @@ public class Player : IPlayer
     public IEnumerator chooseMove(Game g)
     {
         List<string> allMoves = g.getAllPossibleMoves(currentTurn.BuilderLocation);
-
-        while (Game.clickLocation == null)
+        
+        if(g.canMove(currentTurn.BuilderLocation))
         {
-            HighlightManager.highlightAllPossibleMoveLocations(allMoves);
-            yield return new WaitForEndOfFrame();
+            while (Game.clickLocation == null)
+            {
+                HighlightManager.highlightAllPossibleMoveLocations(allMoves);
+                yield return new WaitForEndOfFrame();
+            }
+
+            currentTurn.MoveLocation = Game.clickLocation;
+            Game.clickLocation = null;
+
+            HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
+
+            if (g.canBuild(currentTurn.BuilderLocation))
+            {
+                moveBuidler(getBuilderInt(currentTurn.BuilderLocation), currentTurn.MoveLocation, g);
+            }
+            else
+            {
+                currentTurn.canPerformTurn = false;
+                Debug.Log("Cant Build");
+            }   
         }
-
-        currentTurn.MoveLocation = Game.clickLocation;
-        Game.clickLocation = null;
-
-        HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
-
-        //bug vvvv
-        moveBuidler(getBuilderInt(currentTurn.BuilderLocation), currentTurn.MoveLocation, g);
+        else
+        {
+            currentTurn.canPerformTurn = false;
+            Debug.Log("Cant Move");
+        }
 
     }
 
@@ -107,7 +122,14 @@ public class Player : IPlayer
 
 
         // after choosing a move, need to find the best square to build on. What do I do about this?
-        if (g.isWin(currentTurn.MoveLocation))
+        if (!currentTurn.canPerformTurn)
+        {
+            turns.Add(currentTurn);
+            Debug.Log("YOU LOST");
+            getNextTurn().isWin = true;
+            yield return null;
+        }
+        else if (g.isWin(currentTurn.MoveLocation))
         {
             currentTurn.isWin = true;
             turns.Add(currentTurn);

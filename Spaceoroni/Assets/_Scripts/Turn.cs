@@ -8,6 +8,7 @@ public class Turn
     public Coordinate MoveLocation;
     public Coordinate BuildLocation;
     public bool isWin = false;
+    public bool canPerformTurn = true;
 
     public Turn(Coordinate builderLocation, Coordinate moveLocation, Coordinate buildLocation)
     {

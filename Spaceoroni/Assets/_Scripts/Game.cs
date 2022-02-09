@@ -8,6 +8,7 @@ public class Game : MonoBehaviour
     int[,] Board;
     Player Player1;
     IPlayer Player2;
+    //Player Player2;
 
     public static Coordinate clickLocation;
 
@@ -16,6 +17,7 @@ public class Game : MonoBehaviour
         Board = new int[5, 5];
         Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
         Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
+        //TEST Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
         ClearBoard();
         StartCoroutine(PlayGameToEnd());
     }
@@ -70,7 +72,8 @@ public class Game : MonoBehaviour
 
             // update the board with the current player's move
             Turn t = curPlayer.getNextTurn();
-            Debug.Log(t.ToString());
+            Debug.Log(curPlayer + t.ToString());
+            //TEST yield return StartCoroutine(curPlayer.beginTurn(this));
             processTurnString(t, curPlayer, this);
 
             if (won == true)
@@ -119,6 +122,8 @@ public class Game : MonoBehaviour
     private IEnumerator PlaceBuilders()
     {
         yield return StartCoroutine(Player1.PlaceBuilder(1, this));
+        //TEST yield return StartCoroutine(Player2.PlaceBuilder(1, this));
+        //TEST yield return StartCoroutine(Player2.PlaceBuilder(2, this));
         Player2.PlaceBuilder(1, this);
         Player2.PlaceBuilder(2, this);
         yield return StartCoroutine(Player1.PlaceBuilder(2, this));
@@ -158,6 +163,20 @@ public class Game : MonoBehaviour
     public bool isWin(Coordinate c)
     {
         return Board[c.x, c.y] == 3;
+    }
+
+    public bool canMove(Coordinate c)
+    {
+        int possibleMoves = getAllPossibleMoves(c).Count;
+
+        return (possibleMoves > 0);
+    }
+
+    public bool canBuild(Coordinate c)
+    {
+        int possibleBuilds = getAllPossibleBuilds(c).Count;
+
+        return (possibleBuilds > 0);
     }
 
     // PULLS 4 BUILDER LOCATIONS and returns string ie. A2B3C4D3
