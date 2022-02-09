@@ -125,18 +125,19 @@ public class Player : IPlayer
         if (!currentTurn.canPerformTurn)
         {
             turns.Add(currentTurn);
-            Debug.Log("YOU LOST");
-            getNextTurn().isWin = true;
+            g.playerState = Game.PlayerState.Loser;
             yield return null;
         }
         else if (g.isWin(currentTurn.MoveLocation))
         {
             currentTurn.isWin = true;
             turns.Add(currentTurn);
+            g.playerState = Game.PlayerState.Loser;
             yield return null;
         }
         else
         {
+            g.playerState = Game.PlayerState.Playing;
             yield return StartCoroutine(chooseBuild(g));
             turns.Add(currentTurn);
         }

@@ -5,19 +5,28 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
+    public enum PlayerState
+    {
+        Winner,
+        Loser,
+        Playing
+    };
+    public PlayerState playerState { get; set; }
+
     int[,] Board;
     Player Player1;
+    //Testing Player Player2;
     IPlayer Player2;
-    //Player Player2;
 
     public static Coordinate clickLocation;
 
     private void Start()
     {
         Board = new int[5, 5];
+        playerState = PlayerState.Playing;
         Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
         Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
-        //TEST Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
+        //Testing Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
         ClearBoard();
         StartCoroutine(PlayGameToEnd());
     }
@@ -48,10 +57,9 @@ public class Game : MonoBehaviour
     {
         IPlayer curPlayer;
         IPlayer winner = null;
-        bool won = false;
 
         yield return null;
-        yield return StartCoroutine(PlaceBuilders());
+        yield return StartCoroutine(PlaceBuilders()); 
 
         // Play until we have a winner or tie?
         for (int moveNum = 0; winner == null; moveNum++)
@@ -60,24 +68,33 @@ public class Game : MonoBehaviour
             // Determine who's turn it is.
             curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
 
-            // string turn BUILDERMOVEBUILD string
-            if (curPlayer is Player)
+            //Check if last turn lost
+            if (playerState == PlayerState.Loser)
             {
-                 yield return StartCoroutine(curPlayer.beginTurn(this));
+                winner = curPlayer;
             }
             else
             {
-                yield return new WaitForSeconds(2);
+                // string turn BUILDERMOVEBUILD string
+                if (curPlayer is Player)
+                {
+                    yield return StartCoroutine(curPlayer.beginTurn(this));
+                }
+                else
+                {
+                    yield return new WaitForSeconds(2);
+                }
+
+                // update the board with the current player's move
+                Turn t = curPlayer.getNextTurn();
+                Debug.Log(t.ToString()); //BUG
+                processTurnString(t, curPlayer, this);
+                //Testing yield return StartCoroutine(curPlayer.beginTurn(this));
+
+                //Check if win
+                if(playerState == PlayerState.Winner)
+                        winner = curPlayer;
             }
-
-            // update the board with the current player's move
-            Turn t = curPlayer.getNextTurn();
-            Debug.Log(curPlayer + t.ToString());
-            //TEST yield return StartCoroutine(curPlayer.beginTurn(this));
-            processTurnString(t, curPlayer, this);
-
-            if (won == true)
-                winner = curPlayer;
 
         }
         yield return winner;
@@ -122,8 +139,8 @@ public class Game : MonoBehaviour
     private IEnumerator PlaceBuilders()
     {
         yield return StartCoroutine(Player1.PlaceBuilder(1, this));
-        //TEST yield return StartCoroutine(Player2.PlaceBuilder(1, this));
-        //TEST yield return StartCoroutine(Player2.PlaceBuilder(2, this));
+        //Testing yield return StartCoroutine(Player2.PlaceBuilder(1, this));
+        //Testing yield return StartCoroutine(Player2.PlaceBuilder(2, this));
         Player2.PlaceBuilder(1, this);
         Player2.PlaceBuilder(2, this);
         yield return StartCoroutine(Player1.PlaceBuilder(2, this));
