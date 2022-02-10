@@ -106,9 +106,9 @@ public class Game : MonoBehaviour
         //The Scale Y * 2 of the level object
         const float gamepeiceHeight = (float)0.35;
         const float level0Height = (float)0.5001;
-        const float level1Height = (float)0.5;
-        const float level2Height = (float)0.4;
-        const float level3Height = (float)0.3;
+        const float level1Height = (float)1;
+        const float level2Height = (float)1;
+        const float level3Height = (float)1;
         const float level4Height = (float)0.000;
 
         float newHeightToMoveTo = 0;

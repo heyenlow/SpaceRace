@@ -4,14 +4,9 @@ using UnityEngine;
 
 public class Level : MonoBehaviour
 {
-    Game gameController;
-    Material startMaterial;
-
     // Start is called before the first frame update
     void Start()
     {
-        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<Game>();
-        startMaterial = this.GetComponent<Renderer>().material;
     }
 
     // Update is called once per frame
@@ -22,6 +17,8 @@ public class Level : MonoBehaviour
 
     private void OnMouseOver()
     {
+        Debug.Log(this.transform.parent.name);
+
         //GetComponent<Renderer>().material.color = highlightMaterial;
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
@@ -40,6 +37,7 @@ public class Level : MonoBehaviour
 
     void OnMouseDown()
     {
+        Debug.Log(this.transform.parent.name);
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
             Game.recieveLocationClick(Coordinate.stringToCoord(this.transform.parent.name));
@@ -49,13 +47,20 @@ public class Level : MonoBehaviour
 
     public void makeOpaque()
     {
-        this.GetComponent<Renderer>().material.shader = Shader.Find("Unlit/Transparent");
+        var childRenderers = this.gameObject.GetComponentsInChildren<Renderer>();
+        foreach (var rend in childRenderers)
+        {
+            rend.material.shader = Shader.Find("Unlit/Transparent");
+        }
     }
 
     public void resetMaterial()
     {
-        this.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
-        GetComponent<Renderer>().material = startMaterial;
+        var childRenderers = this.gameObject.GetComponentsInChildren<Renderer>();
+        foreach (var rend in childRenderers)
+        {
+            rend.material.shader = Shader.Find("Standard");
+        }
     }
 
 }
