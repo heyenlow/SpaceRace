@@ -50,7 +50,7 @@ public class Level : MonoBehaviour
         var childRenderers = this.gameObject.GetComponentsInChildren<Renderer>();
         foreach (var rend in childRenderers)
         {
-            rend.material.shader = Shader.Find("Unlit/Transparent");
+            rend.material.shader = Shader.Find("Ultimate 10+ Shaders/Force Field");
         }
     }
 

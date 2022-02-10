@@ -59,13 +59,13 @@ public class Builder : MonoBehaviour
     {
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
-            GetComponent<Renderer>().material = HighlightManager.getHighlightMat();
+            GetComponent<Renderer>().material.shader = Shader.Find("Ultimate 10+ Shaders/Outline");
         }
     }
 
     private void OnMouseExit()
     {
-        GetComponent<Renderer>().material = startMaterial;
+        GetComponent<Renderer>().material.shader = Shader.Find("Standard");
     }
 
 
