@@ -35,6 +35,8 @@ public class StringPlayer : IPlayer
         moveString.Add("A0B0B1");
         moveString.Add("A1B1B2");
         moveString.Add("B0C0C1");
+        moveString.Add("C0D0C1");
+        moveString.Add("B1B0C1");
 
 
         foreach (string s in moveString)

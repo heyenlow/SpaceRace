@@ -23,12 +23,8 @@ public class CameraMovement : MonoBehaviour
         //this.transform.position = EntryScreenCameraPostition;
         //this.transform.rotation = EntryScreenCameraAngle;
 
-        //TEST
-        //GameObject.Find("Main Camera").transform.position = new Vector3((float)2.24000001, (float)4.86000013, (float)-2.77999997);
-        //GameObject.Find("Main Camera").transform.rotation = new Quaternion((float)0.42261827, 0, 0, (float)0.906307876);
-
-        //Testing gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<Game>();
-        //Testing GameBoardLocation = GameObject.Find("GameBoardCameraLocation").transform;
+        //gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<Game>();
+        //GameBoardLocation = GameObject.Find("GameBoardCameraLocation").transform;
     }
 
     // Update is called once per frame
@@ -45,7 +41,7 @@ public class CameraMovement : MonoBehaviour
 
     public void moveCamera()
     {
-        newLocation = GameBoardCameraPostion;
-        movingCamera = this.gameObject;
+        GameObject.Find("Main Camera").transform.position = new Vector3((float)2.24000001, (float)4.86000013, (float)-2.77999997);
+        GameObject.Find("Main Camera").transform.rotation = new Quaternion((float)0.42261827, 0, 0, (float)0.906307876);
     }
 }
