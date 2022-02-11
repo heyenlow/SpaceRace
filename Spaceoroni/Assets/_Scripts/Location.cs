@@ -9,6 +9,7 @@ public class Location : MonoBehaviour
     private Color startColor;
     private Color highlightColor;
     private Color originalColor;
+    private GameObject movingRocket;
     // Start is called before the first frame update
     void Start()
     {
@@ -17,10 +18,10 @@ public class Location : MonoBehaviour
         highlightColor = new Color(0, 145, 255);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void blastOffRocket()
     {
-        
+        var rocket = this.GetComponentInChildren<Rocket>();
+        rocket.blastOffRocket();
     }
 
     private void OnMouseOver()
