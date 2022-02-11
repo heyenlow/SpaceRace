@@ -6,17 +6,16 @@ public class StringPlayer : IPlayer
 {
     public GameObject Builder1GameObject;
     public GameObject Builder2GameObject;
-    Coordinate startLocationBuilder1 = new Coordinate(0, 0);
-    Coordinate startLocationBuilder2 = new Coordinate(0, 1);
-
-    int turnCount = 0;
+    Coordinate startLocationBuilder1;
+    Coordinate startLocationBuilder2;
+    public int playerI;
 
     // Start is called before the first frame update
     void Start()
     {
         Builder1 = Builder1GameObject.GetComponent<Builder>();
         Builder2 = Builder2GameObject.GetComponent<Builder>();
-        addMoves();
+        setBuilderLocations();
     }
 
     // Update is called once per frame
@@ -29,21 +28,14 @@ public class StringPlayer : IPlayer
         throw new System.NotImplementedException();
     }
 
-    public void addMoves()
+    private void setBuilderLocations()
     {
-        List<string> moveString = new List<string>();
-        moveString.Add("A0B0B1");
-        moveString.Add("A1B1B2");
-        moveString.Add("B0C0C1");
-        moveString.Add("C0D0C1");
-        moveString.Add("B1B0C1");
+        string s = Game.getStartLocations(playerI);
+        startLocationBuilder1 = Coordinate.stringToCoord(s.Substring(0, 2));
+        startLocationBuilder2 = Coordinate.stringToCoord(s.Substring(2, 2));
 
-
-        foreach (string s in moveString)
-        {
-            turns.Add(new Turn(Coordinate.stringToCoord(s.Substring(0, 2)), Coordinate.stringToCoord(s.Substring(2, 2)), Coordinate.stringToCoord(s.Substring(4, 2))));
-        }
     }
+
 
     //places builders at 0,0 and 0,1 if not a player
     public override string PlaceBuilder(int i, Game g)
@@ -54,6 +46,7 @@ public class StringPlayer : IPlayer
 
     public override Turn getNextTurn()
     {
-        return turns[turnCount++];
+        Turn t = new Turn(Game.getMoves());
+        return t;
     }
 }
