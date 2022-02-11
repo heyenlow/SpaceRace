@@ -34,6 +34,8 @@ public class Turn
 
     public Turn(string s) 
     {
-        new Turn(Coordinate.stringToCoord(s.Substring(0, 2)), Coordinate.stringToCoord(s.Substring(2, 2)), Coordinate.stringToCoord(s.Substring(4, 2)));
+        BuilderLocation = Coordinate.stringToCoord(s.Substring(0, 2));
+        MoveLocation = Coordinate.stringToCoord(s.Substring(2, 2));
+        BuildLocation = Coordinate.stringToCoord(s.Substring(4, 2));
     }
 }
