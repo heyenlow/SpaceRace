@@ -26,7 +26,7 @@ public class Game : MonoBehaviour
 
     private void Start()
     {
-        GameSettings.gameType = GameSettings.GameType.Watch;
+        GameSettings.gameType = GameSettings.GameType.Multiplayer;
 
 
         Board = new int[5, 5];

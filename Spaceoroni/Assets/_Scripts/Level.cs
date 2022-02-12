@@ -17,8 +17,6 @@ public class Level : MonoBehaviour
 
     private void OnMouseOver()
     {
-        Debug.Log(this.transform.parent.name);
-
         //GetComponent<Renderer>().material.color = highlightMaterial;
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
