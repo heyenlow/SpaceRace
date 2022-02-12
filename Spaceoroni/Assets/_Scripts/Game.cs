@@ -17,8 +17,11 @@ public class Game : MonoBehaviour
     public float level3Height = 0.3f;
     public int timeToTurn = 2;
 
+    static string moves = "A2B1A0C2C1C0B1A0B1C1C0C1A0B1C1C0C1B2B1C0D0C1B2C1C0D0C0B2C3B2D0C0C1C3C2B2C0D0C0C2C3B2D0E0D0C3C2C3E0D1C0C2C3C2D1E0D0C3C2C3E0D1D0C2C3C2D1E0D1C3C4C3E0D1E0C4B3A4D1E2E3B3A4A3E2E3D3A4A3A4E3D3C4A3A4A3D3C4C3A4A3A4C4D3C4A3A4";
+    static string startLocaitons = "A2A1C2B0";
     int[,] Board;
     IPlayer Player1;
+
     IPlayer Player2;
 
     public static Coordinate clickLocation;
@@ -58,7 +61,7 @@ public class Game : MonoBehaviour
                 break;
         }
     }
-
+    
     //will get called by the main menu
     public void startGame()
     {
@@ -71,6 +74,7 @@ public class Game : MonoBehaviour
         curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
         if(GameSettings.gameType == GameSettings.GameType.Watch) yield return new WaitForSeconds(1);
+
         // If not over Where to build?
         if (!turn.isWin)
         {

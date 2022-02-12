@@ -15,6 +15,7 @@ public class StringPlayer : IPlayer
     {
         Builder1 = Builder1GameObject.GetComponent<Builder>();
         Builder2 = Builder2GameObject.GetComponent<Builder>();
+
     }
 
     public override IEnumerator beginTurn(Game g)
@@ -30,6 +31,7 @@ public class StringPlayer : IPlayer
 
 
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
+
     {
         setBuilderLocations(player);
         moveBuidler(builder, builder == 1 ? startLocationBuilder1 : startLocationBuilder2, g);
@@ -39,6 +41,7 @@ public class StringPlayer : IPlayer
     public override Turn getNextTurn()
     {
         Turn t = new Turn(StringGameReader.getMoves());
+
         return t;
     }
 }
