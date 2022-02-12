@@ -9,7 +9,7 @@ public static class GameSettings
         Multiplayer,
         Singleplayer,
         Tutorial,
-        NotSet
+        Watch
     };
 
     public enum AIDifficulty
@@ -29,6 +29,4 @@ public static class GameSettings
     public static GameType gameType { get; set; }
     public static AIDifficulty difficulty { get; set; }
     public static NetworkMode netMode { get; set; }
-
-    public static void setGameModeTutorial() { gameType = GameType.Tutorial; }
 }

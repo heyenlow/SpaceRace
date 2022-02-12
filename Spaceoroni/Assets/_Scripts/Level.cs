@@ -37,10 +37,9 @@ public class Level : MonoBehaviour
 
     void OnMouseDown()
     {
-        Debug.Log(this.transform.parent.name);
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
-            Game.recieveLocationClick(Coordinate.stringToCoord(this.transform.parent.name));
+            Game.recieveLocationClick(Coordinate.stringToCoord(this.transform.parent.parent.name));
             resetMaterial();
         }
     }
