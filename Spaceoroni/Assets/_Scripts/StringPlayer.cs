@@ -15,32 +15,24 @@ public class StringPlayer : IPlayer
     {
         Builder1 = Builder1GameObject.GetComponent<Builder>();
         Builder2 = Builder2GameObject.GetComponent<Builder>();
-        setBuilderLocations();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public override IEnumerator beginTurn(Game g)
     {
         throw new System.NotImplementedException();
     }
 
-    private void setBuilderLocations()
+    private void setBuilderLocations(int player)
     {
-        string s = Game.getStartLocations(playerI);
-        startLocationBuilder1 = Coordinate.stringToCoord(s.Substring(0, 2));
-        startLocationBuilder2 = Coordinate.stringToCoord(s.Substring(2, 2));
-
+        startLocationBuilder1 = StringGameReader.BuilderLocation(player).Item1;
+        startLocationBuilder2 = StringGameReader.BuilderLocation(player).Item2;
     }
 
 
-    //places builders at 0,0 and 0,1 if not a player
-    public override IEnumerator PlaceBuilder(int i, Game g)
+    public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
-        moveBuidler(i, i == 1 ? startLocationBuilder1 : startLocationBuilder2, g);
+        setBuilderLocations(player);
+        moveBuidler(builder, builder == 1 ? startLocationBuilder1 : startLocationBuilder2, g);
         return null;
     }
 

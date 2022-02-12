@@ -1,4 +1,4 @@
-Agent 1: A2A1
+Agent1: A2A1
 Agent2: C2B0
 0: A2B1A0
 1: C2C1C0

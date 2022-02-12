@@ -17,12 +17,8 @@ public class Game : MonoBehaviour
     public float level3Height = 0.3f;
     public int timeToTurn = 2;
 
-    public bool watchGame = false;
-    string[] lines = System.IO.File.ReadAllLines(@"C:\Users\Public\TestFolder\WriteLines2.txt");
-    static string startLocaitons = "A2A1C2B0";
     int[,] Board;
     IPlayer Player1;
-    //Testing Player Player2;
     IPlayer Player2;
 
     public static Coordinate clickLocation;
@@ -63,12 +59,6 @@ public class Game : MonoBehaviour
         }
     }
 
-    public static string getStartLocations(int i)
-    {
-        if (i == 1) return startLocaitons.Substring(0, 4);
-        return startLocaitons.Substring(4, 4);
-    }
-
     //will get called by the main menu
     public void startGame()
     {
@@ -80,7 +70,7 @@ public class Game : MonoBehaviour
         //players already move the builders
         curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
-        if(watchGame) yield return new WaitForSeconds(1);
+        if(GameSettings.gameType == GameSettings.GameType.Watch) yield return new WaitForSeconds(1);
         // If not over Where to build?
         if (!turn.isWin)
         {
@@ -178,15 +168,24 @@ public class Game : MonoBehaviour
 
     private IEnumerator PlaceBuilders()
     {
-        Debug.Log(Player1);
-        if (Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(1, this));
-        else if (Player2 is StringPlayer) Player1.PlaceBuilder(1, this);
-        //Testing yield return StartCoroutine(Player2.PlaceBuilder(1, this));
-        //Testing yield return StartCoroutine(Player2.PlaceBuilder(2, this));
-        Player2.PlaceBuilder(1, this);
-        Player2.PlaceBuilder(2, this);
-        if (Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(2, this));
-        else if (Player2 is StringPlayer) Player1.PlaceBuilder(2, this);
+        //Player 1 Builder 1
+        if (Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(1,1, this));
+        else if (Player1 is StringPlayer) Player1.PlaceBuilder(1,1, this);
+
+
+        //Player 2 Builder 1
+        if (Player2 is Player) yield return StartCoroutine(Player2.PlaceBuilder(1,2, this));
+        else if (Player2 is StringPlayer) Player2.PlaceBuilder(1,2, this);
+
+        //Player 2 Builder 2
+        if (Player2 is Player) yield return StartCoroutine(Player2.PlaceBuilder(2,2, this));
+        else if (Player2 is StringPlayer) Player2.PlaceBuilder(2,2, this);
+
+        //Player 1 Builder 2
+        if (Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(2,1, this));
+        else if (Player2 is StringPlayer) Player1.PlaceBuilder(2,1, this);
+
+
         yield return null;
     }
 
