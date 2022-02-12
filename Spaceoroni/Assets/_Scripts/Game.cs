@@ -17,46 +17,49 @@ public class Game : MonoBehaviour
     public float level3Height = 0.3f;
     public int timeToTurn = 2;
 
-    static string moves = "A2B1A0C2C1C0B1A0B1C1C0C1A0B1C1C0C1B2B1C0D0C1B2C1C0D0C0B2C3B2D0C0C1C3C2B2C0D0C0C2C3B2D0E0D0C3C2C3E0D1C0C2C3C2D1E0D0C3C2C3E0D1D0C2C3C2D1E0D1C3C4C3E0D1E0C4B3A4D1E2E3B3A4A3E2E3D3A4A3A4E3D3C4A3A4A3D3C4C3A4A3A4C4D3C4A3A4";
-    static string startLocaitons = "A2A1C2B0";
     int[,] Board;
     IPlayer Player1;
-    //Testing Player Player2;
+
     IPlayer Player2;
 
     public static Coordinate clickLocation;
 
     private void Start()
     {
+        GameSettings.gameType = GameSettings.GameType.Watch;
+
+
         Board = new int[5, 5];
         playerState = PlayerState.Playing;
-        Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<StringPlayer>();
-        Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
-        //Testing Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
+        setupGameSettings();
         ClearBoard();
         StartCoroutine(PlayGameToEnd());
     }
 
-    public static string getMoves()
+    //reads the settings that will be set by the UI
+    private void setupGameSettings()
     {
-        string s;
-        if (moves.Length > 4)
+        switch (GameSettings.gameType)
         {
-            s = moves.Substring(0, 6);
-            moves = moves.Substring(6);
+            case GameSettings.GameType.Watch:
+                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<StringPlayer>();
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
+                break;
+            case GameSettings.GameType.Tutorial:
+                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
+                break;
+            case GameSettings.GameType.Singleplayer:
+                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
+                break;
+            case GameSettings.GameType.Multiplayer:
+                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
+                break;
         }
-        else
-        {
-            s = moves;
-        }
-        return s;
     }
-
-    public static string getStartLocations(int i)
-    {
-        if (i == 1) return startLocaitons.Substring(0, 4);
-        return startLocaitons.Substring(4, 4);
-    }
+    
     //will get called by the main menu
     public void startGame()
     {
@@ -68,7 +71,8 @@ public class Game : MonoBehaviour
         //players already move the builders
         curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
-        yield return new WaitForSeconds(1);
+        if(GameSettings.gameType == GameSettings.GameType.Watch) yield return new WaitForSeconds(1);
+
         // If not over Where to build?
         if (!turn.isWin)
         {
@@ -77,11 +81,6 @@ public class Game : MonoBehaviour
 
         // build should be completed?
         yield return true;
-    }
-
-    private bool isLevel4(Coordinate c)
-    {
-        return Board[c.x, c.y] == 4;
     }
 
     private void BlastOffRocket(Coordinate c)
@@ -171,15 +170,24 @@ public class Game : MonoBehaviour
 
     private IEnumerator PlaceBuilders()
     {
+        //Player 1 Builder 1
+        if (Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(1,1, this));
+        else if (Player1 is StringPlayer) Player1.PlaceBuilder(1,1, this);
 
-        if(Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(1, this));
-        if (Player2 is StringPlayer) Player1.PlaceBuilder(1, this);
-        //Testing yield return StartCoroutine(Player2.PlaceBuilder(1, this));
-        //Testing yield return StartCoroutine(Player2.PlaceBuilder(2, this));
-        Player2.PlaceBuilder(1, this);
-        Player2.PlaceBuilder(2, this);
-        if (Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(2, this));
-        if (Player2 is StringPlayer) Player1.PlaceBuilder(2, this);
+
+        //Player 2 Builder 1
+        if (Player2 is Player) yield return StartCoroutine(Player2.PlaceBuilder(1,2, this));
+        else if (Player2 is StringPlayer) Player2.PlaceBuilder(1,2, this);
+
+        //Player 2 Builder 2
+        if (Player2 is Player) yield return StartCoroutine(Player2.PlaceBuilder(2,2, this));
+        else if (Player2 is StringPlayer) Player2.PlaceBuilder(2,2, this);
+
+        //Player 1 Builder 2
+        if (Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(2,1, this));
+        else if (Player2 is StringPlayer) Player1.PlaceBuilder(2,1, this);
+
+
         yield return null;
     }
 
@@ -291,7 +299,7 @@ public class Game : MonoBehaviour
         {
             Coordinate c = Coordinate.stringToCoord(coord);
             int height = Board[c.x, c.y];
-            GameObject level = GameObject.Find(coord).transform.GetChild(height).gameObject;
+            GameObject level = GameObject.Find(coord).transform.GetChild(0).GetChild(height).gameObject;
             Levels.Add(level);
         }
         return Levels;
