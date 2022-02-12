@@ -23,7 +23,7 @@ public class Player : IPlayer
 
     }
 
-    public new IEnumerator PlaceBuilder(int i, Game g)
+    public override IEnumerator PlaceBuilder(int i, Game g)
     {
         g.addAllLocationsWithoutBuildersToHighlight();
         while (Game.clickLocation == null)

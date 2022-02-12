@@ -29,8 +29,7 @@ public abstract class IPlayer : MonoBehaviour
     {
         return turns[turns.Count - 1];
     }
-
-    public virtual string PlaceBuilder(int v, Game game)
+    public virtual IEnumerator PlaceBuilder(int v, Game game)
     {
         throw new NotImplementedException();
     }

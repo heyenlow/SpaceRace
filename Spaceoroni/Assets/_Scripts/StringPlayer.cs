@@ -38,15 +38,15 @@ public class StringPlayer : IPlayer
 
 
     //places builders at 0,0 and 0,1 if not a player
-    public override string PlaceBuilder(int i, Game g)
+    public override IEnumerator PlaceBuilder(int i, Game g)
     {
         moveBuidler(i, i == 1 ? startLocationBuilder1 : startLocationBuilder2, g);
-        return "";
+        return null;
     }
 
     public override Turn getNextTurn()
     {
-        Turn t = new Turn(Game.getMoves());
+        Turn t = new Turn(StringGameReader.getMoves());
         return t;
     }
 }
