@@ -2,9 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 public class Game : MonoBehaviour
 {
+    public const byte RAISE_TURN = 1;
+
     public enum PlayerState
     {
         Winner,
@@ -17,6 +22,7 @@ public class Game : MonoBehaviour
     public float level3Height = 0.3f;
     public int timeToTurn = 2;
 
+    List<Turn> turns = new List<Turn>();
     int[,] Board;
     IPlayer Player1;
 
@@ -26,8 +32,7 @@ public class Game : MonoBehaviour
 
     private void Start()
     {
-        GameSettings.gameType = GameSettings.GameType.Watch;
-
+        GameSettings.gameType = GameSettings.GameType.Multiplayer;
 
         Board = new int[5, 5];
         playerState = PlayerState.Playing;
@@ -112,18 +117,22 @@ public class Game : MonoBehaviour
             else
             {
                 // string turn BUILDERMOVEBUILD string
-                if (curPlayer is Player)
+                PhotonView photonView = PhotonView.Get(this);
+                if (curPlayer is Player && photonView.IsMine)
                 {
                     yield return StartCoroutine(curPlayer.beginTurn(this));
+                    Turn t = curPlayer.getNextTurn();
+                    if (GameSettings.gameType == GameSettings.GameType.Multiplayer) RaiseTurnSelected(t);
                 }
                 else
                 {
+                    //this will recieve a turn from a event then add it to the end of the list
+                    //RecieveTurn();
                     yield return new WaitForSeconds(timeToTurn);
                 }
                 // update the board with the current player's move
-                Turn t = curPlayer.getNextTurn();
-                Debug.Log(t.ToString()); //BUG
-                StartCoroutine(processTurnString(t, curPlayer, this));
+                Debug.Log(turns[turns.Count - 1].ToString()); //BUG
+                StartCoroutine(processTurnString(turns[turns.Count - 1], curPlayer, this));
                 //Testing yield return StartCoroutine(curPlayer.beginTurn(this));
 
                 //Check if win
@@ -133,6 +142,26 @@ public class Game : MonoBehaviour
 
         }
         yield return winner;
+    }
+
+    public void OnEvent(EventData photonEvent)
+    {
+        byte eventCode = photonEvent.Code;
+
+        if (eventCode == RAISE_TURN)
+        {
+            object[] data = (object[])photonEvent.CustomData;
+
+            Turn turn = (Turn)data[0];
+
+            turns.Add(turn);
+        }
+    }
+
+    private void RaiseTurnSelected(Turn t)
+    {
+        object[] datas = new object[] { t };
+        PhotonNetwork.RaiseEvent(RAISE_TURN, datas, RaiseEventOptions.Default, SendOptions.SendReliable);
     }
 
     //returns the board height at a given coordinate
