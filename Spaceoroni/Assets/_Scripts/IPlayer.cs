@@ -18,6 +18,11 @@ public abstract class IPlayer : MonoBehaviour
     {
         return (Coordinate.coordToString(Builder1.getLocation()) + Coordinate.coordToString(Builder2.getLocation()));
     }
+
+    public Tuple<Coordinate, Coordinate> getBuildersCoords()
+    {
+        return new Tuple<Coordinate, Coordinate>(Builder1.getLocation(), Builder2.getLocation());
+    }
     public void moveBuidler(int Builder, Coordinate to, Game g)
     {
         Builder builderToMove = Builder == 1 ? Builder1 : Builder2;

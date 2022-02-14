@@ -5,10 +5,15 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
+using TMPro;
 
 public class Game : MonoBehaviour
 {
     public const byte RAISE_TURN = 1;
+    public const byte RAISE_INITIAL_BUILDERS = 2;
+    [SerializeField]
+    private GameObject NewtorkingInfo;
+
 
     public enum PlayerState
     {
@@ -118,7 +123,7 @@ public class Game : MonoBehaviour
             {
                 // string turn BUILDERMOVEBUILD string
                 PhotonView photonView = PhotonView.Get(this);
-                if (curPlayer is Player && photonView.IsMine)
+                if (curPlayer is Player )//&& photonView.IsMine)
                 {
                     yield return StartCoroutine(curPlayer.beginTurn(this));
                     Turn t = curPlayer.getNextTurn();
@@ -144,10 +149,19 @@ public class Game : MonoBehaviour
         yield return winner;
     }
 
+    private void OnEnable()
+    {
+        PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
+    }
+
+    private void OnDisable()
+    {
+        PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
+    }
     public void OnEvent(EventData photonEvent)
     {
         byte eventCode = photonEvent.Code;
-
+        Debug.Log("CaughtEvent code:" + eventCode);
         if (eventCode == RAISE_TURN)
         {
             object[] data = (object[])photonEvent.CustomData;
@@ -156,12 +170,36 @@ public class Game : MonoBehaviour
 
             turns.Add(turn);
         }
+        if (eventCode == RAISE_INITIAL_BUILDERS)
+        {
+            NewtorkingInfo.GetComponent<TextMeshProUGUI>().text += "CAUGHT INIT BUILDERS";
+            object[] data = (object[])photonEvent.CustomData;
+
+            Coordinate P1B1 = new Coordinate((int)data[0], (int)data[1]);
+            Coordinate P1B2 = new Coordinate((int)data[2], (int)data[3]);
+            Coordinate P2B1 = new Coordinate((int)data[4], (int)data[5]);
+            Coordinate P2B2 = new Coordinate((int)data[6], (int)data[7]);
+
+            Player1.moveBuidler(1, P1B1, this);
+            Player2.moveBuidler(1, P2B1, this);
+            Player2.moveBuidler(2, P2B2, this);
+            Player1.moveBuidler(2, P1B2, this);
+
+        }
+    }
+
+    private void RaiseBuilderLocations(Coordinate P1B1, Coordinate P1B2, Coordinate P2B1, Coordinate P2B2)
+    {
+        object[] datas = new object[] { P1B1.x, P1B1.y, P1B2.x, P1B2.y, P2B1.x, P2B1.y, P2B2.x, P2B2.y };
+        PhotonNetwork.RaiseEvent(RAISE_INITIAL_BUILDERS, datas, RaiseEventOptions.Default, SendOptions.SendReliable);
+        Debug.Log("Raising Init Moves");
     }
 
     private void RaiseTurnSelected(Turn t)
     {
         object[] datas = new object[] { t };
         PhotonNetwork.RaiseEvent(RAISE_TURN, datas, RaiseEventOptions.Default, SendOptions.SendReliable);
+        Debug.Log("Raising Turn" + t.ToString());
     }
 
     //returns the board height at a given coordinate
@@ -216,6 +254,9 @@ public class Game : MonoBehaviour
         if (Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(2,1, this));
         else if (Player2 is StringPlayer) Player1.PlaceBuilder(2,1, this);
 
+        var p1Builders = Player1.getBuildersCoords();
+        var p2Builders = Player2.getBuildersCoords();
+        RaiseBuilderLocations(p1Builders.Item1, p1Builders.Item2, p2Builders.Item1, p2Builders.Item2);
 
         yield return null;
     }
