@@ -31,11 +31,10 @@ public class StringPlayer : IPlayer
 
 
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
-
     {
         setBuilderLocations(player);
         moveBuidler(builder, builder == 1 ? startLocationBuilder1 : startLocationBuilder2, g);
-        return null;
+        yield return null;
     }
 
     public override Turn getNextTurn()

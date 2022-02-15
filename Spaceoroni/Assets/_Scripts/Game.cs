@@ -2,9 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
+using TMPro;
 
 public class Game : MonoBehaviour
 {
+
+    [SerializeField]
+    private GameObject NewtorkingInfo;
+
+
     public enum PlayerState
     {
         Winner,
@@ -19,15 +28,16 @@ public class Game : MonoBehaviour
 
     int[,] Board;
     IPlayer Player1;
-
     IPlayer Player2;
 
     public static Coordinate clickLocation;
 
-    private void Start()
+    public void StartGame()
     {
-        GameSettings.gameType = GameSettings.GameType.Watch;
+        Debug.Log("StartingGame");
 
+
+        GameSettings.gameType = GameSettings.GameType.Multiplayer;
 
         Board = new int[5, 5];
         playerState = PlayerState.Playing;
@@ -54,22 +64,35 @@ public class Game : MonoBehaviour
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
                 break;
             case GameSettings.GameType.Multiplayer:
+                setupMultiplayerSettings();
+                break;
+        }
+        Debug.Log("Here");
+    }
+
+    private void setupMultiplayerSettings()
+    {
+        switch (GameSettings.netMode)
+        {
+            case GameSettings.NetworkMode.Host:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<OtherPlayer>();
+                break;
+            case GameSettings.NetworkMode.Join:
+                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<OtherPlayer>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
                 break;
         }
+
+
+        Debug.Log("Player1: " + Player1 + ", Player2: " + Player2);
     }
     
-    //will get called by the main menu
-    public void startGame()
-    {
-
-    }
 
     public IEnumerator processTurnString(Turn turn, IPlayer curPlayer, Game g)
     {
         //players already move the builders
-        curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
+        if (!(curPlayer is Player)) curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
         if(GameSettings.gameType == GameSettings.GameType.Watch) yield return new WaitForSeconds(1);
 
@@ -112,17 +135,21 @@ public class Game : MonoBehaviour
             else
             {
                 // string turn BUILDERMOVEBUILD string
-                if (curPlayer is Player)
+                PhotonView photonView = PhotonView.Get(this);
+                if (curPlayer is Player || curPlayer is OtherPlayer)//&& photonView.IsMine)
                 {
                     yield return StartCoroutine(curPlayer.beginTurn(this));
                 }
-                else
+                else if(curPlayer is StringPlayer)
                 {
+                    //this will recieve a turn from a event then add it to the end of the list
+                    //RecieveTurn();
                     yield return new WaitForSeconds(timeToTurn);
                 }
-                // update the board with the current player's move
+
                 Turn t = curPlayer.getNextTurn();
-                Debug.Log(t.ToString()); //BUG
+                // update the board with the current player's move
+                Debug.Log(t.ToString()); //BUG 
                 StartCoroutine(processTurnString(t, curPlayer, this));
                 //Testing yield return StartCoroutine(curPlayer.beginTurn(this));
 
@@ -134,6 +161,8 @@ public class Game : MonoBehaviour
         }
         yield return winner;
     }
+
+
 
     //returns the board height at a given coordinate
     public float heightAtCoordinate(Coordinate c)
@@ -170,22 +199,28 @@ public class Game : MonoBehaviour
 
     private IEnumerator PlaceBuilders()
     {
+        yield return StartCoroutine(Player1.PlaceBuilder(1, 1, this));
+        yield return StartCoroutine(Player2.PlaceBuilder(1, 2, this));
+        yield return StartCoroutine(Player2.PlaceBuilder(2, 2, this));
+        yield return StartCoroutine(Player1.PlaceBuilder(2, 1, this));
+        /*
         //Player 1 Builder 1
-        if (Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(1,1, this));
-        else if (Player1 is StringPlayer) Player1.PlaceBuilder(1,1, this);
+        if (Player1 is Player || Player1 is OtherPlayer) yield return StartCoroutine(Player1.PlaceBuilder(1, 1, this));
+        else if (Player1 is StringPlayer) Player1.PlaceBuilder(1, 1, this);
 
 
         //Player 2 Builder 1
-        if (Player2 is Player) yield return StartCoroutine(Player2.PlaceBuilder(1,2, this));
+        if (Player2 is Player || Player2 is OtherPlayer) yield return StartCoroutine(Player2.PlaceBuilder(1,2, this));
         else if (Player2 is StringPlayer) Player2.PlaceBuilder(1,2, this);
 
         //Player 2 Builder 2
-        if (Player2 is Player) yield return StartCoroutine(Player2.PlaceBuilder(2,2, this));
+        if (Player2 is Player || Player2 is OtherPlayer) yield return StartCoroutine(Player2.PlaceBuilder(2,2, this));
         else if (Player2 is StringPlayer) Player2.PlaceBuilder(2,2, this);
 
         //Player 1 Builder 2
-        if (Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(2,1, this));
+        if (Player1 is Player || Player1 is OtherPlayer) yield return StartCoroutine(Player1.PlaceBuilder(2,1, this));
         else if (Player2 is StringPlayer) Player1.PlaceBuilder(2,1, this);
+        */
 
 
         yield return null;
