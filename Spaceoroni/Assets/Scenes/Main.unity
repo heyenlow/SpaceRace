@@ -1136,6 +1136,7 @@ GameObject:
   - component: {fileID: 305133673}
   - component: {fileID: 305133675}
   - component: {fileID: 305133676}
+  - component: {fileID: 305133677}
   m_Layer: 0
   m_Name: Player2
   m_TagString: Player2
@@ -1210,6 +1211,20 @@ MonoBehaviour:
   sceneViewId: 1
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &305133677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 305133672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb0d1179e4ec46a4e8a25efb72c270f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Builder1GameObject: {fileID: 1406699862}
+  Builder2GameObject: {fileID: 531677784}
 --- !u!1001 &480123991
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1300,6 +1315,7 @@ MonoBehaviour:
   MainMenuPanel: {fileID: 8563206949739828880}
   HostName: {fileID: 8562379455491124120}
   NewtorkingInfo: {fileID: 1847529888}
+  gameManager: {fileID: 2015303786}
 --- !u!4 &513342119
 Transform:
   m_ObjectHideFlags: 0
@@ -2843,8 +2859,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GameBoardLocation: {fileID: 668778916}
   StartScreenLocation: {fileID: 146967134}
-  MovementSpeed: 35
-  RotationSpeed: 10
+  MovementSpeed: 70
+  RotationSpeed: 20
 --- !u!45 &963194230
 Skybox:
   m_ObjectHideFlags: 0
@@ -4969,6 +4985,7 @@ GameObject:
   - component: {fileID: 1659787305}
   - component: {fileID: 1659787306}
   - component: {fileID: 1659787304}
+  - component: {fileID: 1659787307}
   m_Layer: 0
   m_Name: Player1
   m_TagString: Player1
@@ -5021,6 +5038,20 @@ MonoBehaviour:
   Builder1GameObject: {fileID: 1553901272}
   Builder2GameObject: {fileID: 2036578794}
   playerI: 1
+--- !u!114 &1659787307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1659787303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb0d1179e4ec46a4e8a25efb72c270f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Builder1GameObject: {fileID: 1553901272}
+  Builder2GameObject: {fileID: 2036578794}
 --- !u!4 &1669597350 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3737007749424728393, guid: 550cc4fd729746147842a00693d5a0f1, type: 3}
@@ -6039,6 +6070,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2015303785}
   - component: {fileID: 2015303786}
+  - component: {fileID: 2015303787}
   m_Layer: 0
   m_Name: Starter
   m_TagString: Untagged
@@ -6077,6 +6109,18 @@ MonoBehaviour:
   level2Height: 0.55
   level3Height: 0
   timeToTurn: 2
+--- !u!114 &2015303787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2015303784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0aec4f19cdf03a4a87168ee133528d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2032371397
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8243,6 +8287,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 2015303786}
+        m_TargetAssemblyTypeName: Game, Assembly-CSharp
+        m_MethodName: StartGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!224 &8562379454649483238
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8722,6 +8778,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 2015303787}
+        m_TargetAssemblyTypeName: SettingChanger, Assembly-CSharp
+        m_MethodName: setGameTypeMultiplayer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!224 &8562379454839898650
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9148,6 +9216,18 @@ MonoBehaviour:
       - m_Target: {fileID: 513342118}
         m_TargetAssemblyTypeName: NetworkingManager, Assembly-CSharp
         m_MethodName: JoinGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 2015303787}
+        m_TargetAssemblyTypeName: SettingChanger, Assembly-CSharp
+        m_MethodName: setNetworkingModeJoin
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10942,6 +11022,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 2015303787}
+        m_TargetAssemblyTypeName: SettingChanger, Assembly-CSharp
+        m_MethodName: setNetworkingModeHost
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

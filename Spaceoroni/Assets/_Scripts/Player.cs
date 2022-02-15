@@ -1,4 +1,6 @@
+using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -40,6 +42,9 @@ public class Player : IPlayer
 
             HighlightManager.highlightedObjects.Clear();
         }
+
+        if (GameSettings.gameType == GameSettings.GameType.Multiplayer) RaiseBuilderLocation(moveLocation, builder);
+
         yield return true;
     }
 
@@ -58,6 +63,7 @@ public class Player : IPlayer
 
     public IEnumerator chooseMove(Game g)
     {
+        Coordinate temp = new Coordinate(currentTurn.BuilderLocation);
         List<string> allMoves = g.getAllPossibleMoves(currentTurn.BuilderLocation);
         
         if(g.canMove(currentTurn.BuilderLocation))
@@ -75,7 +81,8 @@ public class Player : IPlayer
 
             if (g.canBuild(currentTurn.BuilderLocation))
             {
-                moveBuidler(getBuilderInt(currentTurn.BuilderLocation), currentTurn.MoveLocation, g);
+                // bughere
+                moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
             }
             else
             {
@@ -89,6 +96,7 @@ public class Player : IPlayer
             Debug.Log("Cant Move");
         }
 
+        currentTurn.BuilderLocation = temp;
     }
 
     public IEnumerator chooseBuild(Game g)
@@ -142,6 +150,22 @@ public class Player : IPlayer
             yield return StartCoroutine(chooseBuild(g));
             turns.Add(currentTurn);
         }
+
+        if (GameSettings.gameType == GameSettings.GameType.Multiplayer) RaiseTurnSelected(currentTurn);
+    }
+
+    private void RaiseBuilderLocation(Coordinate BuilderCoordinate, int BuilderInt)
+    {
+        object[] datas = new object[] { BuilderInt, BuilderCoordinate.x, BuilderCoordinate.y };
+        PhotonNetwork.RaiseEvent(NetworkingManager.RAISE_INITIAL_BUILDER, datas, RaiseEventOptions.Default, SendOptions.SendReliable);
+        Debug.Log("Raising Builder Location");
+    }
+
+    private void RaiseTurnSelected(Turn t)
+    {
+        object[] datas = t.turnToObjectArray();
+        PhotonNetwork.RaiseEvent(NetworkingManager.RAISE_TURN, datas, RaiseEventOptions.Default, SendOptions.SendReliable);
+        Debug.Log("Raising Turn" + t.ToString());
     }
 
 }

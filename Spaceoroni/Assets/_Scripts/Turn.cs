@@ -25,6 +25,20 @@ public class Turn
         isWin = true;
     }
 
+    public object[] turnToObjectArray()
+    {
+        return new object[]{ BuilderLocation.x, BuilderLocation.y, MoveLocation.x, MoveLocation.y, BuildLocation.x, BuildLocation.y, isWin, canPerformTurn };
+    }
+
+    public Turn(object[] o)
+    {
+        BuilderLocation = new Coordinate((int)o[0], (int)o[1]);
+        MoveLocation = new Coordinate((int)o[2], (int)o[3]);
+        BuildLocation = new Coordinate((int)o[4], (int)o[5]);
+        isWin = (bool)o[6];
+        canPerformTurn = (bool)o[7];
+    }
+
     public Turn() { }
 
     public override string ToString()

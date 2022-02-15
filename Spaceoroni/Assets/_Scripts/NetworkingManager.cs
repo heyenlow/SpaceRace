@@ -25,7 +25,16 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     private GameObject HostName;
     [SerializeField]
     private GameObject NewtorkingInfo;
+    [SerializeField]
+    private Game gameManager;
+
+
     private string netinfo = "";
+
+    public const byte RAISE_TURN = 1;
+    public const byte RAISE_INITIAL_BUILDERS = 2;
+    public const byte RAISE_INITIAL_BUILDER = 3;
+    
 
     #region Monobehaviour CallBacks
     private void Awake()
@@ -44,8 +53,6 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     {
         NewtorkingInfo.GetComponent<TextMeshProUGUI>().text = netinfo + " " + PhotonNetwork.CountOfRooms.ToString();
     }
-
-
 
 
     #region Public Methods
@@ -114,11 +121,15 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
+        
         Debug.Log("OnJoinedRoom() called by PUN. Now this client is in a room.");
         //PhotonNetwork.LoadLevel("Main");
         MainMenuPanel.SetActive(false);
         GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraFromStartScreenToGameBoard();
         Debug.Log(PhotonNetwork.CurrentRoom.PlayerCount);
+
+
+        gameManager.StartGame();
     }
 
     public override void OnCreatedRoom()

@@ -13,7 +13,11 @@ public class Coordinate
         this.x = x;
         this.y = y;
     }
-
+    public Coordinate(Coordinate c)
+    {
+        this.x = c.x;
+        this.y = c.y;
+    }
     public Coordinate()
     {
         this.x = -1;

@@ -9,8 +9,7 @@ using TMPro;
 
 public class Game : MonoBehaviour
 {
-    public const byte RAISE_TURN = 1;
-    public const byte RAISE_INITIAL_BUILDERS = 2;
+
     [SerializeField]
     private GameObject NewtorkingInfo;
 
@@ -27,16 +26,17 @@ public class Game : MonoBehaviour
     public float level3Height = 0.3f;
     public int timeToTurn = 2;
 
-    List<Turn> turns = new List<Turn>();
     int[,] Board;
     IPlayer Player1;
-
     IPlayer Player2;
 
     public static Coordinate clickLocation;
 
-    private void Start()
+    public void StartGame()
     {
+        Debug.Log("StartingGame");
+
+
         GameSettings.gameType = GameSettings.GameType.Multiplayer;
 
         Board = new int[5, 5];
@@ -64,22 +64,35 @@ public class Game : MonoBehaviour
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
                 break;
             case GameSettings.GameType.Multiplayer:
+                setupMultiplayerSettings();
+                break;
+        }
+        Debug.Log("Here");
+    }
+
+    private void setupMultiplayerSettings()
+    {
+        switch (GameSettings.netMode)
+        {
+            case GameSettings.NetworkMode.Host:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<OtherPlayer>();
+                break;
+            case GameSettings.NetworkMode.Join:
+                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<OtherPlayer>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
                 break;
         }
+
+
+        Debug.Log("Player1: " + Player1 + ", Player2: " + Player2);
     }
     
-    //will get called by the main menu
-    public void startGame()
-    {
-
-    }
 
     public IEnumerator processTurnString(Turn turn, IPlayer curPlayer, Game g)
     {
         //players already move the builders
-        curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
+        if (!(curPlayer is Player)) curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
         if(GameSettings.gameType == GameSettings.GameType.Watch) yield return new WaitForSeconds(1);
 
@@ -123,21 +136,21 @@ public class Game : MonoBehaviour
             {
                 // string turn BUILDERMOVEBUILD string
                 PhotonView photonView = PhotonView.Get(this);
-                if (curPlayer is Player )//&& photonView.IsMine)
+                if (curPlayer is Player || curPlayer is OtherPlayer)//&& photonView.IsMine)
                 {
                     yield return StartCoroutine(curPlayer.beginTurn(this));
-                    Turn t = curPlayer.getNextTurn();
-                    if (GameSettings.gameType == GameSettings.GameType.Multiplayer) RaiseTurnSelected(t);
                 }
-                else
+                else if(curPlayer is StringPlayer)
                 {
                     //this will recieve a turn from a event then add it to the end of the list
                     //RecieveTurn();
                     yield return new WaitForSeconds(timeToTurn);
                 }
+
+                Turn t = curPlayer.getNextTurn();
                 // update the board with the current player's move
-                Debug.Log(turns[turns.Count - 1].ToString()); //BUG
-                StartCoroutine(processTurnString(turns[turns.Count - 1], curPlayer, this));
+                Debug.Log(t.ToString()); //BUG 
+                StartCoroutine(processTurnString(t, curPlayer, this));
                 //Testing yield return StartCoroutine(curPlayer.beginTurn(this));
 
                 //Check if win
@@ -149,58 +162,7 @@ public class Game : MonoBehaviour
         yield return winner;
     }
 
-    private void OnEnable()
-    {
-        PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
-    }
 
-    private void OnDisable()
-    {
-        PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
-    }
-    public void OnEvent(EventData photonEvent)
-    {
-        byte eventCode = photonEvent.Code;
-        Debug.Log("CaughtEvent code:" + eventCode);
-        if (eventCode == RAISE_TURN)
-        {
-            object[] data = (object[])photonEvent.CustomData;
-
-            Turn turn = (Turn)data[0];
-
-            turns.Add(turn);
-        }
-        if (eventCode == RAISE_INITIAL_BUILDERS)
-        {
-            NewtorkingInfo.GetComponent<TextMeshProUGUI>().text += "CAUGHT INIT BUILDERS";
-            object[] data = (object[])photonEvent.CustomData;
-
-            Coordinate P1B1 = new Coordinate((int)data[0], (int)data[1]);
-            Coordinate P1B2 = new Coordinate((int)data[2], (int)data[3]);
-            Coordinate P2B1 = new Coordinate((int)data[4], (int)data[5]);
-            Coordinate P2B2 = new Coordinate((int)data[6], (int)data[7]);
-
-            Player1.moveBuidler(1, P1B1, this);
-            Player2.moveBuidler(1, P2B1, this);
-            Player2.moveBuidler(2, P2B2, this);
-            Player1.moveBuidler(2, P1B2, this);
-
-        }
-    }
-
-    private void RaiseBuilderLocations(Coordinate P1B1, Coordinate P1B2, Coordinate P2B1, Coordinate P2B2)
-    {
-        object[] datas = new object[] { P1B1.x, P1B1.y, P1B2.x, P1B2.y, P2B1.x, P2B1.y, P2B2.x, P2B2.y };
-        PhotonNetwork.RaiseEvent(RAISE_INITIAL_BUILDERS, datas, RaiseEventOptions.Default, SendOptions.SendReliable);
-        Debug.Log("Raising Init Moves");
-    }
-
-    private void RaiseTurnSelected(Turn t)
-    {
-        object[] datas = new object[] { t };
-        PhotonNetwork.RaiseEvent(RAISE_TURN, datas, RaiseEventOptions.Default, SendOptions.SendReliable);
-        Debug.Log("Raising Turn" + t.ToString());
-    }
 
     //returns the board height at a given coordinate
     public float heightAtCoordinate(Coordinate c)
@@ -237,26 +199,29 @@ public class Game : MonoBehaviour
 
     private IEnumerator PlaceBuilders()
     {
+        yield return StartCoroutine(Player1.PlaceBuilder(1, 1, this));
+        yield return StartCoroutine(Player2.PlaceBuilder(1, 2, this));
+        yield return StartCoroutine(Player2.PlaceBuilder(2, 2, this));
+        yield return StartCoroutine(Player1.PlaceBuilder(2, 1, this));
+        /*
         //Player 1 Builder 1
-        if (Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(1,1, this));
-        else if (Player1 is StringPlayer) Player1.PlaceBuilder(1,1, this);
+        if (Player1 is Player || Player1 is OtherPlayer) yield return StartCoroutine(Player1.PlaceBuilder(1, 1, this));
+        else if (Player1 is StringPlayer) Player1.PlaceBuilder(1, 1, this);
 
 
         //Player 2 Builder 1
-        if (Player2 is Player) yield return StartCoroutine(Player2.PlaceBuilder(1,2, this));
+        if (Player2 is Player || Player2 is OtherPlayer) yield return StartCoroutine(Player2.PlaceBuilder(1,2, this));
         else if (Player2 is StringPlayer) Player2.PlaceBuilder(1,2, this);
 
         //Player 2 Builder 2
-        if (Player2 is Player) yield return StartCoroutine(Player2.PlaceBuilder(2,2, this));
+        if (Player2 is Player || Player2 is OtherPlayer) yield return StartCoroutine(Player2.PlaceBuilder(2,2, this));
         else if (Player2 is StringPlayer) Player2.PlaceBuilder(2,2, this);
 
         //Player 1 Builder 2
-        if (Player1 is Player) yield return StartCoroutine(Player1.PlaceBuilder(2,1, this));
+        if (Player1 is Player || Player1 is OtherPlayer) yield return StartCoroutine(Player1.PlaceBuilder(2,1, this));
         else if (Player2 is StringPlayer) Player1.PlaceBuilder(2,1, this);
+        */
 
-        var p1Builders = Player1.getBuildersCoords();
-        var p2Builders = Player2.getBuildersCoords();
-        RaiseBuilderLocations(p1Builders.Item1, p1Builders.Item2, p2Builders.Item1, p2Builders.Item2);
 
         yield return null;
     }
