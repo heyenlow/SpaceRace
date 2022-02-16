@@ -43,7 +43,9 @@ public class Turn
 
     public override string ToString()
     {
-        return Coordinate.coordToString(BuilderLocation) + Coordinate.coordToString(MoveLocation) + Coordinate.coordToString(BuildLocation);
+        if (isWin) return "WIN: " + Coordinate.coordToString(BuilderLocation) + Coordinate.coordToString(MoveLocation);
+        else return Coordinate.coordToString(BuilderLocation) + Coordinate.coordToString(MoveLocation) + Coordinate.coordToString(BuildLocation);
+
     }
 
     public Turn(string s) 
