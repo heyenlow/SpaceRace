@@ -6,6 +6,7 @@ public static class GameSettings
 {
     public enum GameType
     {
+        NotSet,
         Multiplayer,
         Singleplayer,
         Tutorial,
@@ -14,16 +15,16 @@ public static class GameSettings
 
     public enum AIDifficulty
     {
+        NotSet,
         Easy,
         Med,
-        Hard,
-        NotSet
+        Hard
     };
     public enum NetworkMode
     {
+        NotSet,
         Host,
-        Join,
-        NotSet
+        Join
     };
 
     public static GameType gameType { get; set; }

@@ -20,8 +20,6 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     #endregion
 
     [SerializeField]
-    private GameObject MainMenuPanel;
-    [SerializeField]
     private GameObject HostName;
     [SerializeField]
     private GameObject NewtorkingInfo;
@@ -42,11 +40,6 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         PhotonNetwork.AutomaticallySyncScene = true;
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        MainMenuPanel.SetActive(true);
-    }
     #endregion
 
     private void Update()
@@ -123,13 +116,10 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     {
         
         Debug.Log("OnJoinedRoom() called by PUN. Now this client is in a room.");
-        //PhotonNetwork.LoadLevel("Main");
-        MainMenuPanel.SetActive(false);
-        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraFromStartScreenToGameBoard();
         Debug.Log(PhotonNetwork.CurrentRoom.PlayerCount);
 
 
-        gameManager.StartGame();
+        //gameManager.StartGame();
     }
 
     public override void OnCreatedRoom()
