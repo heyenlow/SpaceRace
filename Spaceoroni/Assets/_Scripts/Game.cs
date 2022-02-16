@@ -16,6 +16,9 @@ public class Game : MonoBehaviour
     [SerializeField]
     private GameObject NewtorkingInfo;
 
+    [SerializeField]
+    private GameObject Rotator;
+
 
     public enum PlayerState
     {
@@ -41,13 +44,23 @@ public class Game : MonoBehaviour
     
 
     public static Coordinate clickLocation;
+    private bool isDebug = false;
+    private void Start()
+    {
+        if (isDebug)
+        {
+            StartGame();
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
+            GameSettings.gameType = GameSettings.GameType.NotSet;
+        }
+    }
+
 
     public void StartGame()
     {
         Debug.Log("StartingGame");
+        Rotator.SetActive(false);
 
-
-        GameSettings.gameType = GameSettings.GameType.Singleplayer;
 
         Board = new int[5, 5];
         playerState = PlayerState.Playing;
@@ -61,6 +74,10 @@ public class Game : MonoBehaviour
     {
         switch (GameSettings.gameType)
         {
+            case GameSettings.GameType.NotSet:
+                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
+                break;
             case GameSettings.GameType.Watch:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<StringPlayer>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
@@ -105,7 +122,7 @@ public class Game : MonoBehaviour
         //players already move the builders
         if (!(curPlayer is Player)) curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
-        if(GameSettings.gameType == GameSettings.GameType.Watch) yield return new WaitForSeconds(1);
+        if(GameSettings.gameType == GameSettings.GameType.Watch) yield return new WaitForSeconds(timeToTurn);
 
         // If not over Where to build?
         if (!turn.isWin)
@@ -113,12 +130,13 @@ public class Game : MonoBehaviour
             BuildLevel(turn.BuildLocation);
         }
 
-        // build should be completed?
+
         yield return true;
     }
 
     private void BlastOffRocket(Coordinate c)
     {
+        Debug.Log("Blasting Off Rocket at " + Coordinate.coordToString(c));
         var location = GameObject.Find(Coordinate.coordToString(c)).GetComponent<Location>();
         location.blastOffRocket();
     }
@@ -159,9 +177,14 @@ public class Game : MonoBehaviour
                 
                 Turn t = curPlayer.getNextTurn();
                 // update the board with the current player's move
-                Debug.Log(t.ToString()); //BUG 
+                Debug.Log(t.ToString());
                 StartCoroutine(processTurnString(t, curPlayer, this));
-                //Testing yield return StartCoroutine(curPlayer.beginTurn(this));
+
+                if (t.isWin)
+                {
+                    BlastOffRocket(t.MoveLocation);
+                    winner = curPlayer;
+                }
 
                 //Check if win
                 if(playerState == PlayerState.Winner)
@@ -344,12 +367,10 @@ public class Game : MonoBehaviour
         {
             Coordinate c = Coordinate.stringToCoord(coord);
             int height = Board[c.x, c.y];
-            GameObject level;
             if (height == 3)
             {
-                Levels.Add(GameObject.Find(coord).transform.GetChild(0).GetChild(0).gameObject);
-                Levels.Add(GameObject.Find(coord).transform.GetChild(0).GetChild(1).gameObject);
-                Levels.Add(GameObject.Find(coord).transform.GetChild(0).GetChild(2).gameObject);
+                //add full rocket, the highlight manager gets the individual levels
+                Levels.Add(GameObject.Find(coord).transform.GetChild(0).gameObject);
             }
             else
             {

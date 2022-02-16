@@ -37,9 +37,17 @@ public static class HighlightManager
     {
         foreach (GameObject l in Levels)
         {
-            l.SetActive(true);
-            l.GetComponent<Level>().makeOpaque();
-            highlightedObjects.Add(l);
+            //need to treat full rockets differently
+            if (l.name == "Rocket")
+            {
+                highlightRocket(l);
+            }
+            else
+            {
+                l.SetActive(true);
+                l.GetComponent<Level>().makeOpaque();
+                highlightedObjects.Add(l);
+            }
         }
     }
 
@@ -47,10 +55,46 @@ public static class HighlightManager
     {
         foreach (GameObject l in Levels)
         {
-            l.SetActive(false);
-            l.GetComponent<Level>().resetMaterial();
-            highlightedObjects.Remove(l);
+            //need to treat full rockets differently
+            if (l.name == "Rocket")
+            {
+                unhighlightRocket(l);
+            }
+            else
+            {
+                l.SetActive(false);
+                l.GetComponent<Level>().resetMaterial();
+                highlightedObjects.Remove(l);
+            }
         }
+    }
+    private static void highlightRocket(GameObject Rocket)
+    {
+        GameObject level1 = Rocket.transform.GetChild(0).gameObject;
+        GameObject level2 = Rocket.transform.GetChild(1).gameObject;
+        GameObject level3 = Rocket.transform.GetChild(2).gameObject;
+
+        level1.GetComponent<Level>().makeOpaque();
+        level2.GetComponent<Level>().makeOpaque();
+        level3.GetComponent<Level>().makeOpaque();
+
+        highlightedObjects.Add(level1);
+        highlightedObjects.Add(level2);
+        highlightedObjects.Add(level3);
+    }
+    private static void unhighlightRocket(GameObject Rocket)
+    {
+        GameObject level1 = Rocket.transform.GetChild(0).gameObject;
+        GameObject level2 = Rocket.transform.GetChild(1).gameObject;
+        GameObject level3 = Rocket.transform.GetChild(2).gameObject;
+        
+        level1.GetComponent<Level>().resetMaterial();
+        level2.GetComponent<Level>().resetMaterial();
+        level3.GetComponent<Level>().resetMaterial();
+
+        highlightedObjects.Remove(level1);
+        highlightedObjects.Remove(level2);
+        highlightedObjects.Remove(level3);
     }
     public static void highlightPlayersBuilder(Player p)
     {
