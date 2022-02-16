@@ -4,19 +4,9 @@ using UnityEngine;
 
 public class StringPlayer : IPlayer
 {
-    public GameObject Builder1GameObject;
-    public GameObject Builder2GameObject;
     Coordinate startLocationBuilder1;
     Coordinate startLocationBuilder2;
     public int playerI;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        Builder1 = Builder1GameObject.GetComponent<Builder>();
-        Builder2 = Builder2GameObject.GetComponent<Builder>();
-
-    }
 
     public override IEnumerator beginTurn(Game g)
     {

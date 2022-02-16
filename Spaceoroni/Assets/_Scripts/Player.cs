@@ -8,23 +8,8 @@ using UnityEngine;
 
 public class Player : IPlayer
 {
-
-    public GameObject Builder1GameObject;
-    public GameObject Builder2GameObject;
     private Turn currentTurn;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        Builder1 = Builder1GameObject.GetComponent<Builder>();
-        Builder2 = Builder2GameObject.GetComponent<Builder>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
