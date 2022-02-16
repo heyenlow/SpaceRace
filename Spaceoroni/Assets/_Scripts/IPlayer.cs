@@ -9,6 +9,12 @@ public abstract class IPlayer : MonoBehaviour
     protected Builder Builder2;
     protected List<Turn> turns = new List<Turn>();
 
+    private void Start()
+    {
+        Builder1 = this.gameObject.GetComponentsInChildren<Builder>()[0];
+        Builder2 = this.gameObject.GetComponentsInChildren<Builder>()[1];
+    }
+
     public abstract IEnumerator beginTurn(Game g);
     /// <summary>
     /// Returns a string showing the current coordinates of this player's builders
@@ -40,5 +46,27 @@ public abstract class IPlayer : MonoBehaviour
         if (Coordinate.Equals(Builder1.getLocation(),location)) return 1;
         if (Coordinate.Equals(Builder2.getLocation(),location)) return 2;
         throw new Exception("No builder at this location");
+    }
+
+    public Tuple<Builder, Builder> getBuilders() { return new Tuple<Builder, Builder>(Builder1, Builder2); }
+
+    public virtual IEnumerator SelectBuilder()
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual IEnumerator chooseMove(Game g)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual IEnumerator chooseBuild(Game g)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual void loadNEATPlayer(string path)
+    {
+        throw new NotImplementedException();
     }
 }

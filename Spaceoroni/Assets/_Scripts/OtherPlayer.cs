@@ -9,13 +9,6 @@ public class OtherPlayer : IPlayer
     bool recievedEvent = false;
     int builderInt;
     Coordinate builderCoord;
-    public GameObject Builder1GameObject;
-    public GameObject Builder2GameObject;
-    void Start()
-    {
-        Builder1 = Builder1GameObject.GetComponent<Builder>();
-        Builder2 = Builder2GameObject.GetComponent<Builder>();
-    }
 
     //this needs to wait for a turn to be recieved
     public override IEnumerator beginTurn(Game g)

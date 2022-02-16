@@ -6,10 +6,13 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 using TMPro;
+using SharpNeat.Core;
+using SharpNeat.Genomes.Neat;
+using SharpNeat.Phenomes;
+using AI_SpaceRace;
 
 public class Game : MonoBehaviour
 {
-
     [SerializeField]
     private GameObject NewtorkingInfo;
 
@@ -27,8 +30,15 @@ public class Game : MonoBehaviour
     public int timeToTurn = 2;
 
     int[,] Board;
-    IPlayer Player1;
-    IPlayer Player2;
+    public int[,] state { get
+        {
+            return Board;
+        } }
+    public IPlayer Player1;
+    public IPlayer Player2;
+    public IPlayer curPlayer;
+    public SantoriniCoevolutionExperiment _experiment { get; private set; }
+    
 
     public static Coordinate clickLocation;
 
@@ -37,7 +47,7 @@ public class Game : MonoBehaviour
         Debug.Log("StartingGame");
 
 
-        GameSettings.gameType = GameSettings.GameType.Multiplayer;
+        GameSettings.gameType = GameSettings.GameType.Singleplayer;
 
         Board = new int[5, 5];
         playerState = PlayerState.Playing;
@@ -61,7 +71,8 @@ public class Game : MonoBehaviour
                 break;
             case GameSettings.GameType.Singleplayer:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
-                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
+                Player2.loadNEATPlayer("coevolution_champion.xml");
                 break;
             case GameSettings.GameType.Multiplayer:
                 setupMultiplayerSettings();
@@ -136,17 +147,16 @@ public class Game : MonoBehaviour
             {
                 // string turn BUILDERMOVEBUILD string
                 PhotonView photonView = PhotonView.Get(this);
-                if (curPlayer is Player || curPlayer is OtherPlayer)//&& photonView.IsMine)
+                if(curPlayer is StringPlayer)
                 {
-                    yield return StartCoroutine(curPlayer.beginTurn(this));
-                }
-                else if(curPlayer is StringPlayer)
-                {
-                    //this will recieve a turn from a event then add it to the end of the list
-                    //RecieveTurn();
                     yield return new WaitForSeconds(timeToTurn);
                 }
+                else
+                {
+                    yield return StartCoroutine(curPlayer.beginTurn(this));
 
+                }
+                
                 Turn t = curPlayer.getNextTurn();
                 // update the board with the current player's move
                 Debug.Log(t.ToString()); //BUG 
@@ -334,8 +344,17 @@ public class Game : MonoBehaviour
         {
             Coordinate c = Coordinate.stringToCoord(coord);
             int height = Board[c.x, c.y];
-            GameObject level = GameObject.Find(coord).transform.GetChild(0).GetChild(height).gameObject;
-            Levels.Add(level);
+            GameObject level;
+            if (height == 3)
+            {
+                Levels.Add(GameObject.Find(coord).transform.GetChild(0).GetChild(0).gameObject);
+                Levels.Add(GameObject.Find(coord).transform.GetChild(0).GetChild(1).gameObject);
+                Levels.Add(GameObject.Find(coord).transform.GetChild(0).GetChild(2).gameObject);
+            }
+            else
+            {
+                Levels.Add(GameObject.Find(coord).transform.GetChild(0).GetChild(height).gameObject);
+            }
         }
         return Levels;
     }

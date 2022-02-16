@@ -54,8 +54,8 @@ public static class HighlightManager
     }
     public static void highlightPlayersBuilder(Player p)
     {
-        highlightedObjects.Add(p.Builder1GameObject);
-        highlightedObjects.Add(p.Builder2GameObject);
+        highlightedObjects.Add(p.getBuilders().Item1.gameObject);
+        highlightedObjects.Add(p.getBuilders().Item2.gameObject);
     }
     public static Material getHighlightMat()
     {
