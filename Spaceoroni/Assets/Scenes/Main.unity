@@ -2859,8 +2859,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GameBoardLocation: {fileID: 668778916}
   StartScreenLocation: {fileID: 146967134}
-  MovementSpeed: 70
-  RotationSpeed: 20
+  MovementSpeed: 280
+  RotationSpeed: 80
 --- !u!45 &963194230
 Skybox:
   m_ObjectHideFlags: 0

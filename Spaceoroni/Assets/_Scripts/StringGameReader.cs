@@ -5,7 +5,7 @@ using UnityEngine;
 
 public static class StringGameReader
 {
-    static string[] lines = System.IO.File.ReadAllLines(@"C:\Users\Team03\Documents\GitHub\SpaceRace\Spaceoroni\Assets\_Scripts\TwoPlayerGame.txt");
+    static string[] lines = System.IO.File.ReadAllLines(@".\Assets\_Scripts\TwoPlayerGame.txt");
     public static int MoveCount = 0;
     public static Coordinate player1builder1Location = Coordinate.stringToCoord(lines[0].Substring(lines[0].IndexOf(' ') + 1));
     public static Coordinate player1builder2Location = Coordinate.stringToCoord(lines[0].Substring(lines[0].IndexOf(' ') + 3));
@@ -15,7 +15,7 @@ public static class StringGameReader
     public static string getMoves()
     {
         string line = lines[MoveCount++ + 2];
-        return line.Substring(line.IndexOf(' ')+1);
+        return line.Substring(line.LastIndexOf(' ')+1);
     }
 
     public static Tuple<Coordinate,Coordinate> BuilderLocation(int player)

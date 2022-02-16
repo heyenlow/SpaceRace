@@ -24,7 +24,7 @@ public class Game : MonoBehaviour
     public float level1Height = 0.8f;
     public float level2Height = 0.5f;
     public float level3Height = 0.3f;
-    public int timeToTurn = 2;
+    public int timeToTurn = 1;
 
     int[,] Board;
     IPlayer Player1;
@@ -37,7 +37,7 @@ public class Game : MonoBehaviour
         Debug.Log("StartingGame");
 
 
-        GameSettings.gameType = GameSettings.GameType.Multiplayer;
+        GameSettings.gameType = GameSettings.GameType.Watch;
 
         Board = new int[5, 5];
         playerState = PlayerState.Playing;
