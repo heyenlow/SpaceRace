@@ -10,7 +10,9 @@ public class CameraMovement : MonoBehaviour
     Transform GameBoardLocation;
     [SerializeField]
     Transform StartScreenLocation;
-   
+    [SerializeField]
+    Transform StartScreenLocationCenter;
+
     /*old
     Vector3 EntryScreenCameraPostition = new Vector3((float)6.71000004, (float)5.44999981, (float)-8.80999947);
     Quaternion EntryScreenCameraAngle = new Quaternion((float)0, (float)0, (float)0, (float)1);
@@ -44,7 +46,7 @@ public class CameraMovement : MonoBehaviour
             movingCamera.transform.position = Vector3.MoveTowards(movingCamera.transform.position, newLocation, MovementSpeed * Time.deltaTime);  
             movingCamera.transform.rotation = Quaternion.RotateTowards(movingCamera.transform.rotation, newRotation, RotationSpeed * Time.deltaTime);
             
-            if (movingCamera.transform.position == newLocation) movingCamera = null;
+            if (movingCamera.transform.position == newLocation && movingCamera.transform.rotation == newRotation) movingCamera = null;
         }
     }
 
@@ -52,6 +54,19 @@ public class CameraMovement : MonoBehaviour
     {
         newLocation = GameBoardLocation.position;
         newRotation = GameBoardLocation.rotation;
+        movingCamera = this.gameObject;
+    }
+
+    public void moveCameraToCenterSpace()
+    {
+        newLocation = StartScreenLocationCenter.position;
+        newRotation = StartScreenLocationCenter.rotation;
+        movingCamera = this.gameObject;
+    }
+    public void moveCameraToStart()
+    {
+        newLocation = StartScreenLocation.position;
+        newRotation = StartScreenLocation.rotation;
         movingCamera = this.gameObject;
     }
 }
