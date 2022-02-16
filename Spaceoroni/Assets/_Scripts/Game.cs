@@ -44,11 +44,15 @@ public class Game : MonoBehaviour
     
 
     public static Coordinate clickLocation;
-    private bool isDebug = true;
+    private bool isDebug = false;
     private void Start()
     {
-        GameSettings.gameType = GameSettings.GameType.NotSet;
-        if (isDebug) StartGame();
+        if (isDebug)
+        {
+            StartGame();
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
+            GameSettings.gameType = GameSettings.GameType.NotSet;
+        }
     }
 
 

@@ -50,7 +50,7 @@ public class CameraMovement : MonoBehaviour
         }
     }
 
-    public void moveCameraFromStartScreenToGameBoard()
+    public void moveCameraToGameBoard()
     {
         newLocation = GameBoardLocation.position;
         newRotation = GameBoardLocation.rotation;
