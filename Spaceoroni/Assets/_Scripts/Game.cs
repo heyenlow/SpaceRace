@@ -18,6 +18,11 @@ public class Game : MonoBehaviour
 
     [SerializeField]
     private GameObject Rotator;
+    [SerializeField]
+    private GameObject PauseButton;
+    [SerializeField]
+    private GameObject DebugInfo;
+
 
 
     public enum PlayerState
@@ -54,19 +59,27 @@ public class Game : MonoBehaviour
             GameSettings.gameType = GameSettings.GameType.NotSet;
         }
     }
-
+    private void Update()
+    {
+        DebugInfo.GetComponent<TextMeshProUGUI>().text = HighlightManager.highlightedObjects.Count.ToString();
+    }
 
     public void StartGame()
     {
+        ResetGame();
         Debug.Log("StartingGame");
+        
         Rotator.SetActive(false);
-
-
-        Board = new int[5, 5];
+        PauseButton.SetActive(true);
         playerState = PlayerState.Playing;
         setupGameSettings();
-        ClearBoard();
         StartCoroutine(PlayGameToEnd());
+    }
+    public void ResetGame()
+    {
+        Board = new int[5, 5];
+        ClearBoard();
+        //need to add move builders home
     }
 
     //reads the settings that will be set by the UI
@@ -116,7 +129,6 @@ public class Game : MonoBehaviour
         Debug.Log("Player1: " + Player1 + ", Player2: " + Player2);
     }
     
-
     public IEnumerator processTurnString(Turn turn, IPlayer curPlayer, Game g)
     {
         //players already move the builders
@@ -194,8 +206,6 @@ public class Game : MonoBehaviour
         }
         yield return winner;
     }
-
-
 
     //returns the board height at a given coordinate
     public float heightAtCoordinate(Coordinate c)
@@ -386,5 +396,8 @@ public class Game : MonoBehaviour
         clickLocation = location;
         HighlightManager.highlightedObjects.Clear();
     }
+
+    public void pauseGame() { HighlightManager.pauseGameHighlights(); }
+    public void resumeGame() { HighlightManager.resumeGameHighlights(); }
 
 }

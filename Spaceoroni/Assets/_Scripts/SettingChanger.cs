@@ -23,6 +23,12 @@ public class SettingChanger : MonoBehaviour
     public void setAIDifficultyHard() { GameSettings.difficulty = GameSettings.AIDifficulty.Hard; }
     public void setAIDifficultyReset() { GameSettings.difficulty = GameSettings.AIDifficulty.NotSet; }
 
-
+    //RESET ALL TO NOTSET
+    public void resetGameSettings()
+    {
+        setGameTypeReset();
+        setAIDifficultyReset();
+        setNetworkingModeReset();
+    }
 
 }

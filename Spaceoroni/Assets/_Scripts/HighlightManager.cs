@@ -7,6 +7,7 @@ public static class HighlightManager
     public static List<GameObject> highlightedObjects = new List<GameObject>();
     private static Material highlight;
     private static Material possibleHighlight;
+    private static List<GameObject> pauseHoldObjects = new List<GameObject>();
 
     public static void highlightPossibleMoveLocations(Coordinate location)
     {
@@ -32,7 +33,6 @@ public static class HighlightManager
             highlightedObjects.Remove(obj);
         }
     }
-
     public static void highlightAllPossibleBuildLocations(List<GameObject> Levels)
     {
         foreach (GameObject l in Levels)
@@ -50,7 +50,6 @@ public static class HighlightManager
             }
         }
     }
-
     public static void unhighlightAllPossibleBuildLocations(List<GameObject> Levels)
     {
         foreach (GameObject l in Levels)
@@ -105,9 +104,23 @@ public static class HighlightManager
     {
         return highlight;
     }
-
     public static bool isHighlightObj(GameObject obj)
     {
         return highlightedObjects.Contains(obj);
+    }
+    public static void pauseGameHighlights()
+    {
+        //moves all the object to the pasue list
+        pauseHoldObjects = new List<GameObject>(highlightedObjects);
+        highlightedObjects.Clear();
+        Debug.Log("Pause: " + highlightedObjects.Count + " " + pauseHoldObjects.Count);
+    }
+    public static void resumeGameHighlights()
+    {
+        //restores the highlighted object list
+        highlightedObjects = new List<GameObject>(pauseHoldObjects);
+        pauseHoldObjects.Clear();
+        Debug.Log("Resume: " + highlightedObjects.Count + " " + pauseHoldObjects.Count);
+
     }
 }

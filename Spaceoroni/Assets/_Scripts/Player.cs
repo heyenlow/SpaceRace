@@ -46,16 +46,16 @@ public class Player : IPlayer
         Game.clickLocation = null;
     }
 
-    public IEnumerator chooseMove(Game g)
+    public override IEnumerator chooseMove(Game g)
     {
         Coordinate temp = new Coordinate(currentTurn.BuilderLocation);
         List<string> allMoves = g.getAllPossibleMoves(currentTurn.BuilderLocation);
         
         if(g.canMove(currentTurn.BuilderLocation))
         {
+            HighlightManager.highlightAllPossibleMoveLocations(allMoves);
             while (Game.clickLocation == null)
             {
-                HighlightManager.highlightAllPossibleMoveLocations(allMoves);
                 yield return new WaitForEndOfFrame();
             }
 
@@ -84,17 +84,17 @@ public class Player : IPlayer
         currentTurn.BuilderLocation = temp;
     }
 
-    public IEnumerator chooseBuild(Game g)
+    public override IEnumerator chooseBuild(Game g)
     {
 
         //Build Block
         Game.clickLocation = null;
         List<string> allBuilds = g.getAllPossibleBuilds(currentTurn.MoveLocation);
         List<GameObject> allBuildLevels = g.getAllPossibleBuildLevels(allBuilds);
-
+        
+        HighlightManager.highlightAllPossibleBuildLocations(allBuildLevels);
         while (Game.clickLocation == null)
         {
-            HighlightManager.highlightAllPossibleBuildLocations(allBuildLevels);
             yield return new WaitForEndOfFrame();
         }
         currentTurn.BuildLocation = Game.clickLocation;
