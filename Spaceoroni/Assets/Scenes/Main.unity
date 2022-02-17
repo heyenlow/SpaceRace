@@ -9269,7 +9269,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 963194229}
         m_TargetAssemblyTypeName: CameraMovement, Assembly-CSharp
-        m_MethodName: moveCameraFromStartScreenToGameBoard
+        m_MethodName: moveCameraToGameBoard
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11851,7 +11851,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 963194229}
         m_TargetAssemblyTypeName: CameraMovement, Assembly-CSharp
-        m_MethodName: moveCameraFromStartScreenToGameBoard
+        m_MethodName: moveCameraToGameBoard
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -12544,7 +12544,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 963194229}
         m_TargetAssemblyTypeName: CameraMovement, Assembly-CSharp
-        m_MethodName: moveCameraFromStartScreenToGameBoard
+        m_MethodName: moveCameraToGameBoard
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
