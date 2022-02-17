@@ -45,6 +45,8 @@ public class Game : MonoBehaviour
     public IPlayer Player1;
     public IPlayer Player2;
     public IPlayer curPlayer;
+    public static bool cancelTurn = false;
+
     public SantoriniCoevolutionExperiment _experiment { get; private set; }
     
 
@@ -77,6 +79,11 @@ public class Game : MonoBehaviour
     }
     public void ResetGame()
     {
+        cancelTurn = true;
+        Player1 = null;
+        Player2 = null;
+        curPlayer = null;
+        clickLocation = null;
         Board = new int[5, 5];
         ClearBoard();
         //need to add move builders home
