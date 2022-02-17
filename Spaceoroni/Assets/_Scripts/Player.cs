@@ -10,7 +10,6 @@ public class Player : IPlayer
 {
     private Turn currentTurn;
 
-
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
         g.addAllLocationsWithoutBuildersToHighlight();
@@ -33,7 +32,7 @@ public class Player : IPlayer
         yield return true;
     }
 
-    public IEnumerator SelectBuilder()
+    public override IEnumerator SelectBuilder()
     {
         //Select Builder
         Game.clickLocation = null;   //Reset click
@@ -66,7 +65,6 @@ public class Player : IPlayer
 
             if (g.canBuild(currentTurn.BuilderLocation))
             {
-                // bughere
                 moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
             }
             else
@@ -152,5 +150,4 @@ public class Player : IPlayer
         PhotonNetwork.RaiseEvent(NetworkingManager.RAISE_TURN, datas, RaiseEventOptions.Default, SendOptions.SendReliable);
         Debug.Log("Raising Turn" + t.ToString());
     }
-
 }

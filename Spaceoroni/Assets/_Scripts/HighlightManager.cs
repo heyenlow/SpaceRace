@@ -20,7 +20,14 @@ public static class HighlightManager
         foreach (string coord in locations)
         {
             GameObject obj = GameObject.Find(coord);
-            obj.GetComponent<Renderer>().material = possibleHighlight;
+            var activeChildren = obj.GetComponentsInChildren<Level>();
+            foreach(var level in activeChildren)
+            {
+                Level.highlightType = Level.HighlightType.move;
+                level.highlightLevel();
+                highlightedObjects.Add(level.gameObject);
+            }
+            obj.GetComponent<Location>().highlightLocation();
             highlightedObjects.Add(obj);
         }
     }
@@ -29,7 +36,13 @@ public static class HighlightManager
         foreach (string coord in locations)
         {
             GameObject obj = GameObject.Find(coord);
-            obj.GetComponent<Location>().resetMaterial();
+            var activeChildren = obj.GetComponentsInChildren<Level>();
+            foreach (var level in activeChildren)
+            {
+                level.removeHighlight();
+                highlightedObjects.Remove(level.gameObject);
+            }
+            obj.GetComponent<Location>().removeHighlight();
             highlightedObjects.Remove(obj);
         }
     }
@@ -45,7 +58,8 @@ public static class HighlightManager
             else
             {
                 l.SetActive(true);
-                l.GetComponent<Level>().makeOpaque();
+                Level.highlightType = Level.HighlightType.build;
+                l.GetComponent<Level>().highlightLevel();
                 highlightedObjects.Add(l);
             }
         }
@@ -62,20 +76,21 @@ public static class HighlightManager
             else
             {
                 l.SetActive(false);
-                l.GetComponent<Level>().resetMaterial();
+                l.GetComponent<Level>().removeHighlight();
                 highlightedObjects.Remove(l);
             }
         }
     }
     private static void highlightRocket(GameObject Rocket)
     {
+        Level.highlightType = Level.HighlightType.build;
         GameObject level1 = Rocket.transform.GetChild(0).gameObject;
         GameObject level2 = Rocket.transform.GetChild(1).gameObject;
         GameObject level3 = Rocket.transform.GetChild(2).gameObject;
 
-        level1.GetComponent<Level>().makeOpaque();
-        level2.GetComponent<Level>().makeOpaque();
-        level3.GetComponent<Level>().makeOpaque();
+        level1.GetComponent<Level>().highlightLevel();
+        level2.GetComponent<Level>().highlightLevel();
+        level3.GetComponent<Level>().highlightLevel();
 
         highlightedObjects.Add(level1);
         highlightedObjects.Add(level2);
@@ -87,9 +102,9 @@ public static class HighlightManager
         GameObject level2 = Rocket.transform.GetChild(1).gameObject;
         GameObject level3 = Rocket.transform.GetChild(2).gameObject;
         
-        level1.GetComponent<Level>().resetMaterial();
-        level2.GetComponent<Level>().resetMaterial();
-        level3.GetComponent<Level>().resetMaterial();
+        level1.GetComponent<Level>().removeHighlight();
+        level2.GetComponent<Level>().removeHighlight();
+        level3.GetComponent<Level>().removeHighlight();
 
         highlightedObjects.Remove(level1);
         highlightedObjects.Remove(level2);

@@ -5,19 +5,7 @@ using UnityEngine.EventSystems;
 
 public class Location : MonoBehaviour
 {
-    private Game gameController;
-    private Color startColor;
-    private Color highlightColor;
-    private Color originalColor;
-    private GameObject movingRocket;
-    // Start is called before the first frame update
-    void Start()
-    {
-        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<Game>();
-        originalColor = this.GetComponent<Renderer>().material.color;
-        highlightColor = new Color(0, 145, 255);
-    }
-
+    private bool isMove = false;
     public void blastOffRocket()
     {
         var rocket = this.GetComponentInChildren<Rocket>();
@@ -26,11 +14,9 @@ public class Location : MonoBehaviour
 
     private void OnMouseOver()
     {
-        //GetComponent<Renderer>().material.color = highlightMaterial;
         if(HighlightManager.isHighlightObj(this.gameObject)) 
         {
-            if (GetComponent<Renderer>().material.color != highlightColor) { startColor = GetComponent<Renderer>().material.color; }
-            GetComponent<Renderer>().material.color = highlightColor;
+            mouseOverHighlight();
         }
     }
 
@@ -38,7 +24,14 @@ public class Location : MonoBehaviour
     {
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
-            GetComponent<Renderer>().material.color = startColor;
+            if (isMove)
+            {
+                highlightLocation();
+            }
+            else
+            {
+                removeHighlight();
+            }
         }
     }
 
@@ -47,13 +40,23 @@ public class Location : MonoBehaviour
         if (HighlightManager.isHighlightObj(this.gameObject)) 
         {
             Game.recieveLocationClick(Coordinate.stringToCoord(this.name));
-            resetMaterial();
+            isMove = false;
+            removeHighlight();
         }
     }
 
-    public void resetMaterial()
+    public void removeHighlight()
     {
-        this.GetComponent<Renderer>().material.color = originalColor;
+        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
+    }
+    public void highlightLocation()
+    {
+        isMove = true;
+        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Ultimate 10+ Shaders/Force Field");
+    }
+    public void mouseOverHighlight()
+    {
+        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");
     }
 
 }

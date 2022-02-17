@@ -4,23 +4,19 @@ using UnityEngine;
 
 public class Level : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public enum HighlightType
     {
+        move,
+        build
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public static HighlightType highlightType;
 
     private void OnMouseOver()
     {
         //GetComponent<Renderer>().material.color = highlightMaterial;
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
-            resetMaterial();
+            removeHighlight();
         }
         //gameController.canHighlightBuilderPlacement(Coordinate.stringToCoord(this.name));
     }
@@ -29,7 +25,7 @@ public class Level : MonoBehaviour
     {
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
-            makeOpaque();
+            highlightLevel();
         }
     }
 
@@ -38,20 +34,21 @@ public class Level : MonoBehaviour
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
             Game.recieveLocationClick(Coordinate.stringToCoord(this.transform.parent.parent.name));
-            resetMaterial();
+            removeHighlight();
         }
     }
 
-    public void makeOpaque()
+    public void highlightLevel()
     {
         var childRenderers = this.gameObject.GetComponentsInChildren<Renderer>();
         foreach (var rend in childRenderers)
         {
-            rend.material.shader = Shader.Find("Ultimate 10+ Shaders/Force Field");
+            if(highlightType == HighlightType.build) rend.material.shader = Shader.Find("Ultimate 10+ Shaders/Force Field");
+            else if (highlightType == HighlightType.move) rend.material.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");
         }
     }
 
-    public void resetMaterial()
+    public void removeHighlight()
     {
         var childRenderers = this.gameObject.GetComponentsInChildren<Renderer>();
         foreach (var rend in childRenderers)
