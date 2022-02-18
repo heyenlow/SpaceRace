@@ -12,6 +12,8 @@ public class CameraMovement : MonoBehaviour
     Transform StartScreenLocation;
     [SerializeField]
     Transform StartScreenLocationCenter;
+    [SerializeField]
+    Transform PostGameScreenPerspective;
 
     /*old
     Vector3 EntryScreenCameraPostition = new Vector3((float)6.71000004, (float)5.44999981, (float)-8.80999947);
@@ -67,6 +69,12 @@ public class CameraMovement : MonoBehaviour
     {
         newLocation = StartScreenLocation.position;
         newRotation = StartScreenLocation.rotation;
+        movingCamera = this.gameObject;
+    }
+    public void moveCameraToPostGame()
+    {
+        newLocation = PostGameScreenPerspective.position;
+        newRotation = PostGameScreenPerspective.rotation;
         movingCamera = this.gameObject;
     }
 }
