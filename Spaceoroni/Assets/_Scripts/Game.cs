@@ -22,7 +22,8 @@ public class Game : MonoBehaviour
     private GameObject PauseButton;
     [SerializeField]
     private GameObject DebugInfo;
-
+    [SerializeField]
+    private GameObject EndOfGameScreen;
 
 
     public enum PlayerState
@@ -211,7 +212,14 @@ public class Game : MonoBehaviour
             }
 
         }
+        goToEndOfGameScreen();
         yield return winner;
+    }
+
+    public void goToEndOfGameScreen()
+    {
+        EndOfGameScreen.SetActive(true);
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToPostGame();
     }
 
     //returns the board height at a given coordinate
