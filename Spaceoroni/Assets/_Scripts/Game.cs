@@ -218,6 +218,7 @@ public class Game : MonoBehaviour
 
     public void goToEndOfGameScreen()
     {
+        PauseButton.SetActive(false);
         EndOfGameScreen.SetActive(true);
         GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToPostGame();
     }
