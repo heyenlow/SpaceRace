@@ -10,6 +10,25 @@ public class Player : IPlayer
 {
     private Turn currentTurn;
 
+    private Builder builder;
+
+    public bool clickedBuilder(Coordinate click)
+    { 
+        Builder[] builders = this.gameObject.GetComponentsInChildren<Builder>();
+
+        for(int i = 0; i < builders.Length; i++)
+        {
+            if(click.x == builders[i].coord.x &&
+                click.y == builders[i].coord.y)
+            {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
         g.addAllLocationsWithoutBuildersToHighlight();
@@ -32,7 +51,7 @@ public class Player : IPlayer
         yield return true;
     }
 
-    public override IEnumerator SelectBuilder()
+    public override IEnumerator SelectBuilder(Game g)
     {
         //Select Builder
         Game.clickLocation = null;   //Reset click
@@ -43,39 +62,57 @@ public class Player : IPlayer
         }
         currentTurn.BuilderLocation = Game.clickLocation;
         Game.clickLocation = null;
+
+        // after choosing a builder, find the best square you can move to from it.
+        yield return StartCoroutine(chooseMove(g));
     }
 
     public override IEnumerator chooseMove(Game g)
     {
         Coordinate temp = new Coordinate(currentTurn.BuilderLocation);
         List<string> allMoves = g.getAllPossibleMoves(currentTurn.BuilderLocation);
-        
-        if(g.canMove(currentTurn.BuilderLocation))
+
+        Debug.Log((this.gameObject.GetComponentsInChildren<Builder>())[0]);
+        Debug.Log(Coordinate.coordToString(this.gameObject.GetComponentsInChildren<Builder>()[1].coord));
+        //allMoves.ForEach(m => Debug.Log(m));
+
+        if (g.canMove(currentTurn.BuilderLocation))
         {
+            HighlightManager.highlightPlayersBuilder(this);
             HighlightManager.highlightAllPossibleMoveLocations(allMoves);
             while (Game.clickLocation == null)
             {
                 yield return new WaitForEndOfFrame();
             }
 
-            currentTurn.MoveLocation = Game.clickLocation;
-            Game.clickLocation = null;
-
-            HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
-
-            if (g.canBuild(currentTurn.BuilderLocation))
+            if (clickedBuilder(Game.clickLocation))
             {
-                moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
+                Game.clickLocation = null;
+                HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
+                yield return StartCoroutine(SelectBuilder(g));
             }
             else
             {
-                currentTurn.canPerformTurn = false;
-                Debug.Log("Cant Build");
-            }   
+                currentTurn.MoveLocation = Game.clickLocation;
+                Game.clickLocation = null;
+
+                HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
+
+                if (g.canBuild(currentTurn.BuilderLocation))
+                {
+                    moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
+                }
+                else
+                {
+                    currentTurn.canPerformTurn = false;
+                    Debug.Log("Cant Build");
+                }
+            }
         }
         else
         {
             currentTurn.canPerformTurn = false;
+            yield return StartCoroutine(SelectBuilder(g));
             Debug.Log("Cant Move");
         }
 
@@ -107,10 +144,7 @@ public class Player : IPlayer
         currentTurn = new Turn();
         
         // after activation choose a builder
-        yield return StartCoroutine(SelectBuilder());
-
-        // after choosing a builder, find the best square you can move to from it.
-        yield return StartCoroutine(chooseMove(g));
+        yield return StartCoroutine(SelectBuilder(g));
 
 
         // after choosing a move, need to find the best square to build on. What do I do about this?

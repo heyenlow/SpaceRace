@@ -50,7 +50,7 @@ public abstract class IPlayer : MonoBehaviour
 
     public Tuple<Builder, Builder> getBuilders() { return new Tuple<Builder, Builder>(Builder1, Builder2); }
 
-    public virtual IEnumerator SelectBuilder()
+    public virtual IEnumerator SelectBuilder(Game g)
     {
         throw new NotImplementedException();
     }

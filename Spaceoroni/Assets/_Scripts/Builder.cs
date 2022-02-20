@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Builder : MonoBehaviour
 {
-    Coordinate coord = new Coordinate();
+    public Coordinate coord = new Coordinate();
     Material startMaterial;
     GameObject movingBuilder;
     Vector3 newLocation;
