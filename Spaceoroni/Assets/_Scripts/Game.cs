@@ -52,14 +52,14 @@ public class Game : MonoBehaviour
     
 
     public static Coordinate clickLocation;
-    private bool isDebug = false;
+    private bool isDebug = true;
     private void Start()
     {
         if (isDebug)
         {
-            StartGame();
+            GameSettings.gameType = GameSettings.GameType.Watch;
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
-            GameSettings.gameType = GameSettings.GameType.NotSet;
+            StartGame();
         }
     }
     private void Update()
@@ -142,7 +142,7 @@ public class Game : MonoBehaviour
         //players already move the builders
         if (!(curPlayer is Player)) curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
-        if(GameSettings.gameType == GameSettings.GameType.Watch) yield return new WaitForSeconds(timeToTurn);
+        if(GameSettings.gameType == GameSettings.GameType.Watch) yield return new WaitForSeconds(timeToTurn/2);
 
         // If not over Where to build?
         if (!turn.isWin)
