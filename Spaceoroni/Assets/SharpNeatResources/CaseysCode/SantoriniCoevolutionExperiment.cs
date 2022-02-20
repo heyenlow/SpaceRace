@@ -31,8 +31,8 @@ namespace AI_SpaceRace
         ParallelOptions _parallelOptions;
 
         #region INeatExperiment Members
-        public int InputCount { get { return 38; } }
-        public int OutputCount { get { return 38; } }
+        public int InputCount { get { return 47; } }
+        public int OutputCount { get { return 20; } }
 
         public ICoevolutionPhenomeEvaluator<IBlackBox> PhenomeEvaluator
         {

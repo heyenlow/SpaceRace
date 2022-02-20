@@ -30,7 +30,7 @@ public class NeatPlayer : IPlayer
         _experiment.Initialize("Santorini", xmlConfig.DocumentElement);
 
         NeatGenome genome = null;
-        NeatGenomeFactory fac = new NeatGenomeFactory(38, 38);
+        NeatGenomeFactory fac = new NeatGenomeFactory(47, 20);
 
         XmlReader xr = XmlReader.Create(path);
         genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, false, fac)[0];
@@ -109,9 +109,9 @@ public class NeatPlayer : IPlayer
         setInputSignalArrayBuilder(inputSignalArray, g);
         Coordinate evalBuild;
         // loop finishes up last 9 possible inputs
-        for (int i = 29; i < possib.Count; i++)
+        for (int i = 38; i < possib.Count; i++)
         {
-            evalBuild = Coordinate.stringToCoord(possib[i - 29]);
+            evalBuild = Coordinate.stringToCoord(possib[i - 38]);
             inputSignalArray[i] = (evalBuild.x * 5) + evalBuild.y;
         }
 
@@ -150,10 +150,10 @@ public class NeatPlayer : IPlayer
 
         for (int i = 0; i < possibleBuilds.Count; i++)
         {
-            Coordinate evalBuild = new Coordinate();
+            Coordinate evalBuild;
             evalBuild = Coordinate.stringToCoord(possibleBuilds[i]);
 
-            if (Brain.OutputSignalArray[i+2] > max && evalBuild.x != currentTurn.MoveLocation.x && evalBuild.y != currentTurn.MoveLocation.y)
+            if (Brain.OutputSignalArray[i+11] > max && evalBuild.x != currentTurn.MoveLocation.x && evalBuild.y != currentTurn.MoveLocation.y)
             {
                 build.x = evalBuild.x;
                 build.y = evalBuild.y;
