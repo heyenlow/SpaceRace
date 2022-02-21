@@ -14,7 +14,7 @@ public class OtherPlayer : IPlayer
     public override IEnumerator beginTurn(Game g)
     {
         recievedEvent = false;
-        while (!recievedEvent)
+        while (!recievedEvent && !Game.cancelTurn)
         {
             yield return new WaitForEndOfFrame();
         }
@@ -23,13 +23,18 @@ public class OtherPlayer : IPlayer
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
         recievedEvent = false;
-        while (!recievedEvent)
+        while (!recievedEvent && !Game.cancelTurn)
         {
             yield return new WaitForEndOfFrame();
         }
-        moveBuidler(builder, builderCoord, g);
 
-        Debug.Log("Moving builder " + builder + " to " + Coordinate.coordToString(builderCoord));
+        if (!Game.cancelTurn)
+        {
+            moveBuidler(builder, builderCoord, g);
+
+            Debug.Log("Moving builder " + builder + " to " + Coordinate.coordToString(builderCoord));
+        }
+
         yield return true;
     }
     public void OnEvent(EventData photonEvent)
