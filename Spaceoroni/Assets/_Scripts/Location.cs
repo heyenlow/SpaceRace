@@ -9,6 +9,7 @@ public class Location : MonoBehaviour
     public void blastOffRocket()
     {
         var rocket = this.GetComponentInChildren<Rocket>();
+        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("FX/Flare");
         rocket.blastOffRocket();
     }
 
