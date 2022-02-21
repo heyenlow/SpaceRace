@@ -26,6 +26,12 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject WaitingForPlayer;
     [SerializeField]
+    private GameObject Connecting;
+    [SerializeField]
+    private GameObject Join;
+    [SerializeField]
+    private GameObject Host;
+
     private Game gameManager;
 
 
@@ -52,13 +58,23 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
 
     #region Public Methods
 
-    public void ConnectToPUN()
+    public void OnClick_Multiplayer()
     {
-        if(!PhotonNetwork.IsConnected)
+        if (!PhotonNetwork.IsConnected)
         {
             isConnecting = PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = gameVersion;
+            Connecting.SetActive(true);
+            Join.SetActive(false);
+            Host.SetActive(false);
         }
+        else
+        {
+            Connecting.SetActive(false);
+            Join.SetActive(true);
+            Host.SetActive(true);
+        }
+
     }
 
     public void HostGame()
@@ -94,11 +110,15 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     #region MonoBehaviorPunCallbacks Callbacks
     public override void OnConnectedToMaster()
     {
+
         Debug.Log("OnConnectedToMaster() was called by PUN");
         if (isConnecting)
         {
             isConnecting = false;
             Debug.Log("Connected to master");
+            Connecting.SetActive(false);
+            Join.SetActive(true);
+            Host.SetActive(true);
         }
     }
 
@@ -122,11 +142,13 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         
         Debug.Log("OnJoinedRoom() called by PUN. Now this client is in a room.");
         Debug.Log(PhotonNetwork.CurrentRoom.PlayerCount);
+
         if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
         {
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
             gameManager.StartGame();
         }
+
     }
 
     public override void OnCreatedRoom()

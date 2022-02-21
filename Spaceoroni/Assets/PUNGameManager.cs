@@ -22,16 +22,6 @@ public class PUNGameManager : MonoBehaviourPunCallbacks
         Debug.LogFormat("Player left room");
     }
 
-    public override void OnPlayerEnteredRoom(Photon.Realtime.Player other)
-    {
-        Debug.LogFormat("OnPlayerEnteredRoom() {0}", other.NickName);
-
-        if (PhotonNetwork.IsMasterClient)
-        {
-            Debug.LogFormat("OnPlayerEnteredRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient);
-        }
-    }
-
     public override void OnPlayerLeftRoom(Photon.Realtime.Player other)
     {
         Debug.LogFormat("OnPlayerLeftRoom() ", other);
