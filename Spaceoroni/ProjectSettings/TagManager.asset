@@ -8,6 +8,7 @@ TagManager:
   - Player1
   - Square
   - Board
+  - Debug
   layers:
   - Default
   - TransparentFX

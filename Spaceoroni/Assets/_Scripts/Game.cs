@@ -60,6 +60,11 @@ public class Game : MonoBehaviour
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
             StartGame();
         }
+        else
+        {
+            var debugObjects = GameObject.FindGameObjectsWithTag("Debug");
+            foreach (GameObject d in debugObjects) { d.SetActive(false); }
+        }
     }
         string lastClick = "";
     private void Update()
