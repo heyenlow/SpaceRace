@@ -2224,7 +2224,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 0fd45d7d491891743a3ee5f4081129ef, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4361edf8f68b9b848bb8a6f89fb6b010, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2742,6 +2742,7 @@ MonoBehaviour:
   Connecting: {fileID: 128520469}
   Join: {fileID: 8562379454921958699}
   Host: {fileID: 8562379455599289733}
+  gameManager: {fileID: 2015303786}
 --- !u!4 &513342119
 Transform:
   m_ObjectHideFlags: 0
