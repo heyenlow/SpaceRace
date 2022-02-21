@@ -15,7 +15,6 @@ public class Game : MonoBehaviour
 {
     [SerializeField]
     private GameObject NewtorkingInfo;
-
     [SerializeField]
     private GameObject Rotator;
     [SerializeField]
@@ -52,26 +51,34 @@ public class Game : MonoBehaviour
     
 
     public static Coordinate clickLocation;
-    private bool isDebug = true;
+    private bool isDebug = false;
     private void Start()
     {
         if (isDebug)
         {
-            GameSettings.gameType = GameSettings.GameType.Watch;
+            GameSettings.gameType = GameSettings.GameType.Singleplayer;
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
             StartGame();
         }
     }
+        string lastClick = "";
     private void Update()
     {
-        DebugInfo.GetComponent<TextMeshProUGUI>().text = HighlightManager.highlightedObjects.Count.ToString();
+        if (clickLocation != null) lastClick = Coordinate.coordToString(clickLocation);
+        else lastClick = "null";
+        DebugInfo.GetComponent<TextMeshProUGUI>().text = HighlightManager.highlightedObjects.Count.ToString() + " " + lastClick;
+
     }
 
     public void StartGame()
     {
-        ResetGame();
+        //ResetGame();
         Debug.Log("StartingGame");
-        
+
+        Board = new int[5, 5];
+        ClearBoard();
+
+        cancelTurn = false;
         Rotator.SetActive(false);
         PauseButton.SetActive(true);
         playerState = PlayerState.Playing;
@@ -80,14 +87,27 @@ public class Game : MonoBehaviour
     }
     public void ResetGame()
     {
+        
+        //cancel current turn
         cancelTurn = true;
+        StopAllCoroutines();
+        
+        if(Player1 != null && Player2!= null) clearPlayersTurnsAndSendBuildersHome();
+
+        HighlightManager.unHighlightEverything();
+        HighlightManager.highlightedObjects.Clear();
+
+        //reset game variables
         Player1 = null;
         Player2 = null;
         curPlayer = null;
         clickLocation = null;
-        Board = new int[5, 5];
-        ClearBoard();
-        //need to add move builders home
+        
+    }
+    private void clearPlayersTurnsAndSendBuildersHome()
+    {
+        Player1.resetPlayer();
+        Player2.resetPlayer();
     }
 
     //reads the settings that will be set by the UI
@@ -116,7 +136,6 @@ public class Game : MonoBehaviour
                 setupMultiplayerSettings();
                 break;
         }
-        Debug.Log("Here");
     }
 
     private void setupMultiplayerSettings()
@@ -262,26 +281,6 @@ public class Game : MonoBehaviour
         yield return StartCoroutine(Player2.PlaceBuilder(1, 2, this));
         yield return StartCoroutine(Player2.PlaceBuilder(2, 2, this));
         yield return StartCoroutine(Player1.PlaceBuilder(2, 1, this));
-        /*
-        //Player 1 Builder 1
-        if (Player1 is Player || Player1 is OtherPlayer) yield return StartCoroutine(Player1.PlaceBuilder(1, 1, this));
-        else if (Player1 is StringPlayer) Player1.PlaceBuilder(1, 1, this);
-
-
-        //Player 2 Builder 1
-        if (Player2 is Player || Player2 is OtherPlayer) yield return StartCoroutine(Player2.PlaceBuilder(1,2, this));
-        else if (Player2 is StringPlayer) Player2.PlaceBuilder(1,2, this);
-
-        //Player 2 Builder 2
-        if (Player2 is Player || Player2 is OtherPlayer) yield return StartCoroutine(Player2.PlaceBuilder(2,2, this));
-        else if (Player2 is StringPlayer) Player2.PlaceBuilder(2,2, this);
-
-        //Player 1 Builder 2
-        if (Player1 is Player || Player1 is OtherPlayer) yield return StartCoroutine(Player1.PlaceBuilder(2,1, this));
-        else if (Player2 is StringPlayer) Player1.PlaceBuilder(2,1, this);
-        */
-
-
         yield return null;
     }
 

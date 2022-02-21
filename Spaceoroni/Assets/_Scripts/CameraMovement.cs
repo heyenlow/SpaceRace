@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    // Start is called before the first frame update
-    
     [SerializeField]
     Transform GameBoardLocation;
     [SerializeField]
@@ -15,14 +13,6 @@ public class CameraMovement : MonoBehaviour
     [SerializeField]
     Transform PostGameScreenPerspective;
 
-    /*old
-    Vector3 EntryScreenCameraPostition = new Vector3((float)6.71000004, (float)5.44999981, (float)-8.80999947);
-    Quaternion EntryScreenCameraAngle = new Quaternion((float)0, (float)0, (float)0, (float)1);
-    Vector3 gbca = new Vector3((float)40.4000015, (float)284.269989, (float)0.00000224223459);
-    Vector3 GameBoardCameraPostion = new Vector3((float)7.5999999, (float)5.44000006, (float)0.589999974);
-    Quaternion GameBoardCameraAngle = new Quaternion((float)0.272598833, (float)-0.576049924, (float)0.211945131, (float)0.740901887);
-    */
-
     Vector3 newLocation;
     Quaternion newRotation;
     [SerializeField]
@@ -31,16 +21,6 @@ public class CameraMovement : MonoBehaviour
     private int RotationSpeed = 10;
     GameObject movingCamera;
 
-    void Start()
-    {
-        //this.transform.position = EntryScreenCameraPostition;
-        //this.transform.rotation = EntryScreenCameraAngle;
-
-        //gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<Game>();
-        //GameBoardLocation = GameObject.Find("GameBoardCameraLocation").transform;
-    }
-
-    // Update is called once per frame
     void Update()
     {
         if (movingCamera != null)

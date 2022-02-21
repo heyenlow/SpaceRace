@@ -9,7 +9,6 @@ using UnityEngine;
 public class Player : IPlayer
 {
     private Turn currentTurn;
-
     private Builder builder;
 
     public bool clickedBuilder(Coordinate click)
@@ -26,28 +25,30 @@ public class Player : IPlayer
         }
 
         return false;
-
     }
 
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
         g.addAllLocationsWithoutBuildersToHighlight();
-        while (Game.clickLocation == null)
+        while (Game.clickLocation == null && !Game.cancelTurn)
         {
             yield return new WaitForEndOfFrame();
         }
-        Coordinate moveLocation = Game.clickLocation;
-        Game.clickLocation = null;
-
-        if (moveLocation != null)
+        if (!Game.cancelTurn)
         {
-            moveBuidler(builder, moveLocation, g);
 
-            HighlightManager.highlightedObjects.Clear();
+            Coordinate moveLocation = Game.clickLocation;
+            Game.clickLocation = null;
+
+            if (moveLocation != null)
+            {
+                moveBuidler(builder, moveLocation, g);
+
+                HighlightManager.highlightedObjects.Clear();
+            }
+
+            if (GameSettings.gameType == GameSettings.GameType.Multiplayer) RaiseBuilderLocation(moveLocation, builder);
         }
-
-        if (GameSettings.gameType == GameSettings.GameType.Multiplayer) RaiseBuilderLocation(moveLocation, builder);
-
         yield return true;
     }
 
@@ -56,15 +57,17 @@ public class Player : IPlayer
         //Select Builder
         Game.clickLocation = null;   //Reset click
         HighlightManager.highlightPlayersBuilder(this);
-        while (Game.clickLocation == null)
+        while (Game.clickLocation == null && !Game.cancelTurn)
         {
             yield return new WaitForEndOfFrame();
         }
-        currentTurn.BuilderLocation = Game.clickLocation;
-        Game.clickLocation = null;
-
+        if (!Game.cancelTurn)
+        {
+            currentTurn.BuilderLocation = Game.clickLocation;
+            Game.clickLocation = null;
+        }
         // after choosing a builder, find the best square you can move to from it.
-        yield return StartCoroutine(chooseMove(g));
+        yield return null;
     }
 
     public override IEnumerator chooseMove(Game g)
@@ -80,32 +83,36 @@ public class Player : IPlayer
         {
             HighlightManager.highlightPlayersBuilder(this);
             HighlightManager.highlightAllPossibleMoveLocations(allMoves);
-            while (Game.clickLocation == null)
+            while (Game.clickLocation == null && !Game.cancelTurn)
             {
                 yield return new WaitForEndOfFrame();
             }
-
-            if (clickedBuilder(Game.clickLocation))
+            if (!Game.cancelTurn)
             {
-                Game.clickLocation = null;
-                HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
-                yield return StartCoroutine(SelectBuilder(g));
-            }
-            else
-            {
-                currentTurn.MoveLocation = Game.clickLocation;
-                Game.clickLocation = null;
 
-                HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
-
-                if (g.canBuild(currentTurn.BuilderLocation))
+                if (clickedBuilder(Game.clickLocation))
                 {
-                    moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
+                    currentTurn.BuilderLocation = Game.clickLocation;
+                    Game.clickLocation = null;
+                    HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
+                    yield return StartCoroutine(chooseMove(g));
                 }
                 else
                 {
-                    currentTurn.canPerformTurn = false;
-                    Debug.Log("Cant Build");
+                    currentTurn.MoveLocation = Game.clickLocation;
+                    Game.clickLocation = null;
+
+                    HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
+
+                    if (g.canBuild(currentTurn.BuilderLocation))
+                    {
+                        moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
+                    }
+                    else
+                    {
+                        currentTurn.canPerformTurn = false;
+                        Debug.Log("Cant Build");
+                    }
                 }
             }
         }
@@ -128,14 +135,18 @@ public class Player : IPlayer
         List<GameObject> allBuildLevels = g.getAllPossibleBuildLevels(allBuilds);
         
         HighlightManager.highlightAllPossibleBuildLocations(allBuildLevels);
-        while (Game.clickLocation == null)
+        while (Game.clickLocation == null && !Game.cancelTurn)
         {
             yield return new WaitForEndOfFrame();
         }
-        currentTurn.BuildLocation = Game.clickLocation;
-        Game.clickLocation = null;
 
-        HighlightManager.unhighlightAllPossibleBuildLocations(allBuildLevels);
+        if (!Game.cancelTurn)
+        {
+            currentTurn.BuildLocation = Game.clickLocation;
+            Game.clickLocation = null;
+
+            HighlightManager.unhighlightAllPossibleBuildLocations(allBuildLevels);
+        }
 
     }
 
@@ -146,6 +157,8 @@ public class Player : IPlayer
         // after activation choose a builder
         yield return StartCoroutine(SelectBuilder(g));
 
+        //choose a move
+        yield return StartCoroutine(chooseMove(g));
 
         // after choosing a move, need to find the best square to build on. What do I do about this?
         if (!currentTurn.canPerformTurn)

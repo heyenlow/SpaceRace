@@ -138,4 +138,23 @@ public static class HighlightManager
         Debug.Log("Resume: " + highlightedObjects.Count + " " + pauseHoldObjects.Count);
 
     }
+
+    //resets the highlight and every level and rocket for a new game
+    public static void unHighlightEverything()
+    {
+        var allSquares = GameObject.FindGameObjectsWithTag("Square");
+        foreach(var square in allSquares)
+        {
+            var activeChildren = square.GetComponentsInChildren<Level>();
+            foreach (var level in activeChildren)
+            {
+                level.reset();
+                highlightedObjects.Remove(level.gameObject);
+            }
+            square.GetComponentInChildren<Rocket>().resetLocation();
+            square.GetComponent<Location>().removeHighlight();
+            highlightedObjects.Remove(square);
+        }
+        if (highlightedObjects.Count > 0) Debug.Log("Did not unhighlight everything");
+    }
 }
