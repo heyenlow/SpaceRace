@@ -51,12 +51,12 @@ public class Game : MonoBehaviour
     
 
     public static Coordinate clickLocation;
-    private bool isDebug = false;
+    private bool isDebug = true;
     private void Start()
     {
         if (isDebug)
         {
-            GameSettings.gameType = GameSettings.GameType.Singleplayer;
+            GameSettings.gameType = GameSettings.GameType.Watch;
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
             StartGame();
         }

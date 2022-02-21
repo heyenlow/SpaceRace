@@ -1,18 +1,36 @@
-Agent1: A3A4
-Agent2: C2C4
-0: Agent 1: A4B3A2
-1: Agent 2: C4B4A4
-2: Agent 1: B3C3D2
-3: Agent 2: B4C4D4
-4: Agent 1: C3D2D3
-5: Agent 2: C4D3E2
-6: Agent 1: D2E1E0
-7: Agent 2: D3D4E3
-8: Agent 1: E1E0E1
-9: Agent 2: D4E3E2
-10: Agent 1: E0E1E0
-11: Agent 2: E3E2E3
-12: Agent 1: E1E0E1
-13: Agent 2: E2E1E2
-14: Agent 1: E0D0E0
-15: Agent 2: E1E2
+MMPlayer: B2A0
+NeatPlayer: A2A1
+MMPlayer: B2B3C4
+NeatPlayer: A2B1C0
+MMPlayer: B3C4B4
+NeatPlayer: B1B0C1
+MMPlayer: C4B4A3
+NeatPlayer: B0C0D0
+MMPlayer: B4A3A2
+NeatPlayer: C0B1C0
+MMPlayer: A3B4C4
+NeatPlayer: B1B0C1
+MMPlayer: B4C4B3
+NeatPlayer: B0B1C0
+MMPlayer: A0B0C0
+NeatPlayer: B1A2B3
+MMPlayer: C4B3A3
+NeatPlayer: A2B1C1
+MMPlayer: B3B2C2
+NeatPlayer: B1A2B3
+MMPlayer: B2C2B1
+NeatPlayer: A2B1C1
+MMPlayer: C2B2B3
+NeatPlayer: B1A2B1
+MMPlayer: B2C2C3
+NeatPlayer: A2B1B2
+MMPlayer: C2C3B2
+NeatPlayer: B1A2B2
+MMPlayer: C3C4B4
+NeatPlayer: A2B1C2
+MMPlayer: C4C3B2
+NeatPlayer: B1A2B1
+MMPlayer: C3B4A3
+NeatPlayer: A1A0B1
+MMPlayer: B4A4A3
+NeatPlayer: A2A1A2
