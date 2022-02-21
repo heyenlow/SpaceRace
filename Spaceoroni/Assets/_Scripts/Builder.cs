@@ -8,18 +8,18 @@ public class Builder : MonoBehaviour
     GameObject movingBuilder;
     Vector3 newLocation;
     Quaternion newRotation;
-    public float Speed = 5;
-    public float RotationSpeed = 3;
     Vector3 homeLocation;
     Quaternion homeRotation;
+    public float Speed = 5;
+    public float RotationSpeed = 100;
+    private Animator anim;
 
-
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         homeLocation = this.transform.position;
         homeRotation = this.transform.rotation;
 
+		anim = gameObject.GetComponentInChildren<Animator>();
     }
 
     // Update is called once per frame
@@ -28,9 +28,10 @@ public class Builder : MonoBehaviour
         if (movingBuilder != null)
         {
             movingBuilder.transform.position = Vector3.MoveTowards(movingBuilder.transform.position, newLocation, Speed * Time.deltaTime);
+            //movingBuilder.transform.position = Vector3.RotateTowards(movingBuilder.transform.position, newLocation, RotationSpeed * Time.deltaTime, 0.0f);
             movingBuilder.transform.rotation = Quaternion.RotateTowards(movingBuilder.transform.rotation, newRotation, RotationSpeed * Time.deltaTime);
 
-            if (movingBuilder.transform.position == newLocation && movingBuilder.transform.rotation == newRotation) movingBuilder = null;
+            if (movingBuilder.transform.position == newLocation) movingBuilder = null; anim.SetInteger("AnimationPar", 0);
         }
     }
 
@@ -47,7 +48,14 @@ public class Builder : MonoBehaviour
         //this next line will need to be adjusted for the height of each level object
         Vector3 heightDiff = new Vector3(0, (g.heightAtCoordinate(coordinateOfSquare)), 0);
         newLocation = Square.transform.position + heightDiff;
+
+        Vector3 direction = new Vector3((Square.transform.position.x - GamePiece.transform.position.x), 0f, 0f);
+        newRotation = Quaternion.LookRotation(direction);
+        GamePiece.transform.rotation = newRotation;
+        //Vector3 target = Square.transform
+        //GamePiece.transform.LookAt(Square.transform, rotationDifference);
         movingBuilder = GamePiece;
+        anim.SetInteger("AnimationPar", 1);
     }
 
     public GameObject findSquare(Coordinate c)
@@ -71,13 +79,13 @@ public class Builder : MonoBehaviour
     {
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
-            GetComponent<Renderer>().material.shader = Shader.Find("Ultimate 10+ Shaders/Outline");
+            GetComponentInChildren<Renderer>().material.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");
         }
     }
 
     private void OnMouseExit()
     {
-        GetComponent<Renderer>().material.shader = Shader.Find("Standard");
+        GetComponentInChildren<Renderer>().material.shader = Shader.Find("Standard");
     }
 
     void OnMouseDown()
