@@ -24,6 +24,14 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject NewtorkingInfo;
     [SerializeField]
+    private GameObject WaitingForPlayer;
+    [SerializeField]
+    private GameObject Connecting;
+    [SerializeField]
+    private GameObject Join;
+    [SerializeField]
+    private GameObject Host;
+    [SerializeField]
     private Game gameManager;
 
 
@@ -50,22 +58,35 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
 
     #region Public Methods
 
-    public void ConnectToPUN()
+    public void OnClick_Multiplayer()
     {
-        if(!PhotonNetwork.IsConnected)
+        if (!PhotonNetwork.IsConnected)
         {
             isConnecting = PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = gameVersion;
+            Connecting.SetActive(true);
+            Join.SetActive(false);
+            Host.SetActive(false);
         }
+        else
+        {
+            Connecting.SetActive(false);
+            Join.SetActive(true);
+            Host.SetActive(true);
+        }
+
     }
 
     public void HostGame()
     {
         if (PhotonNetwork.IsConnected)
         {
+            RoomOptions options = new RoomOptions();
+            options.MaxPlayers = 2;
+
             Debug.Log("CreateRoom called with name:");// + HostName.GetComponent<TextMeshPro>().text);
-            PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayersPerRoom });
-            
+            PhotonNetwork.CreateRoom(null, options, TypedLobby.Default);
+         
         }
         else
         {
@@ -89,19 +110,23 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     #region MonoBehaviorPunCallbacks Callbacks
     public override void OnConnectedToMaster()
     {
+
         Debug.Log("OnConnectedToMaster() was called by PUN");
         if (isConnecting)
         {
             isConnecting = false;
             Debug.Log("Connected to master");
+            Connecting.SetActive(false);
+            Join.SetActive(true);
+            Host.SetActive(true);
         }
     }
 
         public override void OnDisconnected(DisconnectCause cause)
     {
-        
         Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
         isConnecting = false;
+
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
@@ -118,13 +143,27 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         Debug.Log("OnJoinedRoom() called by PUN. Now this client is in a room.");
         Debug.Log(PhotonNetwork.CurrentRoom.PlayerCount);
 
+        if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
+        {
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
+            gameManager.StartGame();
+        }
 
-        //gameManager.StartGame();
     }
 
     public override void OnCreatedRoom()
     {
         Debug.Log("You Created a Room");
+    }
+
+    public override void OnPlayerEnteredRoom(Photon.Realtime.Player other)
+    {
+       if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
+        {
+            WaitingForPlayer.SetActive(false);
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
+            gameManager.StartGame();
+        }
     }
 
     #endregion
