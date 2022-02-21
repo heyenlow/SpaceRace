@@ -10,7 +10,7 @@ public class Builder : MonoBehaviour
     Quaternion newRotation;
     Vector3 homeLocation;
     Quaternion homeRotation;
-    public float Speed = 5;
+    public float Speed = 0.1f;
     public float RotationSpeed = 100;
     private Animator anim;
 
@@ -28,8 +28,7 @@ public class Builder : MonoBehaviour
         if (movingBuilder != null)
         {
             movingBuilder.transform.position = Vector3.MoveTowards(movingBuilder.transform.position, newLocation, Speed * Time.deltaTime);
-            //movingBuilder.transform.position = Vector3.RotateTowards(movingBuilder.transform.position, newLocation, RotationSpeed * Time.deltaTime, 0.0f);
-            movingBuilder.transform.rotation = Quaternion.RotateTowards(movingBuilder.transform.rotation, newRotation, RotationSpeed * Time.deltaTime);
+            //movingBuilder.transform.rotation = Quaternion.RotateTowards(movingBuilder.transform.rotation, newRotation, RotationSpeed * Time.deltaTime);
 
             if (movingBuilder.transform.position == newLocation) movingBuilder = null; anim.SetInteger("AnimationPar", 0);
         }
@@ -49,13 +48,20 @@ public class Builder : MonoBehaviour
         Vector3 heightDiff = new Vector3(0, (g.heightAtCoordinate(coordinateOfSquare)), 0);
         newLocation = Square.transform.position + heightDiff;
 
-        Vector3 direction = new Vector3((Square.transform.position.x - GamePiece.transform.position.x), 0f, 0f);
-        newRotation = Quaternion.LookRotation(direction);
-        GamePiece.transform.rotation = newRotation;
-        //Vector3 target = Square.transform
-        //GamePiece.transform.LookAt(Square.transform, rotationDifference);
-        movingBuilder = GamePiece;
+        var x_diff = (Square.transform.position.x - GamePiece.transform.position.x);
+        var y_diff = (Square.transform.position.y - GamePiece.transform.position.y);
+        var z_diff = (Square.transform.position.z - GamePiece.transform.position.z);
+
+        if (x_diff != 0 || z_diff != 0)
+        {
+            Vector3 direction = new Vector3(x_diff, 0f, z_diff);
+
+            newRotation = Quaternion.LookRotation(direction);
+            GamePiece.transform.rotation = newRotation;
+        }
+
         anim.SetInteger("AnimationPar", 1);
+        movingBuilder = GamePiece;
     }
 
     public GameObject findSquare(Coordinate c)
