@@ -134,7 +134,6 @@ GameObject:
   - component: {fileID: 4268597916284530}
   - component: {fileID: 95340733316770424}
   - component: {fileID: 143350241100547368}
-  - component: {fileID: 2392361646588393764}
   m_Layer: 0
   m_Name: Stylized Astronaut
   m_TagString: Untagged
@@ -195,20 +194,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.125, z: -0.01}
---- !u!114 &2392361646588393764
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1147752367711628}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64baf06b44ab048c29acc30224561063, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Speed: 5
-  RotationSpeed: 5
 --- !u!1 &1158021920011488
 GameObject:
   m_ObjectHideFlags: 0

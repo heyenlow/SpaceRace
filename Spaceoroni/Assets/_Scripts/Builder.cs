@@ -14,7 +14,7 @@ public class Builder : MonoBehaviour
     public float RotationSpeed = 100;
     private Animator anim;
 
-    private void Start()
+    void Start()
     {
         homeLocation = this.transform.position;
         homeRotation = this.transform.rotation;
@@ -30,7 +30,11 @@ public class Builder : MonoBehaviour
             movingBuilder.transform.position = Vector3.MoveTowards(movingBuilder.transform.position, newLocation, Speed * Time.deltaTime);
             //movingBuilder.transform.rotation = Quaternion.RotateTowards(movingBuilder.transform.rotation, newRotation, RotationSpeed * Time.deltaTime);
 
-            if (movingBuilder.transform.position == newLocation) movingBuilder = null; anim.SetInteger("AnimationPar", 0);
+            if (movingBuilder.transform.position == newLocation)
+            {
+                movingBuilder = null;
+                anim.SetInteger("AnimationPar", 0);
+            }
         }
     }
 
