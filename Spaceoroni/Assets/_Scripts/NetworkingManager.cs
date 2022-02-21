@@ -31,7 +31,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     private GameObject Join;
     [SerializeField]
     private GameObject Host;
-
+    [SerializeField]
     private Game gameManager;
 
 
