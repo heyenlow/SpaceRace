@@ -40,13 +40,13 @@ public class Location : MonoBehaviour
         if (HighlightManager.isHighlightObj(this.gameObject)) 
         {
             Game.recieveLocationClick(Coordinate.stringToCoord(this.name));
-            isMove = false;
             removeHighlight();
         }
     }
 
     public void removeHighlight()
     {
+        isMove = false;
         this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
     }
     public void highlightLocation()

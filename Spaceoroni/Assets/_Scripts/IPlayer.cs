@@ -7,10 +7,11 @@ public abstract class IPlayer : MonoBehaviour
 {
     protected Builder Builder1;
     protected Builder Builder2;
-    protected List<Turn> turns = new List<Turn>();
+    protected List<Turn> turns;
 
     private void Start()
     {
+        turns = new List<Turn>();
         Builder1 = this.gameObject.GetComponentsInChildren<Builder>()[0];
         Builder2 = this.gameObject.GetComponentsInChildren<Builder>()[1];
     }
@@ -50,7 +51,7 @@ public abstract class IPlayer : MonoBehaviour
 
     public Tuple<Builder, Builder> getBuilders() { return new Tuple<Builder, Builder>(Builder1, Builder2); }
 
-    public virtual IEnumerator SelectBuilder()
+    public virtual IEnumerator SelectBuilder(Game g)
     {
         throw new NotImplementedException();
     }
@@ -68,5 +69,11 @@ public abstract class IPlayer : MonoBehaviour
     public virtual void loadNEATPlayer(string path)
     {
         throw new NotImplementedException();
+    }
+    public void resetPlayer()
+    {
+        turns.Clear();
+        Builder1.returnHome();
+        Builder2.returnHome();
     }
 }

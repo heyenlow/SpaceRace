@@ -4,6 +4,17 @@ using UnityEngine;
 
 public class Level : MonoBehaviour
 {
+    private Vector3 homeLocation;
+    private void Start()
+    {
+        homeLocation = this.transform.position;
+    }
+    public void reset()
+    {
+        this.transform.position = homeLocation;
+        removeHighlight(); 
+        this.gameObject.SetActive(false); 
+    }
     public enum HighlightType
     {
         move,

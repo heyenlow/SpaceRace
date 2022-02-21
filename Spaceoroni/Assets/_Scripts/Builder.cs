@@ -4,17 +4,22 @@ using UnityEngine;
 
 public class Builder : MonoBehaviour
 {
-    Coordinate coord = new Coordinate();
-    Material startMaterial;
+    public Coordinate coord = new Coordinate();
     GameObject movingBuilder;
     Vector3 newLocation;
+    Quaternion newRotation;
     public float Speed = 5;
+    public float RotationSpeed = 3;
+    Vector3 homeLocation;
+    Quaternion homeRotation;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        startMaterial = this.GetComponent<Renderer>().material;
+        homeLocation = this.transform.position;
+        homeRotation = this.transform.rotation;
+
     }
 
     // Update is called once per frame
@@ -23,8 +28,9 @@ public class Builder : MonoBehaviour
         if (movingBuilder != null)
         {
             movingBuilder.transform.position = Vector3.MoveTowards(movingBuilder.transform.position, newLocation, Speed * Time.deltaTime);
+            movingBuilder.transform.rotation = Quaternion.RotateTowards(movingBuilder.transform.rotation, newRotation, RotationSpeed * Time.deltaTime);
 
-            if (movingBuilder.transform.position == newLocation) movingBuilder = null;
+            if (movingBuilder.transform.position == newLocation && movingBuilder.transform.rotation == newRotation) movingBuilder = null;
         }
     }
 
@@ -49,10 +55,16 @@ public class Builder : MonoBehaviour
         return GameObject.Find(Coordinate.coordToString(c));
     }
 
-
     public Coordinate getLocation()
     {
         return coord;
+    }
+    public void returnHome()
+    {
+        newLocation = homeLocation;
+        newRotation = homeRotation;
+        movingBuilder = this.gameObject;
+        coord = new Coordinate();
     }
 
     private void OnMouseOver()
@@ -67,7 +79,6 @@ public class Builder : MonoBehaviour
     {
         GetComponent<Renderer>().material.shader = Shader.Find("Standard");
     }
-
 
     void OnMouseDown()
     {

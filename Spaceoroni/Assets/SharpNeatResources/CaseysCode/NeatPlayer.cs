@@ -50,8 +50,8 @@ public class NeatPlayer : IPlayer
         if (builder == 1) { moveBuidler(builder, builder1, g); } else { moveBuidler(builder, builder2, g); }
         yield return true;
     }
-
-    public override IEnumerator SelectBuilder()
+    
+    public override IEnumerator SelectBuilder(Game g)
     {
         // output 0 and 1 represent confidence values for builder 1 and 2
         // return whichever builder has the highest confidence value.
@@ -175,7 +175,7 @@ public class NeatPlayer : IPlayer
         Brain.Activate();
 
         // after activation choose a builder
-        yield return StartCoroutine(SelectBuilder());
+        yield return StartCoroutine(SelectBuilder(g));
 
         //Debug.Log("NEAT player builder selected");
 
