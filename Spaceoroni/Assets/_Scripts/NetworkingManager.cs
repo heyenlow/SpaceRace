@@ -24,6 +24,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject NewtorkingInfo;
     [SerializeField]
+    private GameObject WaitingForPlayer;
+    [SerializeField]
     private Game gameManager;
 
 
@@ -63,9 +65,12 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsConnected)
         {
+            RoomOptions options = new RoomOptions();
+            options.MaxPlayers = 2;
+
             Debug.Log("CreateRoom called with name:");// + HostName.GetComponent<TextMeshPro>().text);
-            PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayersPerRoom });
-            
+            PhotonNetwork.CreateRoom(null, options, TypedLobby.Default);
+         
         }
         else
         {
@@ -99,9 +104,9 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
 
         public override void OnDisconnected(DisconnectCause cause)
     {
-        
         Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
         isConnecting = false;
+
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
@@ -117,14 +122,26 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         
         Debug.Log("OnJoinedRoom() called by PUN. Now this client is in a room.");
         Debug.Log(PhotonNetwork.CurrentRoom.PlayerCount);
-
-
-        //gameManager.StartGame();
+        if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
+        {
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
+            gameManager.StartGame();
+        }
     }
 
     public override void OnCreatedRoom()
     {
         Debug.Log("You Created a Room");
+    }
+
+    public override void OnPlayerEnteredRoom(Photon.Realtime.Player other)
+    {
+       if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
+        {
+            WaitingForPlayer.SetActive(false);
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
+            gameManager.StartGame();
+        }
     }
 
     #endregion
