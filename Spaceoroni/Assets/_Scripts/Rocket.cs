@@ -6,7 +6,7 @@ public class Rocket : MonoBehaviour
 {
     private GameObject movingRocket;
     private Vector3 homeLocation;
-    public int Speed = 2;
+    public int Speed = 15;
     private Vector3 newLocation;
     private void Start()
     {

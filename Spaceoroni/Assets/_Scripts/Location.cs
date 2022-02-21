@@ -10,7 +10,16 @@ public class Location : MonoBehaviour
     {
         var rocket = this.GetComponentInChildren<Rocket>();
         this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("FX/Flare");
+        StartCoroutine(blastOffAnimatin());
         rocket.blastOffRocket();
+    }
+
+    public IEnumerator blastOffAnimatin()
+    {
+        this.transform.GetChild(1).gameObject.SetActive(true);
+        yield return new WaitForSeconds(5);
+        this.transform.GetChild(1).gameObject.SetActive(false);
+        yield return null;
     }
 
     private void OnMouseOver()
