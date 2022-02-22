@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Builder : MonoBehaviour
 {
+    public ParticleSystem dust; //Dust Effect
     public Coordinate coord = new Coordinate();
     GameObject movingBuilder;
     Vector3 newLocation;
@@ -40,6 +41,7 @@ public class Builder : MonoBehaviour
 
     public void move(Coordinate c, Game g)
     {
+        createDust(); //Create Dust when object moves 
         moveBuilderToNewSquare(this.gameObject, findSquare(c), g); //moves the object to the new square
         coord.x = c.x;
         coord.y = c.y;
@@ -102,5 +104,18 @@ public class Builder : MonoBehaviour
     {
         //Output to console the clicked GameObject's name and the following message. You can replace this with your own actions for when clicking the GameObject.
         if(HighlightManager.isHighlightObj(this.gameObject)) Game.recieveLocationClick(coord);
+    }
+
+    void createDust(){
+        //set particle duration to be equal to speed of object 
+        /*
+        dust = GetComponent<ParticleSystem>();
+        dust.Stop() //Never alter Duration while particle system is working
+
+        var particleDuration = dust.main;
+        particleDuration.duration = Speed * Time.deltaTime;
+        */
+
+        dust.Play();
     }
 }
