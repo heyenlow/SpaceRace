@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
+using System.Xml.Schema;
 using UnityEngine;
 
 public class NeatPlayer : IPlayer
@@ -35,13 +36,21 @@ public class NeatPlayer : IPlayer
         NeatGenome genome = null;
         NeatGenomeFactory fac = new NeatGenomeFactory(47, 20);
 
-        XmlReader xr = XmlReader.Create(path);
-        //TextAsset text = (TextAsset)Resources.Load(coevolutionXml);
-        //XmlDocument xmlDoc = new XmlDocument();
-        //xmlDoc.LoadXml(text.text);
-        //XmlTextReader xr = new XmlTextReader(xmlDoc);
+        //XmlReader xr = XmlReader.Create(path);
+       
+        TextAsset text = (TextAsset)Resources.Load(path);
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.LoadXml(text.text);
+        XmlNodeReader nodeReader = new XmlNodeReader(xmlDoc);
 
-        genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, false, fac)[0];
+        // Set the validation settings.
+        XmlReaderSettings settings = new XmlReaderSettings();
+
+        // Create a validating reader that wraps the XmlNodeReader object.
+        XmlReader reader = XmlReader.Create(nodeReader, settings);
+
+
+        genome = NeatGenomeXmlIO.ReadCompleteGenomeList(reader, false, fac)[0];
 
         IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder;
 
@@ -49,6 +58,11 @@ public class NeatPlayer : IPlayer
 
         Brain = genomeDecoder.Decode(genome);
         
+    }
+
+    private void ValidationCallBack(object sender, ValidationEventArgs e)
+    {
+        throw new NotImplementedException();
     }
 
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
