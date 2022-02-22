@@ -35,6 +35,7 @@ public class Builder : MonoBehaviour
             {
                 movingBuilder = null;
                 anim.SetInteger("AnimationPar", 0);
+                dust.Stop();
             }
         }
     }
@@ -115,7 +116,9 @@ public class Builder : MonoBehaviour
         var particleDuration = dust.main;
         particleDuration.duration = Speed * Time.deltaTime;
         */
-
-        dust.Play();
+        if (transform.position.y < .1)
+        {
+            dust.Play();
+        }
     }
 }

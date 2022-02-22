@@ -51,12 +51,12 @@ public class Game : MonoBehaviour
     
 
     public static Coordinate clickLocation;
-    private bool isDebug = false;
+    private bool isDebug = true;
     private void Start()
     {
         if (isDebug)
         {
-            GameSettings.gameType = GameSettings.GameType.Singleplayer;
+            GameSettings.gameType = GameSettings.GameType.Watch;
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
             StartGame();
         }
@@ -252,7 +252,7 @@ public class Game : MonoBehaviour
     {
         //The Scale Y * 2 of the level object
         const float gamepeiceHeight = (float)0;
-        const float level0Height = (float)0.5001;
+        const float level0Height = (float)0.500;
         const float level4Height = (float)0.000;
 
         float newHeightToMoveTo = 0;
