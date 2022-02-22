@@ -23,7 +23,8 @@ public class Game : MonoBehaviour
     private GameObject DebugInfo;
     [SerializeField]
     private GameObject EndOfGameScreen;
-
+    [SerializeField]
+    private GameObject MainMenu;
 
     public enum PlayerState
     {
@@ -54,6 +55,7 @@ public class Game : MonoBehaviour
     private bool isDebug = false;
     private void Start()
     {
+
         if (isDebug)
         {
             GameSettings.gameType = GameSettings.GameType.Watch;
@@ -113,6 +115,23 @@ public class Game : MonoBehaviour
     {
         Player1.resetPlayer();
         Player2.resetPlayer();
+    }
+    public void QuitGame()
+    {
+        if(GameSettings.gameType == GameSettings.GameType.Multiplayer)
+        {
+            NetworkingManager.LeaveRoom();
+        }
+
+        SettingChanger.resetGameSettings();
+        ResetGame();
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToStart();
+        Rotator.SetActive(true);
+        if(!MainMenu.activeSelf)
+        {
+            MainMenu.SetActive(true);
+        }
+
     }
 
     //reads the settings that will be set by the UI
