@@ -23,7 +23,10 @@ public class Game : MonoBehaviour
     private GameObject DebugInfo;
     [SerializeField]
     private GameObject EndOfGameScreen;
-
+    [SerializeField]
+    private GameObject MainMenu;
+    [SerializeField]
+    private GameObject JoinMenu;
 
     public enum PlayerState
     {
@@ -54,6 +57,7 @@ public class Game : MonoBehaviour
     private bool isDebug = false;
     private void Start()
     {
+
         if (isDebug)
         {
             GameSettings.gameType = GameSettings.GameType.Watch;
@@ -77,7 +81,8 @@ public class Game : MonoBehaviour
 
     public void StartGame()
     {
-        //ResetGame();
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
+
         Debug.Log("StartingGame");
 
         Board = new int[5, 5];
@@ -109,10 +114,40 @@ public class Game : MonoBehaviour
         clickLocation = null;
         
     }
+
+    public void RestartGame()
+    {
+        cancelTurn = true;
+        StopAllCoroutines();
+        HighlightManager.unHighlightEverything();
+        HighlightManager.highlightedObjects.Clear();
+        if (Player1 != null && Player2 != null) clearPlayersTurnsAndSendBuildersHome();
+        curPlayer = null;
+        clickLocation = null;
+
+        StartGame();
+    }
+
     private void clearPlayersTurnsAndSendBuildersHome()
     {
         Player1.resetPlayer();
         Player2.resetPlayer();
+    }
+    public void QuitGame()
+    {
+        if(GameSettings.gameType == GameSettings.GameType.Multiplayer)
+        {
+            NetworkingManager.LeaveRoom();
+        }
+
+        SettingChanger.resetGameSettings();
+        ResetGame();
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToStart();
+        EndOfGameScreen.SetActive(false);
+        JoinMenu.SetActive(false);
+        Rotator.SetActive(true);
+        MainMenu.SetActive(true);
+
     }
 
     //reads the settings that will be set by the UI
@@ -221,7 +256,7 @@ public class Game : MonoBehaviour
                 
                 Turn t = curPlayer.getNextTurn();
                 // update the board with the current player's move
-                Debug.Log(t.ToString());
+                Debug.Log("Processing Turn: " + t.ToString());
                 StartCoroutine(processTurnString(t, curPlayer, this));
 
                 if (t.isWin)
