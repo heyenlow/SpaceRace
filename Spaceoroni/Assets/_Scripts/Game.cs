@@ -51,7 +51,7 @@ public class Game : MonoBehaviour
     
 
     public static Coordinate clickLocation;
-    private bool isDebug = true;
+    private bool isDebug = false;
     private void Start()
     {
         if (isDebug)

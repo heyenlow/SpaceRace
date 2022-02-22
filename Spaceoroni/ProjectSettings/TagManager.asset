@@ -9,6 +9,7 @@ TagManager:
   - Square
   - Board
   - Debug
+  - MusicVolumeSlider
   layers:
   - Default
   - TransparentFX
