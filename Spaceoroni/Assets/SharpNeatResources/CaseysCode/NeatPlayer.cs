@@ -25,14 +25,22 @@ public class NeatPlayer : IPlayer
         this.turns = new List<Turn>();
         // NEAT SETUP 
         _experiment = new SantoriniCoevolutionExperiment();
+
+        TextAsset textAsset = (TextAsset)Resources.Load("santorini.config");
         XmlDocument xmlConfig = new XmlDocument();
-        xmlConfig.Load("santorini.config.xml");
+        xmlConfig.LoadXml(textAsset.text);
+
         _experiment.Initialize("Santorini", xmlConfig.DocumentElement);
 
         NeatGenome genome = null;
         NeatGenomeFactory fac = new NeatGenomeFactory(47, 20);
 
         XmlReader xr = XmlReader.Create(path);
+        //TextAsset text = (TextAsset)Resources.Load(coevolutionXml);
+        //XmlDocument xmlDoc = new XmlDocument();
+        //xmlDoc.LoadXml(text.text);
+        //XmlTextReader xr = new XmlTextReader(xmlDoc);
+
         genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, false, fac)[0];
 
         IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder;

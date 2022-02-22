@@ -135,7 +135,7 @@ public class Game : MonoBehaviour
             case GameSettings.GameType.Singleplayer:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
-                Player2.loadNEATPlayer("coevolution_champion.xml");
+                Player2.loadNEATPlayer(Application.dataPath + "/Resources/coevolution_champion.xml");
                 break;
             case GameSettings.GameType.Multiplayer:
                 setupMultiplayerSettings();
