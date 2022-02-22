@@ -25,6 +25,8 @@ public class Game : MonoBehaviour
     private GameObject EndOfGameScreen;
     [SerializeField]
     private GameObject MainMenu;
+    [SerializeField]
+    private GameObject JoinMenu;
 
     public enum PlayerState
     {
@@ -141,8 +143,9 @@ public class Game : MonoBehaviour
         SettingChanger.resetGameSettings();
         ResetGame();
         GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToStart();
-        Rotator.SetActive(true);
         EndOfGameScreen.SetActive(false);
+        JoinMenu.SetActive(false);
+        Rotator.SetActive(true);
         MainMenu.SetActive(true);
 
     }
