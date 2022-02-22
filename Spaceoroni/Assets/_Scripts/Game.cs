@@ -79,7 +79,8 @@ public class Game : MonoBehaviour
 
     public void StartGame()
     {
-        //ResetGame();
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
+
         Debug.Log("StartingGame");
 
         Board = new int[5, 5];
@@ -111,6 +112,20 @@ public class Game : MonoBehaviour
         clickLocation = null;
         
     }
+
+    public void RestartGame()
+    {
+        cancelTurn = true;
+        StopAllCoroutines();
+        HighlightManager.unHighlightEverything();
+        HighlightManager.highlightedObjects.Clear();
+        if (Player1 != null && Player2 != null) clearPlayersTurnsAndSendBuildersHome();
+        curPlayer = null;
+        clickLocation = null;
+
+        StartGame();
+    }
+
     private void clearPlayersTurnsAndSendBuildersHome()
     {
         Player1.resetPlayer();
@@ -240,7 +255,7 @@ public class Game : MonoBehaviour
                 
                 Turn t = curPlayer.getNextTurn();
                 // update the board with the current player's move
-                Debug.Log(t.ToString());
+                Debug.Log("Processing Turn: " + t.ToString());
                 StartCoroutine(processTurnString(t, curPlayer, this));
 
                 if (t.isWin)

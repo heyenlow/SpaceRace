@@ -75,8 +75,8 @@ public class Player : IPlayer
         Coordinate temp = new Coordinate(currentTurn.BuilderLocation);
         List<string> allMoves = g.getAllPossibleMoves(currentTurn.BuilderLocation);
 
-        Debug.Log((this.gameObject.GetComponentsInChildren<Builder>())[0]);
-        Debug.Log(Coordinate.coordToString(this.gameObject.GetComponentsInChildren<Builder>()[1].coord));
+        //Debug.Log((this.gameObject.GetComponentsInChildren<Builder>())[0]);
+        //Debug.Log(Coordinate.coordToString(this.gameObject.GetComponentsInChildren<Builder>()[1].coord));
         //allMoves.ForEach(m => Debug.Log(m));
 
         if (g.canMove(currentTurn.BuilderLocation))
@@ -165,14 +165,12 @@ public class Player : IPlayer
         {
             turns.Add(currentTurn);
             g.playerState = Game.PlayerState.Loser;
-            yield return null;
         }
         else if (g.isWin(currentTurn.MoveLocation))
         {
             currentTurn.isWin = true;
             turns.Add(currentTurn);
             g.playerState = Game.PlayerState.Loser;
-            yield return null;
         }
         else
         {
@@ -182,6 +180,7 @@ public class Player : IPlayer
         }
 
         if (GameSettings.gameType == GameSettings.GameType.Multiplayer) RaiseTurnSelected(currentTurn);
+        yield return null;
     }
 
     private void RaiseBuilderLocation(Coordinate BuilderCoordinate, int BuilderInt)
