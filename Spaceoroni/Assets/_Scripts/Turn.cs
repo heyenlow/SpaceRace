@@ -53,6 +53,7 @@ public class Turn
     {
         BuilderLocation = Coordinate.stringToCoord(s.Substring(0, 2));
         MoveLocation = Coordinate.stringToCoord(s.Substring(2, 2));
-        BuildLocation = Coordinate.stringToCoord(s.Substring(4, 2));
+        if (s.Length == 6) BuildLocation = Coordinate.stringToCoord(s.Substring(4, 2));
+        else isWin = true;
     }
 }

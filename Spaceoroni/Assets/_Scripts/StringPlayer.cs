@@ -29,8 +29,6 @@ public class StringPlayer : IPlayer
 
     public override Turn getNextTurn()
     {
-        Turn t = new Turn(StringGameReader.getMoves());
-
-        return t;
+       return new Turn(StringGameReader.getMoves());
     }
 }

@@ -8,6 +8,7 @@ public class SettingChanger : MonoBehaviour
     //SET GAME TYPE FUNCTIONS ------------------------------------
     public void setGameTypeMultiplayer() { GameSettings.gameType = GameSettings.GameType.Multiplayer; }
     public void setGameTypeTutorial() { GameSettings.gameType = GameSettings.GameType.Tutorial; }
+    public void setGameTypeWatch() { GameSettings.gameType = GameSettings.GameType.Watch; }
     public void setGameTypeSinglePlayer() { GameSettings.gameType = GameSettings.GameType.Singleplayer; }
     public static void setGameTypeReset() { GameSettings.gameType = GameSettings.GameType.NotSet; }
 

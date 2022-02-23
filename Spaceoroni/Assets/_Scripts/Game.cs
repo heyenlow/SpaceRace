@@ -101,8 +101,11 @@ public class Game : MonoBehaviour
         //cancel current turn
         cancelTurn = true;
         StopAllCoroutines();
-        
-        if(Player1 != null && Player2!= null) clearPlayersTurnsAndSendBuildersHome();
+
+        //needs to reset the reader to the first move
+        StringGameReader.MoveCount = 0;
+
+        if (Player1 != null && Player2!= null) clearPlayersTurnsAndSendBuildersHome();
 
         HighlightManager.unHighlightEverything();
         HighlightManager.highlightedObjects.Clear();
@@ -120,6 +123,10 @@ public class Game : MonoBehaviour
     {
         cancelTurn = true;
         StopAllCoroutines();
+
+        //needs to reset the reader to the first move
+        StringGameReader.MoveCount = 0;
+
         HighlightManager.unHighlightEverything();
         HighlightManager.highlightedObjects.Clear();
         if (Player1 != null && Player2 != null) clearPlayersTurnsAndSendBuildersHome();
