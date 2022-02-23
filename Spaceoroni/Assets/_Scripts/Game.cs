@@ -172,7 +172,7 @@ public class Game : MonoBehaviour
             case GameSettings.GameType.Singleplayer:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
-                Player2.loadNEATPlayer("coevolution_champion.xml"); // this string represents the `path` variable seen elsewhere in the AI code... It's just the name of the champion file in the root directory of the project.
+                Player2.loadNEATPlayer("coevolution_champion");
                 break;
             case GameSettings.GameType.Multiplayer:
                 setupMultiplayerSettings();

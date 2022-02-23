@@ -26,8 +26,10 @@ public class NeatPlayer : IPlayer
         turns = new List<Turn>();
         // NEAT SETUP 
         _experiment = new SantoriniCoevolutionExperiment();
+
+        TextAsset textAsset = (TextAsset)Resources.Load("santorini.config");
         XmlDocument xmlConfig = new XmlDocument();
-        xmlConfig.Load("santorini.config.xml");
+        xmlConfig.LoadXml(textAsset.text);
         _experiment.Initialize("Santorini", xmlConfig.DocumentElement);
 
         NeatGenome genome;
@@ -35,8 +37,16 @@ public class NeatPlayer : IPlayer
 
         try
         {
-            XmlReader xr = XmlReader.Create(path);
-            genome = NeatGenomeXmlIO.ReadCompleteGenomeList(xr, false, fac)[0];
+            //XmlReader xr = XmlReader.Create(path);
+            TextAsset text = (TextAsset)Resources.Load(path);
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(text.text);
+            XmlNodeReader nodeReader = new XmlNodeReader(xmlDoc);
+            XmlReaderSettings settings = new XmlReaderSettings();
+            XmlReader reader = XmlReader.Create(nodeReader, settings);
+
+
+            genome = NeatGenomeXmlIO.ReadCompleteGenomeList(reader, false, fac)[0];
 
             IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder;
 
