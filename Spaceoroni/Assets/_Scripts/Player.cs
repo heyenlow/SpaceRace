@@ -9,7 +9,7 @@ using UnityEngine;
 public class Player : IPlayer
 {
     private Turn currentTurn;
-    private Builder builder;
+    private Builder builder;  //TODO: Marked for deprecation?
 
     public bool clickedBuilder(Coordinate click)
     { 

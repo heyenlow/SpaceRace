@@ -54,7 +54,7 @@ public class Game : MonoBehaviour
     
 
     public static Coordinate clickLocation;
-    private bool isDebug = true;
+    private bool isDebug = false;
     private void Start()
     {
 
@@ -172,7 +172,7 @@ public class Game : MonoBehaviour
             case GameSettings.GameType.Singleplayer:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
-                Player2.loadNEATPlayer("evolution_champion.xml"); // this string represents the `path` variable seen elsewhere in the AI code... It's just the name of the champion file in the root directory of the project.
+                Player2.loadNEATPlayer("coevolution_champion.xml"); // this string represents the `path` variable seen elsewhere in the AI code... It's just the name of the champion file in the root directory of the project.
                 break;
             case GameSettings.GameType.Multiplayer:
                 setupMultiplayerSettings();
@@ -203,7 +203,7 @@ public class Game : MonoBehaviour
         //players already move the builders
         if (!(curPlayer is Player)) curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
-        if(GameSettings.gameType == GameSettings.GameType.Watch) yield return new WaitForSeconds(timeToTurn/2);
+        if(!(curPlayer is Player)) yield return new WaitForSeconds(timeToTurn/2);
 
         // If not over Where to build?
         if (!turn.isWin)
@@ -417,7 +417,7 @@ public class Game : MonoBehaviour
             for (int j = -1; j <= 1; ++j)
             {
                 Coordinate test = new Coordinate(c.x + i, c.y + j);
-                if (Coordinate.inBounds(test) && Board[test.x, test.y] < 4 && locationClearOfAllBuilders(test))
+                if (Coordinate.inBounds(test) && Board[test.x, test.y] < 4 && locationClearOfAllBuilders(test) && !Coordinate.Equals(test, c))
                 {
                     allBuilds.Add(Coordinate.coordToString(test));
                 }

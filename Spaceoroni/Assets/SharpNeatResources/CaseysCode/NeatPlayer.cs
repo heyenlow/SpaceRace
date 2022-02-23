@@ -41,6 +41,7 @@ public class NeatPlayer : IPlayer
             IGenomeDecoder<NeatGenome, IBlackBox> genomeDecoder;
 
             genomeDecoder = _experiment.CreateGenomeDecoder();
+            Debug.Log("Loaded " + path + " AI successfully.");
 
             Brain = genomeDecoder.Decode(genome);
         }
@@ -101,45 +102,45 @@ public class NeatPlayer : IPlayer
 
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
-        Coordinate builder1 = new Coordinate(0, 0);
-        Coordinate builder2 = new Coordinate(1, 1);
-        if (builder == 1) { moveBuidler(builder, builder1, g); } else { moveBuidler(builder, builder2, g); }
-        //// this player is now temporarily the current player
-        //g.curPlayer = this;
-        //// the rival is whichever player this isn't
-        //g.rival = (ReferenceEquals(g.Player2, this)) ? g.Player1 : g.Player2;
-        //System.Random rnd = new System.Random();
-        //Coordinate tmp = new Coordinate();
-        //int x, y;
-        //if (g.rival.getBuilders().Item1.coord.x == -1 && g.rival.getBuilders().Item2.coord.y == -1)
-        //{
-        //    if (builder == 1)
-        //    {
-        //        tmp.x = rnd.Next(0, 4);
-        //        tmp.y = rnd.Next(0, 4);
-        //        moveBuidler(builder, tmp, g);
-        //    }
-        //    else if (builder == 2)
-        //    {
-        //        // nothing should happen here because if we're placing our second builder the opponent must have already defined at least their first builder.
-        //        Debug.Log("This error shouldn't be happening... look in NeatPlayer.cs");
-        //    }
-        //}
-        //else
-        //{
-        //    // opponent's first builder is defined, but not guaranteed the second is defined...
-        //    if (g.rival.getBuilders().Item2.coord.x == -1 && g.rival.getBuilders().Item2.coord.y == -1)
-        //    {
-        //        // place a builder near the opponent's first builder.
-        //        findFreeSpots(g, g.rival.getBuilders().Item1.getLocation().x, g.rival.getBuilders().Item2.getLocation().y, builder);
-        //    }
-        //    else
-        //    {
-        //        x = Math.Abs((g.rival.getBuilders().Item1.coord.x + g.rival.getBuilders().Item2.coord.x) / 2);
-        //        y = Math.Abs((g.rival.getBuilders().Item1.coord.y + g.rival.getBuilders().Item2.coord.y) / 2);
-        //        findFreeSpots(g, x, y, builder); // neat player places second builder close to opponent's builder averaged out
-        //    }
-        //}
+        //Coordinate builder1 = new Coordinate(0, 0);
+        //Coordinate builder2 = new Coordinate(1, 1);
+        //if (builder == 1) { moveBuidler(builder, builder1, g); } else { moveBuidler(builder, builder2, g); }
+        // this player is now temporarily the current player
+        g.curPlayer = this;
+        // the rival is whichever player this isn't
+        g.rival = (ReferenceEquals(g.Player2, this)) ? g.Player1 : g.Player2;
+        System.Random rnd = new System.Random();
+        Coordinate tmp = new Coordinate();
+        int x, y;
+        if (g.rival.getBuilders().Item1.coord.x == -1 && g.rival.getBuilders().Item2.coord.y == -1)
+        {
+            if (builder == 1)
+            {
+                tmp.x = rnd.Next(0, 4);
+                tmp.y = rnd.Next(0, 4);
+                moveBuidler(builder, tmp, g);
+            }
+            else if (builder == 2)
+            {
+                // nothing should happen here because if we're placing our second builder the opponent must have already defined at least their first builder.
+                Debug.Log("This error shouldn't be happening... look in NeatPlayer.cs");
+            }
+        }
+        else
+        {
+            // opponent's first builder is defined, but not guaranteed the second is defined...
+            if (g.rival.getBuilders().Item2.coord.x == -1 && g.rival.getBuilders().Item2.coord.y == -1)
+            {
+                // place a builder near the opponent's first builder.
+                findFreeSpots(g, g.rival.getBuilders().Item1.getLocation().x, g.rival.getBuilders().Item1.getLocation().y, builder);
+            }
+            else
+            {
+                x = Math.Abs((g.rival.getBuilders().Item1.coord.x + g.rival.getBuilders().Item2.coord.x) / 2);
+                y = Math.Abs((g.rival.getBuilders().Item1.coord.y + g.rival.getBuilders().Item2.coord.y) / 2);
+                findFreeSpots(g, x, y, builder); // neat player places second builder close to opponent's builder averaged out
+            }
+        }
         yield return true;
     }
 
@@ -193,7 +194,11 @@ public class NeatPlayer : IPlayer
     {
         // this function has a chance to return {-1,-1} (shouldn't be possible?)   
         var possibleMoves = g.getAllPossibleMoves(currentTurn.BuilderLocation);
-        if (possibleMoves.Count == 0) yield return null;
+        if (possibleMoves.Count == 0)
+        {
+            currentTurn.canPerformTurn = false;
+            yield return null;
+        }
         // outputs 2-11 are the 9 possible move locations confidence values
         // find most confident move
         Coordinate move = new Coordinate();
@@ -209,7 +214,8 @@ public class NeatPlayer : IPlayer
         }
         // return highest scoring move to go to next.
         currentTurn.MoveLocation = move;
-        yield return move;
+        moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), move, g);
+        yield return null;
     }
 
     public override IEnumerator chooseBuild(Game g)
@@ -222,7 +228,7 @@ public class NeatPlayer : IPlayer
         if (possibleBuilds.Count < 1)
         {
             // shouldn't be possible... because you should always be able to at least build on the square you came from...
-            Debug.LogError("NeatPlayer returned less than one build possible!");
+            Debug.LogError("NeatPlayer returned less than one build possible!\nMOVELOCATION: " + Coordinate.coordToString(currentTurn.MoveLocation));
         }
         else
         {
@@ -234,22 +240,40 @@ public class NeatPlayer : IPlayer
             Coordinate evalBuild;
             evalBuild = Coordinate.stringToCoord(possibleBuilds[i]);
 
-            if (Brain.OutputSignalArray[i+11] >= max && (evalBuild.x != currentTurn.MoveLocation.x && evalBuild.y != currentTurn.MoveLocation.y))
+            if (Brain.OutputSignalArray[i+11] >= max && !Coordinate.Equals(evalBuild, currentTurn.MoveLocation))
             {
                 build.x = evalBuild.x;
                 build.y = evalBuild.y;
                 max = Brain.OutputSignalArray[i+11];
             }
         }
-
+        if (Coordinate.Equals(build, new Coordinate()))
+        {
+            if (Coordinate.stringToCoord(possibleBuilds[0]).x != -1 && Coordinate.stringToCoord(possibleBuilds[0]).y != -1)
+            {
+                build = Coordinate.stringToCoord(possibleBuilds[0]);
+            }
+            else
+            {
+                // null build error case
+                Debug.LogError("NeatPlayer chooseBuild returned null build");
+                currentTurn.canPerformTurn = false;
+                yield return null;
+            }
+        }
+        if (Coordinate.Equals(currentTurn.MoveLocation, new Coordinate(0, 0)))
+        {
+            Debug.LogError("Reported no move...");
+        }
         currentTurn.BuildLocation = build;
-        yield return build;
+        yield return null;
     }
 
     public override IEnumerator beginTurn(Game g)
     {
         //Debug.Log("NEAT turn Begin");
         currentTurn = new Turn();
+        Brain.ResetState();
 
         setInputSignalArrayBuilder(Brain.InputSignalArray, g);
 
@@ -301,7 +325,13 @@ public class NeatPlayer : IPlayer
             setInputSignalArrayBuildLoc(Brain.InputSignalArray, possib, g);
             Brain.Activate();
 
+
             yield return StartCoroutine(chooseBuild(g)); // might return -1,-1? shouldn't though....
+
+            if (currentTurn.MoveLocation == currentTurn.BuildLocation)
+            {
+                Debug.LogError("This shouldn't be possible!");
+            }
 
             turns.Add(currentTurn);
         }
