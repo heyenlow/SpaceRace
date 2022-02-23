@@ -23,9 +23,6 @@ using SharpNeat.Network;
 
 namespace SharpNeat.Phenomes.NeuralNets
 {
-    // TODO: Create a version of this class that uses single precision signals for extra performance. 
-    // TODO: Reconsider algorithm. Even better/faster way?
-
     /// <summary>
     /// A neural network class that represents a network with recurrent (cyclic) connections. 
     /// 

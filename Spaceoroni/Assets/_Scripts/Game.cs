@@ -47,14 +47,14 @@ public class Game : MonoBehaviour
         } }
     public IPlayer Player1;
     public IPlayer Player2;
-    public IPlayer curPlayer;
+    public IPlayer curPlayer, rival;
     public static bool cancelTurn = false;
 
     public SantoriniCoevolutionExperiment _experiment { get; private set; }
     
 
     public static Coordinate clickLocation;
-    private bool isDebug = false;
+    private bool isDebug = true;
     private void Start()
     {
 
@@ -111,6 +111,7 @@ public class Game : MonoBehaviour
         Player1 = null;
         Player2 = null;
         curPlayer = null;
+        rival = null;
         clickLocation = null;
         
     }
@@ -123,6 +124,7 @@ public class Game : MonoBehaviour
         HighlightManager.highlightedObjects.Clear();
         if (Player1 != null && Player2 != null) clearPlayersTurnsAndSendBuildersHome();
         curPlayer = null;
+        rival = null;
         clickLocation = null;
 
         StartGame();
@@ -170,7 +172,7 @@ public class Game : MonoBehaviour
             case GameSettings.GameType.Singleplayer:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
-                Player2.loadNEATPlayer("coevolution_champion.xml");
+                Player2.loadNEATPlayer("evolution_champion.xml"); // this string represents the `path` variable seen elsewhere in the AI code... It's just the name of the champion file in the root directory of the project.
                 break;
             case GameSettings.GameType.Multiplayer:
                 setupMultiplayerSettings();
