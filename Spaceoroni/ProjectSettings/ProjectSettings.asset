@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: DefaultCompany
-  productName: Spaceoroni
+  productName: RocketRush
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
@@ -274,7 +274,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: 431220746319a4a458e78dfb22841781, type: 3}
+      m_Icon: {fileID: 2800000, guid: 6aa0251558f1e60499d3eeacd9dc94bd, type: 3}
       m_Width: 128
       m_Height: 128
       m_Kind: 0

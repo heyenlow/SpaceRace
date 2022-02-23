@@ -153,6 +153,7 @@ public class Game : MonoBehaviour
         ResetGame();
         GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToStart();
         EndOfGameScreen.SetActive(false);
+        PauseButton.SetActive(false);
         JoinMenu.SetActive(false);
         Rotator.SetActive(true);
         MainMenu.SetActive(true);
