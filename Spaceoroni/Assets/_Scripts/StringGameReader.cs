@@ -5,7 +5,28 @@ using UnityEngine;
 
 public static class StringGameReader
 {
-    static string[] lines = System.IO.File.ReadAllLines(@".\Assets\_Scripts\TwoPlayerGame.txt");
+    //TODO: SEPARTE THE FILE IN LINES
+    static TextAsset myfile = (TextAsset)Resources.Load("TwoPlayerGame");
+    
+    static string[] lines = {
+        "Player1: C0A0",
+        "Player2: B0B1",
+        "NEAT MOVE: A0A1B2",
+        "NEAT MOVE: B1B2C1",
+        "NEAT MOVE: A1B1C2",
+        "NEAT MOVE: B2C3D4",
+        "NEAT MOVE: B1C2D1",
+        "NEAT MOVE: C3D4E3",
+        "NEAT MOVE: C2D3E2",
+        "NEAT MOVE: D4E3D4",
+        "NEAT MOVE: D3E4D3",
+        "NEAT MOVE: E3D4E3",
+        "NEAT MOVE: E4D3E2",
+        "NEAT MOVE: D4E3D4",
+        "NEAT MOVE: D3E4D3",
+        "NEAT MOVE: E3D4"
+    };
+
     public static int MoveCount = 0;
     public static Coordinate player1builder1Location = Coordinate.stringToCoord(lines[0].Substring(lines[0].IndexOf(' ') + 1));
     public static Coordinate player1builder2Location = Coordinate.stringToCoord(lines[0].Substring(lines[0].IndexOf(' ') + 3));
