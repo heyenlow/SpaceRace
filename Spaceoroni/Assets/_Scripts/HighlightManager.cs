@@ -145,14 +145,13 @@ public static class HighlightManager
         var allSquares = GameObject.FindGameObjectsWithTag("Square");
         foreach(var square in allSquares)
         {
-            //rocket should stop moving before resetting everythign else
-            square.GetComponentInChildren<Rocket>().resetLocation();
             var activeChildren = square.GetComponentsInChildren<Level>();
             foreach (var level in activeChildren)
             {
                 level.reset();
                 highlightedObjects.Remove(level.gameObject);
             }
+            square.GetComponentInChildren<Rocket>().resetLocation();
             square.GetComponent<Location>().removeHighlight();
             highlightedObjects.Remove(square);
         }

@@ -27,7 +27,6 @@ public class Turn
 
     public object[] turnToObjectArray()
     {
-        if(isWin) return new object[] { BuilderLocation.x, BuilderLocation.y, MoveLocation.x, MoveLocation.y, -1, -1, isWin, canPerformTurn };
         return new object[]{ BuilderLocation.x, BuilderLocation.y, MoveLocation.x, MoveLocation.y, BuildLocation.x, BuildLocation.y, isWin, canPerformTurn };
     }
 

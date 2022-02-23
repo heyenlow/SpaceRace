@@ -17,4 +17,18 @@ public class PUNGameManager : MonoBehaviourPunCallbacks
         PhotonNetwork.LoadLevel("Main");
     }
 
+    public override void OnLeftRoom()
+    {
+        Debug.LogFormat("Player left room");
+    }
+
+    public override void OnPlayerLeftRoom(Photon.Realtime.Player other)
+    {
+        Debug.LogFormat("OnPlayerLeftRoom() ", other);
+
+        if(PhotonNetwork.IsMasterClient)
+        {
+            Debug.LogFormat("OnPlayerLeftRoom IsMasterClient", PhotonNetwork.IsMasterClient);
+        }
+    }
 }
