@@ -23,7 +23,10 @@ public class Game : MonoBehaviour
     private GameObject DebugInfo;
     [SerializeField]
     private GameObject EndOfGameScreen;
-
+    [SerializeField]
+    private GameObject MainMenu;
+    [SerializeField]
+    private GameObject JoinMenu;
 
     public enum PlayerState
     {
@@ -44,19 +47,20 @@ public class Game : MonoBehaviour
         } }
     public IPlayer Player1;
     public IPlayer Player2;
-    public IPlayer curPlayer;
+    public IPlayer curPlayer, rival;
     public static bool cancelTurn = false;
 
     public SantoriniCoevolutionExperiment _experiment { get; private set; }
     
 
     public static Coordinate clickLocation;
-    private bool isDebug = true;
+    private bool isDebug = false;
     private void Start()
     {
+
         if (isDebug)
         {
-            GameSettings.gameType = GameSettings.GameType.Singleplayer;
+            GameSettings.gameType = GameSettings.GameType.Watch;
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
             StartGame();
         }
@@ -77,7 +81,8 @@ public class Game : MonoBehaviour
 
     public void StartGame()
     {
-        //ResetGame();
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
+
         Debug.Log("StartingGame");
 
         Board = new int[5, 5];
@@ -106,13 +111,45 @@ public class Game : MonoBehaviour
         Player1 = null;
         Player2 = null;
         curPlayer = null;
+        rival = null;
         clickLocation = null;
         
     }
+
+    public void RestartGame()
+    {
+        cancelTurn = true;
+        StopAllCoroutines();
+        HighlightManager.unHighlightEverything();
+        HighlightManager.highlightedObjects.Clear();
+        if (Player1 != null && Player2 != null) clearPlayersTurnsAndSendBuildersHome();
+        curPlayer = null;
+        rival = null;
+        clickLocation = null;
+
+        StartGame();
+    }
+
     private void clearPlayersTurnsAndSendBuildersHome()
     {
         Player1.resetPlayer();
         Player2.resetPlayer();
+    }
+    public void QuitGame()
+    {
+        if(GameSettings.gameType == GameSettings.GameType.Multiplayer)
+        {
+            NetworkingManager.LeaveRoom();
+        }
+
+        SettingChanger.resetGameSettings();
+        ResetGame();
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToStart();
+        EndOfGameScreen.SetActive(false);
+        JoinMenu.SetActive(false);
+        Rotator.SetActive(true);
+        MainMenu.SetActive(true);
+
     }
 
     //reads the settings that will be set by the UI
@@ -135,7 +172,7 @@ public class Game : MonoBehaviour
             case GameSettings.GameType.Singleplayer:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
-                Player2.loadNEATPlayer("coevolution_champion");
+                Player2.loadNEATPlayer("coevolution_champion.xml"); // this string represents the `path` variable seen elsewhere in the AI code... It's just the name of the champion file in the root directory of the project.
                 break;
             case GameSettings.GameType.Multiplayer:
                 setupMultiplayerSettings();
@@ -166,7 +203,7 @@ public class Game : MonoBehaviour
         //players already move the builders
         if (!(curPlayer is Player)) curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
-        if(GameSettings.gameType == GameSettings.GameType.Watch) yield return new WaitForSeconds(timeToTurn/2);
+        if(!(curPlayer is Player)) yield return new WaitForSeconds(timeToTurn/2);
 
         // If not over Where to build?
         if (!turn.isWin)
@@ -221,7 +258,7 @@ public class Game : MonoBehaviour
                 
                 Turn t = curPlayer.getNextTurn();
                 // update the board with the current player's move
-                Debug.Log(t.ToString());
+                Debug.Log("Processing Turn: " + t.ToString());
                 StartCoroutine(processTurnString(t, curPlayer, this));
 
                 if (t.isWin)
@@ -252,7 +289,7 @@ public class Game : MonoBehaviour
     {
         //The Scale Y * 2 of the level object
         const float gamepeiceHeight = (float)0;
-        const float level0Height = (float)0.5001;
+        const float level0Height = (float)0.500;
         const float level4Height = (float)0.000;
 
         float newHeightToMoveTo = 0;
@@ -380,7 +417,7 @@ public class Game : MonoBehaviour
             for (int j = -1; j <= 1; ++j)
             {
                 Coordinate test = new Coordinate(c.x + i, c.y + j);
-                if (Coordinate.inBounds(test) && Board[test.x, test.y] < 4 && locationClearOfAllBuilders(test))
+                if (Coordinate.inBounds(test) && Board[test.x, test.y] < 4 && locationClearOfAllBuilders(test) && !Coordinate.Equals(test, c))
                 {
                     allBuilds.Add(Coordinate.coordToString(test));
                 }

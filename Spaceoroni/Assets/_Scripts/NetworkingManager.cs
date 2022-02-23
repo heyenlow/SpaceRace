@@ -32,6 +32,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject Host;
     [SerializeField]
+    private GameObject hostRoomName;
+    [SerializeField]
     private Game gameManager;
 
 
@@ -83,9 +85,10 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         {
             RoomOptions options = new RoomOptions();
             options.MaxPlayers = 2;
+            string name = hostRoomName.GetComponent<TMP_InputField>().ToString();
 
             Debug.Log("CreateRoom called with name:");// + HostName.GetComponent<TextMeshPro>().text);
-            PhotonNetwork.CreateRoom(null, options, TypedLobby.Default);
+            PhotonNetwork.CreateRoom(name, options, TypedLobby.Default);
          
         }
         else
@@ -104,6 +107,11 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
             netinfo += "Joined Room";
         }
     }
+
+    public static void LeaveRoom()
+    {
+        PhotonNetwork.LeaveRoom();
+    }
     #endregion
 
 
@@ -116,6 +124,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         {
             isConnecting = false;
             Debug.Log("Connected to master");
+            PhotonNetwork.JoinLobby();
             Connecting.SetActive(false);
             Join.SetActive(true);
             Host.SetActive(true);
@@ -131,10 +140,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Debug.Log("PUN Basics Tutorial/Launcher:OnJoinRandomFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom");
-
-        // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
-        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayersPerRoom });
+        Debug.Log("Join Random Room failed.");   
     }
 
     public override void OnJoinedRoom()
@@ -164,6 +170,13 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
             gameManager.StartGame();
         }
+    }
+
+    public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
+    {
+        Debug.LogFormat("OnPlayerLeftRoom() ", otherPlayer);
+
+        gameManager.QuitGame();
     }
 
     #endregion
