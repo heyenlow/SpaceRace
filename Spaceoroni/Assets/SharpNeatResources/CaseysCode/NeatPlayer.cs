@@ -273,7 +273,10 @@ public class NeatPlayer : IPlayer
         }
         if (Coordinate.Equals(currentTurn.MoveLocation, new Coordinate(0, 0)))
         {
-            Debug.LogError("Reported no move...");
+            // this was an error in the console logic
+            // because in the console logic moveLocation is never null
+            // I think because the AI moves as soon as it picks a new location
+            //Debug.LogError("Reported no move...");
         }
         currentTurn.BuildLocation = build;
         yield return null;
