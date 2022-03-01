@@ -35,6 +35,7 @@ public class Game : MonoBehaviour
         Playing
     };
     public PlayerState playerState { get; set; }
+    public float boardScale = 4f;
     public float level1Height = 0.8f;
     public float level2Height = 0.5f;
     public float level3Height = 0.3f;
@@ -297,7 +298,7 @@ public class Game : MonoBehaviour
     {
         //The Scale Y * 2 of the level object
         const float gamepeiceHeight = (float)0;
-        const float level0Height = (float)0.500;
+        const float level0Height = (float)0.5;
         const float level4Height = (float)0.000;
 
         float newHeightToMoveTo = 0;
@@ -306,20 +307,20 @@ public class Game : MonoBehaviour
         switch (BHeight)
         {
             case 4:
-                newHeightToMoveTo += level4Height;
+                newHeightToMoveTo += level4Height * boardScale;
                 goto case 3;
             case 3:
-                newHeightToMoveTo += level3Height;
+                newHeightToMoveTo += level3Height * boardScale;
                 goto case 2;
             case 2:
-                newHeightToMoveTo += level2Height;
+                newHeightToMoveTo += level2Height * boardScale;
                 goto case 1;
             case 1:
-                newHeightToMoveTo += level1Height;
+                newHeightToMoveTo += level1Height * boardScale;
                 goto case 0;
             case 0:
-                newHeightToMoveTo += gamepeiceHeight;
-                newHeightToMoveTo += level0Height;
+                newHeightToMoveTo += gamepeiceHeight * boardScale;
+                newHeightToMoveTo += level0Height * boardScale;
                 break;
         }
         return newHeightToMoveTo;
