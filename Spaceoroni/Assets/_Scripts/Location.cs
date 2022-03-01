@@ -57,7 +57,7 @@ public class Location : MonoBehaviour
     public void removeHighlight()
     {
         isMove = false;
-        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
+        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Universal Render Pipeline/Lit");
     }
     public void highlightLocation()
     {

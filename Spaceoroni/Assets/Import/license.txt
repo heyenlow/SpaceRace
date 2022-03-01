@@ -1,0 +1,8 @@
+Model Information:
+* title:	Cartoon Lowpoly Earth Planet 2 UVW textured
+* source:	https://sketchfab.com/3d-models/cartoon-lowpoly-earth-planet-2-uvw-textured-73dd3283bf6d45a3a62d4806f3044633
+* author:	antonmoek (https://sketchfab.com/antonmoek)
+
+Model License:
+* license type:	SKETCHFAB Editorial (https://sketchfab.com/licenses)
+* requirements:	Use only in connection with events that are newsworthy or of public interest

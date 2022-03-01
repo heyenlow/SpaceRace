@@ -98,7 +98,7 @@ public class Builder : MonoBehaviour
 
     private void OnMouseExit()
     {
-        GetComponentInChildren<Renderer>().material.shader = Shader.Find("Standard");
+        GetComponentInChildren<Renderer>().material.shader = Shader.Find("Universal Render Pipeline/Lit");
     }
 
     void OnMouseDown()

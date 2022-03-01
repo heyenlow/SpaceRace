@@ -13,15 +13,20 @@ public class OtherPlayer : IPlayer
     //this needs to wait for a turn to be recieved
     public override IEnumerator beginTurn(Game g)
     {
+        turnText.text = "Other Players Turn";
         recievedEvent = false;
         while (!recievedEvent && !Game.cancelTurn)
         {
             yield return new WaitForEndOfFrame();
         }
+        
+        turnText.text = "";
         yield return null;
     }
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
+        turnText.text = "Other Player is Placing Builders";
+
         recievedEvent = false;
         while (!recievedEvent && !Game.cancelTurn)
         {
@@ -34,6 +39,8 @@ public class OtherPlayer : IPlayer
 
             Debug.Log("Moving builder " + builder + " to " + Coordinate.coordToString(builderCoord));
         }
+
+        turnText.text = "";
 
         yield return true;
     }
