@@ -2,18 +2,22 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public abstract class IPlayer : MonoBehaviour
 {
     protected Builder Builder1;
     protected Builder Builder2;
     protected List<Turn> turns;
+    protected TextMeshProUGUI turnText;
+
 
     private void Start()
     {
         turns = new List<Turn>();
         Builder1 = this.gameObject.GetComponentsInChildren<Builder>()[0];
         Builder2 = this.gameObject.GetComponentsInChildren<Builder>()[1];
+        turnText = GameObject.FindGameObjectWithTag("TurnText").GetComponent<TextMeshProUGUI>();
     }
 
     public abstract IEnumerator beginTurn(Game g);

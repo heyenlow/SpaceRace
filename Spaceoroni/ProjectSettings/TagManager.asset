@@ -10,6 +10,7 @@ TagManager:
   - Board
   - Debug
   - MusicVolumeSlider
+  - TurnText
   layers:
   - Default
   - TransparentFX

@@ -5,11 +5,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Player : IPlayer
 {
     private Turn currentTurn;
-    private Builder builder;  //TODO: Marked for deprecation?
 
     public bool clickedBuilder(Coordinate click)
     { 
@@ -29,6 +29,8 @@ public class Player : IPlayer
 
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
+        turnText.text = "Place Builder";
+
         g.addAllLocationsWithoutBuildersToHighlight();
         while (Game.clickLocation == null && !Game.cancelTurn)
         {
@@ -49,11 +51,14 @@ public class Player : IPlayer
 
             if (GameSettings.gameType == GameSettings.GameType.Multiplayer) RaiseBuilderLocation(moveLocation, builder);
         }
+
+        turnText.text = "";
         yield return true;
     }
 
     public override IEnumerator SelectBuilder(Game g)
     {
+        turnText.text = "Select a Builder";
         //Select Builder
         Game.clickLocation = null;   //Reset click
         HighlightManager.highlightPlayersBuilder(this);
@@ -67,11 +72,14 @@ public class Player : IPlayer
             Game.clickLocation = null;
         }
         // after choosing a builder, find the best square you can move to from it.
+        turnText.text = "";
         yield return null;
     }
 
     public override IEnumerator chooseMove(Game g)
     {
+        turnText.text = "Select a Move";
+
         Coordinate temp = new Coordinate(currentTurn.BuilderLocation);
         List<string> allMoves = g.getAllPossibleMoves(currentTurn.BuilderLocation);
 
@@ -124,10 +132,13 @@ public class Player : IPlayer
         }
 
         currentTurn.BuilderLocation = temp;
+        turnText.text = "";
+
     }
 
     public override IEnumerator chooseBuild(Game g)
     {
+        turnText.text = "Select a Rocket to Build or Blast Off";
 
         //Build Block
         Game.clickLocation = null;
@@ -148,6 +159,7 @@ public class Player : IPlayer
             HighlightManager.unhighlightAllPossibleBuildLocations(allBuildLevels);
         }
 
+        turnText.text = "";
     }
 
     public override IEnumerator beginTurn(Game g)
