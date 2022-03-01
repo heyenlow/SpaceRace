@@ -64,7 +64,7 @@ public class Level : MonoBehaviour
         var childRenderers = this.gameObject.GetComponentsInChildren<Renderer>();
         foreach (var rend in childRenderers)
         {
-            rend.material.shader = Shader.Find("Standard");
+            rend.material.shader = Shader.Find("Universal Render Pipeline/Lit");
         }
     }
 

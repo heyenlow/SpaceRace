@@ -28,7 +28,7 @@ public class CameraMovement : MonoBehaviour
             movingCamera.transform.position = Vector3.MoveTowards(movingCamera.transform.position, newLocation, MovementSpeed * Time.deltaTime);  
             movingCamera.transform.rotation = Quaternion.RotateTowards(movingCamera.transform.rotation, newRotation, RotationSpeed * Time.deltaTime);
             
-            if (movingCamera.transform.position == newLocation && movingCamera.transform.rotation == newRotation) movingCamera = null;
+            //if (movingCamera.transform.position == newLocation && movingCamera.transform.rotation == newRotation) movingCamera = null;
         }
     }
 

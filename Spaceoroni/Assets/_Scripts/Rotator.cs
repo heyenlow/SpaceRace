@@ -4,15 +4,42 @@ using UnityEngine;
 
 public class Rotator : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
+    public enum Axis
+    {
+        x,
+        y,
+        z,
+        earth
+    };
+    
+    public Axis RotateAxis;
+    public float Speed = 0.015f;
+    public GameObject CenterObject;
+
     void Update()
     {
-        this.transform.Rotate(0f, 0f, 0.015f);
+        rotateObject();
+    }
+
+    private void rotateObject()
+    {
+        switch (RotateAxis)
+        {
+            case Axis.x:
+                this.transform.Rotate( Speed, 0f, 0f);
+                break;
+            case Axis.y:
+                this.transform.Rotate(0f, Speed, 0f);
+                break;
+            case Axis.z:
+                this.transform.Rotate(0f, 0f, Speed);
+                break;
+            case Axis.earth:
+                this.transform.Rotate(Speed, 0f, -1 * Speed);
+                break;
+
+        }
+
     }
 }
