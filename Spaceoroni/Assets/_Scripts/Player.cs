@@ -9,7 +9,7 @@ using TMPro;
 
 public class Player : IPlayer
 {
-    private Turn currentTurn;
+    protected Turn currentTurn;
 
     public bool clickedBuilder(Coordinate click)
     { 
@@ -32,6 +32,7 @@ public class Player : IPlayer
         turnText.text = "Place Builder";
 
         g.addAllLocationsWithoutBuildersToHighlight();
+
         while (Game.clickLocation == null && !Game.cancelTurn)
         {
             yield return new WaitForEndOfFrame();
@@ -61,6 +62,7 @@ public class Player : IPlayer
         turnText.text = "Select a Builder";
         //Select Builder
         Game.clickLocation = null;   //Reset click
+
         HighlightManager.highlightPlayersBuilder(this);
         while (Game.clickLocation == null && !Game.cancelTurn)
         {

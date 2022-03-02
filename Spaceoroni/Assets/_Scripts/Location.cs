@@ -6,6 +6,8 @@ using UnityEngine.EventSystems;
 public class Location : MonoBehaviour
 {
     private bool isMove = false;
+    public static Location LocationBlinking = null;
+
     public void blastOffRocket()
     {
         var rocket = this.GetComponentInChildren<Rocket>();
@@ -34,7 +36,11 @@ public class Location : MonoBehaviour
     {
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
-            if (isMove)
+            if (this == LocationBlinking)
+            {
+                Blink();
+            }
+            else if (isMove)
             {
                 highlightLocation();
             }
@@ -47,9 +53,10 @@ public class Location : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (HighlightManager.isHighlightObj(this.gameObject)) 
+        if (HighlightManager.isHighlightObj(this.gameObject) && (LocationBlinking == null || this == LocationBlinking)) 
         {
             Game.recieveLocationClick(Coordinate.stringToCoord(this.name));
+            LocationBlinking = null;
             removeHighlight();
         }
     }
@@ -67,6 +74,14 @@ public class Location : MonoBehaviour
     public void mouseOverHighlight()
     {
         this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");
+    }
+
+    public void Blink()
+    {
+        LocationBlinking = this;
+        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Shader Graphs/Blink");
+        var rocket = GetComponentInChildren<Rocket>();
+        rocket.Blink();
     }
 
 }

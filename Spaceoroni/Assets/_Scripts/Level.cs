@@ -38,13 +38,19 @@ public class Level : MonoBehaviour
         {
             highlightLevel();
         }
+        if(Rocket.blinkingRocket == this.GetComponentInParent<Rocket>())
+        {
+            Blink();
+        }
     }
 
     void OnMouseDown()
     {
-        if (HighlightManager.isHighlightObj(this.gameObject))
+        if (HighlightManager.isHighlightObj(this.gameObject) && (Rocket.blinkingRocket == null || GetComponentInParent<Rocket>() == Rocket.blinkingRocket))
         {
             Game.recieveLocationClick(Coordinate.stringToCoord(this.transform.parent.parent.name));
+            Rocket.blinkingRocket = null;
+            GetComponentInParent<Location>().removeHighlight();
             removeHighlight();
         }
     }
@@ -56,6 +62,16 @@ public class Level : MonoBehaviour
         {
             if(highlightType == HighlightType.build) rend.material.shader = Shader.Find("Ultimate 10+ Shaders/Force Field");
             else if (highlightType == HighlightType.move) rend.material.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");
+        }
+    }
+
+    public void Blink()
+    {
+        Rocket.blinkingRocket = GetComponentInParent<Rocket>();
+        var childRenderers = this.gameObject.GetComponentsInChildren<Renderer>();
+        foreach (var rend in childRenderers)
+        {
+            rend.material.shader = Shader.Find("Shader Graphs/Blink");
         }
     }
 

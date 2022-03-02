@@ -11,14 +11,17 @@ public class Builder : MonoBehaviour
     Quaternion newRotation;
     Vector3 homeLocation;
     Quaternion homeRotation;
-    public float Speed = 0.1f;
-    public float RotationSpeed = 100;
+    static float Speed = 8f;
     private Animator anim;
+
+    static Builder BlinkingBuilder = null;
+    static float BlinkTime = 1f;
 
     void Start()
     {
         homeLocation = this.transform.position;
         homeRotation = this.transform.rotation;
+
 
 		anim = gameObject.GetComponentInChildren<Animator>();
     }
@@ -92,27 +95,27 @@ public class Builder : MonoBehaviour
     {
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
-            var materials = GetComponentInChildren<Renderer>().materials;
-            foreach (var m in materials)
-            {
-                m.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");
-            }
+            highlight();
         }
     }
 
     private void OnMouseExit()
     {
-        var materials = GetComponentInChildren<Renderer>().materials;
-        foreach (var m in materials)
+        if (this == BlinkingBuilder)
         {
-            m.shader = Shader.Find("Universal Render Pipeline/Lit");
+            Blink();
+        }
+        else
+        {
+            removeHighlight();
         }
     }
 
     void OnMouseDown()
     {
         //Output to console the clicked GameObject's name and the following message. You can replace this with your own actions for when clicking the GameObject.
-        if(HighlightManager.isHighlightObj(this.gameObject)) Game.recieveLocationClick(coord);
+        if(HighlightManager.isHighlightObj(this.gameObject) && (BlinkingBuilder == null || this == BlinkingBuilder)) Game.recieveLocationClick(coord);
+        BlinkingBuilder = null;
     }
 
     void createDust(){
@@ -130,8 +133,32 @@ public class Builder : MonoBehaviour
         }
     }
 
-    void startBlink()
+    public void Blink()
     {
-
+        BlinkingBuilder = this;
+        var materials = GetComponentInChildren<Renderer>().materials;
+        foreach (var m in materials)
+        {
+            m.shader = Shader.Find("Shader Graphs/Blink");
+        }
     }
+
+    void highlight()
+    {
+        var materials = GetComponentInChildren<Renderer>().materials;
+        foreach (var m in materials)
+        {
+            m.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");
+        }
+    }
+
+    void removeHighlight()
+    {
+        var materials = GetComponentInChildren<Renderer>().materials;
+        foreach (var m in materials)
+        {
+            m.shader = Shader.Find("Universal Render Pipeline/Lit");
+        }
+    }
+
 }
