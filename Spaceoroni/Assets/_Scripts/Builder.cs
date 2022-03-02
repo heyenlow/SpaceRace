@@ -92,13 +92,21 @@ public class Builder : MonoBehaviour
     {
         if (HighlightManager.isHighlightObj(this.gameObject))
         {
-            GetComponentInChildren<Renderer>().material.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");
+            var materials = GetComponentInChildren<Renderer>().materials;
+            foreach (var m in materials)
+            {
+                m.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");
+            }
         }
     }
 
     private void OnMouseExit()
     {
-        GetComponentInChildren<Renderer>().material.shader = Shader.Find("Universal Render Pipeline/Lit");
+        var materials = GetComponentInChildren<Renderer>().materials;
+        foreach (var m in materials)
+        {
+            m.shader = Shader.Find("Universal Render Pipeline/Lit");
+        }
     }
 
     void OnMouseDown()
@@ -120,5 +128,10 @@ public class Builder : MonoBehaviour
         {
             dust.Play();
         }
+    }
+
+    void startBlink()
+    {
+
     }
 }
