@@ -8,6 +8,9 @@ public class TutorialPlayer : Player
     public GameObject SelectBuilderOverlay;
     public GameObject SelectMoveOverlay;
     public GameObject SelectBuildOverlay;
+    public GameObject BlockARocketOverlay;
+    public GameObject MoveToWinOverlay;
+
 
 
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
@@ -83,6 +86,8 @@ public class TutorialPlayer : Player
     public override IEnumerator chooseMove(Game g)
     {
         if (StringGameReader.MoveCount == 1) SelectMoveOverlay.SetActive(true);
+        if (StringGameReader.MoveCount == 23) MoveToWinOverlay.SetActive(true);
+
         while (SelectMoveOverlay.activeInHierarchy)
         {
             yield return new WaitForEndOfFrame();
@@ -151,6 +156,8 @@ public class TutorialPlayer : Player
     public override IEnumerator chooseBuild(Game g)
     {
         if (StringGameReader.MoveCount == 1) SelectBuildOverlay.SetActive(true);
+        if (StringGameReader.MoveCount == 5) BlockARocketOverlay.SetActive(true);
+
         while (SelectBuildOverlay.activeInHierarchy)
         {
             yield return new WaitForEndOfFrame();
@@ -166,7 +173,15 @@ public class TutorialPlayer : Player
 
         //only blink the top layer
         var levels = GameObject.Find(Coordinate.coordToString(currentTurn.BuildLocation)).GetComponentsInChildren<Level>();
-        levels[levels.Length -1].Blink();
+        //blink whole rocket if it is the third level
+        if (levels.Length == 3)
+        {
+            levels[0].GetComponentInParent<Rocket>().Blink();
+        }
+        else
+        {
+            levels[levels.Length - 1].Blink();
+        }
 
         while (Game.clickLocation == null && !Game.cancelTurn)
         {
@@ -188,7 +203,7 @@ public class TutorialPlayer : Player
     {
         currentTurn = StringGameReader.getCurrentTurn();
         //play the first 2 turns
-        if (StringGameReader.MoveCount <= 3)
+        if (StringGameReader.MoveCount <= 3 || StringGameReader.MoveCount == 5 || StringGameReader.MoveCount == 23)
         {
             // after activation choose a builder
             yield return StartCoroutine(SelectBuilder(g));
@@ -219,8 +234,10 @@ public class TutorialPlayer : Player
         }
         else
         {
+            turnText.text = ">>";
             yield return new WaitForSeconds(1);
-            moveBuidler(getBuilderInt(currentTurn.BuilderLocation), currentTurn.MoveLocation, g); ;
+            moveBuidler(getBuilderInt(currentTurn.BuilderLocation), currentTurn.MoveLocation, g);
+            yield return new WaitForSeconds(1);
             turns.Add(currentTurn);
         }
     }

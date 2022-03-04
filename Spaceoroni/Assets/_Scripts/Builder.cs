@@ -6,11 +6,11 @@ public class Builder : MonoBehaviour
 {
     public ParticleSystem dust; //Dust Effect
     public Coordinate coord = new Coordinate();
-    GameObject movingBuilder;
-    Vector3 newLocation;
-    Quaternion newRotation;
-    Vector3 homeLocation;
-    Quaternion homeRotation;
+    private GameObject movingBuilder;
+    private Vector3 newLocation;
+    private Quaternion newRotation;
+    private Vector3 homeLocation;
+    private Quaternion homeRotation;
     static float Speed = 8f;
     private Animator anim;
 

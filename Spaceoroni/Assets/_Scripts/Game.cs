@@ -214,7 +214,7 @@ public class Game : MonoBehaviour
         //players already move the builders
         if (!(curPlayer is Player)) curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
-        if(!(curPlayer is Player) || curPlayer is TutorialPlayer) yield return new WaitForSeconds(timeToTurn/2);
+        if(!(curPlayer is Player)) yield return new WaitForSeconds(timeToTurn/2);
 
         // If not over Where to build?
         if (!turn.isWin)

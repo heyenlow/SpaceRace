@@ -25,7 +25,7 @@ public class Level : MonoBehaviour
     private void OnMouseOver()
     {
         //GetComponent<Renderer>().material.color = highlightMaterial;
-        if (HighlightManager.isHighlightObj(this.gameObject))
+        if (HighlightManager.isHighlightObj(this.gameObject) || Rocket.blinkingRocket == GetComponentInParent<Rocket>())
         {
             removeHighlight();
         }
@@ -51,6 +51,7 @@ public class Level : MonoBehaviour
             Game.recieveLocationClick(Coordinate.stringToCoord(this.transform.parent.parent.name));
             Rocket.blinkingRocket = null;
             GetComponentInParent<Location>().removeHighlight();
+            foreach (Level l in GetComponentInParent<Rocket>().getRocketsLevels()) l.removeHighlight();
             removeHighlight();
         }
     }

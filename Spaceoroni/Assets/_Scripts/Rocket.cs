@@ -41,9 +41,13 @@ public class Rocket : MonoBehaviour
     {
         blinkingRocket = this;
         var levelOfRocket = GetComponentsInChildren<Level>();
-        foreach(Level l in levelOfRocket)
+        foreach (Level l in levelOfRocket)
         {
             l.Blink();
         }
+    }
+    public Level[] getRocketsLevels()
+    {
+        return GetComponentsInChildren<Level>();
     }
 }
