@@ -19,7 +19,14 @@ public class Rotator : MonoBehaviour
 
     void Update()
     {
-        rotateObject();
+        if (CenterObject == null)
+        {
+            rotateObject();
+        }
+        else
+        {
+            rotateAroundCenterObject();
+        }
     }
 
     private void rotateObject()
@@ -41,5 +48,25 @@ public class Rotator : MonoBehaviour
 
         }
 
+    }
+    private void rotateAroundCenterObject()
+    {
+
+        switch (RotateAxis)
+        {
+            case Axis.x:
+                this.transform.RotateAround(CenterObject.transform.position, new Vector3(Speed, 0f, 0f), Speed);
+                break;
+            case Axis.y:
+                this.transform.RotateAround(CenterObject.transform.position, new Vector3(0f, Speed, 0f), Speed);
+                break;
+            case Axis.z:
+                this.transform.RotateAround(CenterObject.transform.position, new Vector3(0f, 0f, Speed), Speed);
+                break;
+            case Axis.earth:
+                this.transform.Rotate(Speed, 0f, -1 * Speed);
+                break;
+
+        }
     }
 }
