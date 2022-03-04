@@ -13,12 +13,15 @@ public class CinemachineCamSwitcher : MonoBehaviour
     private CinemachineVirtualCamera EndOfGameCamera;
     [SerializeField]
     private CinemachineVirtualCamera CenterEarthCamera;
+    [SerializeField]
+    private CinemachineVirtualCamera SolarSystemCam;
 
     public void MoveToGameBoard()
     {
         BoardCamera.Priority = 2;
         SpaceCamera.Priority = 1;
         EndOfGameCamera.Priority = 1;
+        SolarSystemCam.Priority = 1;
         CenterEarthCamera.Priority = 1;
     }
     public void MoveToStart()
@@ -26,6 +29,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
         SpaceCamera.Priority = 2;
         BoardCamera.Priority = 1;
         EndOfGameCamera.Priority = 1;
+        SolarSystemCam.Priority = 1;
         CenterEarthCamera.Priority = 1;
     }
     public void MoveToEnd()
@@ -33,11 +37,22 @@ public class CinemachineCamSwitcher : MonoBehaviour
         EndOfGameCamera.Priority = 2;
         BoardCamera.Priority = 1;
         SpaceCamera.Priority = 1;
+        SolarSystemCam.Priority = 1;
         CenterEarthCamera.Priority = 1;
     }
     public void MoveToCenterEarth()
     {
         CenterEarthCamera.Priority = 2;
+        EndOfGameCamera.Priority = 1;
+        BoardCamera.Priority = 1;
+        SpaceCamera.Priority = 1;
+        SolarSystemCam.Priority = 1;
+    }
+
+    public void MoveToSolarSystem()
+    {
+        SolarSystemCam.Priority = 2;
+        CenterEarthCamera.Priority = 1;
         EndOfGameCamera.Priority = 1;
         BoardCamera.Priority = 1;
         SpaceCamera.Priority = 1;
