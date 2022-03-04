@@ -62,7 +62,7 @@ public class Game : MonoBehaviour
         if (isDebug)
         {
             GameSettings.gameType = GameSettings.GameType.Watch;
-            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
             StartGame();
         }
         else
@@ -82,7 +82,7 @@ public class Game : MonoBehaviour
 
     public void StartGame()
     {
-        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
 
 
         Board = new int[5, 5];
@@ -149,10 +149,11 @@ public class Game : MonoBehaviour
         {
             NetworkingManager.LeaveRoom();
         }
+        Player1.GetComponent<TutorialPlayer>().setAllOverlaysInactive();
 
         SettingChanger.resetGameSettings();
         ResetGame();
-        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToStart();
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToStart();
         EndOfGameScreen.SetActive(false);
         PauseButton.SetActive(false);
         JoinMenu.SetActive(false);
@@ -295,7 +296,7 @@ public class Game : MonoBehaviour
     {
         PauseButton.SetActive(false);
         EndOfGameScreen.SetActive(true);
-        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToPostGame();
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToEnd();
     }
 
     //returns the board height at a given coordinate

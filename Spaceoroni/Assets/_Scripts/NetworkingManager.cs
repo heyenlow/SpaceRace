@@ -89,7 +89,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
 
             Debug.Log("CreateRoom called with name:");// + HostName.GetComponent<TextMeshPro>().text);
             PhotonNetwork.CreateRoom(name, options, TypedLobby.Default);
-         
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToCenterEarth();
+
         }
         else
         {
@@ -151,7 +152,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
         {
-            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
             gameManager.StartGame();
         }
 
@@ -167,7 +168,6 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
        if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
         {
             WaitingForPlayer.SetActive(false);
-            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
             gameManager.StartGame();
         }
     }

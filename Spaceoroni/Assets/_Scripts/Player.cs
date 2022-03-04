@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Cinemachine;
 
 public class Player : IPlayer
 {
@@ -72,6 +73,8 @@ public class Player : IPlayer
         {
             currentTurn.BuilderLocation = Game.clickLocation;
             Game.clickLocation = null;
+            var v = GameObject.Find("VCamTarget").GetComponent<CinemachineTargetGroup>().m_Targets[0];
+            v.weight = 100;
         }
         // after choosing a builder, find the best square you can move to from it.
         turnText.text = "";
