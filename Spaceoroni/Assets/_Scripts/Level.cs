@@ -5,6 +5,7 @@ using UnityEngine;
 public class Level : MonoBehaviour
 {
     private Vector3 homeLocation;
+    static Level BlinkingLevel;
     private void Start()
     {
         homeLocation = this.transform.position;
@@ -25,7 +26,7 @@ public class Level : MonoBehaviour
     private void OnMouseOver()
     {
         //GetComponent<Renderer>().material.color = highlightMaterial;
-        if (HighlightManager.isHighlightObj(this.gameObject))
+        if (HighlightManager.isHighlightObj(this.gameObject) || Rocket.blinkingRocket == GetComponentInParent<Rocket>())
         {
             removeHighlight();
         }
@@ -34,7 +35,15 @@ public class Level : MonoBehaviour
 
     private void OnMouseExit()
     {
-        if (HighlightManager.isHighlightObj(this.gameObject))
+        if (this == BlinkingLevel)
+        {
+            OnlyBlinkThisLevel();
+        }
+        else if(Rocket.blinkingRocket == this.GetComponentInParent<Rocket>())
+        {
+            Blink();
+        }
+        else if (HighlightManager.isHighlightObj(this.gameObject))
         {
             highlightLevel();
         }
@@ -42,9 +51,13 @@ public class Level : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (HighlightManager.isHighlightObj(this.gameObject))
+        if (HighlightManager.isHighlightObj(this.gameObject) && (Rocket.blinkingRocket == null || GetComponentInParent<Rocket>() == Rocket.blinkingRocket || this == BlinkingLevel))
         {
             Game.recieveLocationClick(Coordinate.stringToCoord(this.transform.parent.parent.name));
+            Rocket.blinkingRocket = null;
+            BlinkingLevel = null;
+            GetComponentInParent<Location>().removeHighlight();
+            foreach (Level l in GetComponentInParent<Rocket>().getRocketsLevels()) l.removeHighlight();
             removeHighlight();
         }
     }
@@ -59,6 +72,23 @@ public class Level : MonoBehaviour
         }
     }
 
+    public void Blink()
+    {
+        var childRenderers = this.gameObject.GetComponentsInChildren<Renderer>();
+        foreach (var rend in childRenderers)
+        {
+            rend.material.shader = Shader.Find("Shader Graphs/Blink");
+        }
+    }
+    public void OnlyBlinkThisLevel()
+    {
+        BlinkingLevel = this;
+        var childRenderers = this.gameObject.GetComponentsInChildren<Renderer>();
+        foreach (var rend in childRenderers)
+        {
+            rend.material.shader = Shader.Find("Shader Graphs/Blink");
+        }
+    }
     public void removeHighlight()
     {
         var childRenderers = this.gameObject.GetComponentsInChildren<Renderer>();

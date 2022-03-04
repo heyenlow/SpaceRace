@@ -122,7 +122,7 @@ public class NeatPlayer : IPlayer
         System.Random rnd = new System.Random();
         Coordinate tmp = new Coordinate();
         int x, y;
-        if (g.rival.getBuilders().Item1.coord.x == -1 && g.rival.getBuilders().Item2.coord.y == -1)
+        if (g.rival.getBuilders().Item1.coord.x == -1 && g.rival.getBuilders().Item1.coord.y == -1)
         {
             if (builder == 1)
             {

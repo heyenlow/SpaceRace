@@ -8,6 +8,7 @@ public class Rocket : MonoBehaviour
     private Vector3 homeLocation;
     public int Speed = 15;
     private Vector3 newLocation;
+    public static Rocket blinkingRocket = null;
     private void Start()
     {
         homeLocation = this.transform.position;
@@ -34,5 +35,19 @@ public class Rocket : MonoBehaviour
     {
         movingRocket = null;
         this.transform.position = homeLocation;
+    }
+
+    public void Blink()
+    {
+        blinkingRocket = this;
+        var levelOfRocket = GetComponentsInChildren<Level>();
+        foreach (Level l in levelOfRocket)
+        {
+            l.Blink();
+        }
+    }
+    public Level[] getRocketsLevels()
+    {
+        return GetComponentsInChildren<Level>();
     }
 }

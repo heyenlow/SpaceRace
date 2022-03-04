@@ -84,7 +84,6 @@ public class Game : MonoBehaviour
     {
         GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>().moveCameraToGameBoard();
 
-        Debug.Log("StartingGame");
 
         Board = new int[5, 5];
         ClearBoard();
@@ -94,6 +93,7 @@ public class Game : MonoBehaviour
         PauseButton.SetActive(true);
         playerState = PlayerState.Playing;
         setupGameSettings();
+        Debug.Log("Starting " + GameSettings.gameType +  " Game" + Player1 + Player2);
         StartCoroutine(PlayGameToEnd());
     }
     public void ResetGame()
@@ -171,12 +171,18 @@ public class Game : MonoBehaviour
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
                 break;
             case GameSettings.GameType.Watch:
+                //Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<NeatPlayer>();
+                //Player1.loadNEATPlayer("coevolution_champion");
+                //Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
+                //Player2.loadNEATPlayer("coevolution_champion");
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<StringPlayer>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
+                StringGameReader.setGameLines();
                 break;
             case GameSettings.GameType.Tutorial:
-                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
+                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<TutorialPlayer>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
+                StringGameReader.setGameLines();
                 break;
             case GameSettings.GameType.Singleplayer:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
@@ -262,7 +268,6 @@ public class Game : MonoBehaviour
                 else
                 {
                     yield return StartCoroutine(curPlayer.beginTurn(this));
-
                 }
                 
                 Turn t = curPlayer.getNextTurn();
@@ -329,9 +334,9 @@ public class Game : MonoBehaviour
     private IEnumerator PlaceBuilders()
     {
         yield return StartCoroutine(Player1.PlaceBuilder(1, 1, this));
+        yield return StartCoroutine(Player1.PlaceBuilder(2, 1, this));
         yield return StartCoroutine(Player2.PlaceBuilder(1, 2, this));
         yield return StartCoroutine(Player2.PlaceBuilder(2, 2, this));
-        yield return StartCoroutine(Player1.PlaceBuilder(2, 1, this));
         yield return null;
     }
 
@@ -342,6 +347,15 @@ public class Game : MonoBehaviour
         foreach (var l in locations)
         {
             if (!buildersLocations.Contains(l.name)) { HighlightManager.highlightedObjects.Add(l); }
+        }
+    }
+    public void blinkAllLocationsWithoutBuildersToHighlight()
+    {
+        var locations = GameObject.FindGameObjectsWithTag("Square");
+        var buildersLocations = getAllBuildersString();
+        foreach (var l in locations)
+        {
+            if (!buildersLocations.Contains(l.name)) { l.GetComponent<Location>().Blink(); }
         }
     }
 
@@ -364,6 +378,10 @@ public class Game : MonoBehaviour
         GameObject level = GameObject.Find(Coordinate.coordToString(c));
         if(Board[c.x,c.y] < 4) level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
         else { BlastOffRocket(c); }
+    }
+    public int getBoardHeightAtCoord(Coordinate c)
+    {
+        return Board[c.x, c.y];
     }
 
     public bool isWin(Coordinate c)

@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: BoardMat1
-  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
+  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -110,6 +110,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Vector1_0c67ca6274cd46c9a658948fda98ceff: 2
     - _AlphaClip: 0
     - _Amplitude: 1
     - _Blend: 0
@@ -134,6 +135,7 @@ Material:
     - _Parallax: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _SampleGI: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -145,6 +147,8 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - Color_0ca61496551c466a8b4c949e9ee0627c: {r: 0, g: 0, b: 0, a: 0}
+    - Color_dc1dc5d9cc444ef1b01d02fbea142a47: {r: 0, g: 0.4528302, b: 0.02264689, a: 0.8431373}
     - _BaseColor: {r: 0.04940852, g: 0.1792453, b: 0, a: 1}
     - _BoxDims: {r: 5, g: 5, b: 5, a: 1}
     - _Color: {r: 0.04940852, g: 0.1792453, b: 0, a: 1}
