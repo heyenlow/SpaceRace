@@ -4,12 +4,18 @@ using UnityEngine;
 
 public class TutorialPlayer : Player
 {
-    public GameObject PlacingBuilderOverlay;
-    public GameObject SelectBuilderOverlay;
-    public GameObject SelectMoveOverlay;
-    public GameObject SelectBuildOverlay;
-    public GameObject BlockARocketOverlay;
-    public GameObject MoveToWinOverlay;
+    [SerializeField]
+    private GameObject PlacingBuilderOverlay;
+    [SerializeField]
+    private GameObject SelectBuilderOverlay;
+    [SerializeField]
+    private GameObject SelectMoveOverlay;
+    [SerializeField]
+    private GameObject SelectBuildOverlay;
+    [SerializeField]
+    private GameObject BlockARocketOverlay;
+    [SerializeField]
+    private GameObject MoveToWinOverlay;
 
 
 
@@ -242,4 +248,13 @@ public class TutorialPlayer : Player
         }
     }
 
+    public void setAllOverlaysInactive()
+    {
+        PlacingBuilderOverlay.SetActive(false);
+        SelectBuilderOverlay.SetActive(false);
+        SelectMoveOverlay.SetActive(false);
+        SelectBuildOverlay.SetActive(false);
+        BlockARocketOverlay.SetActive(false);
+        MoveToWinOverlay.SetActive(false);
+    }
 }
