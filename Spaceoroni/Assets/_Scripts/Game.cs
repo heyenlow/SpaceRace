@@ -171,6 +171,10 @@ public class Game : MonoBehaviour
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
                 break;
             case GameSettings.GameType.Watch:
+                //Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<NeatPlayer>();
+                //Player1.loadNEATPlayer("coevolution_champion");
+                //Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
+                //Player2.loadNEATPlayer("coevolution_champion");
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<StringPlayer>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<StringPlayer>();
                 StringGameReader.setGameLines();
@@ -374,6 +378,10 @@ public class Game : MonoBehaviour
         GameObject level = GameObject.Find(Coordinate.coordToString(c));
         if(Board[c.x,c.y] < 4) level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
         else { BlastOffRocket(c); }
+    }
+    public int getBoardHeightAtCoord(Coordinate c)
+    {
+        return Board[c.x, c.y];
     }
 
     public bool isWin(Coordinate c)

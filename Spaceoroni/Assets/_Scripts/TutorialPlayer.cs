@@ -86,7 +86,7 @@ public class TutorialPlayer : Player
     public override IEnumerator chooseMove(Game g)
     {
         if (StringGameReader.MoveCount == 1) SelectMoveOverlay.SetActive(true);
-        if (StringGameReader.MoveCount == 23) MoveToWinOverlay.SetActive(true);
+        if (StringGameReader.MoveCount == StringGameReader.lengthOfTutorialMoves()) MoveToWinOverlay.SetActive(true);
 
         while (SelectMoveOverlay.activeInHierarchy)
         {
@@ -156,7 +156,7 @@ public class TutorialPlayer : Player
     public override IEnumerator chooseBuild(Game g)
     {
         if (StringGameReader.MoveCount == 1) SelectBuildOverlay.SetActive(true);
-        if (StringGameReader.MoveCount == 5) BlockARocketOverlay.SetActive(true);
+        if (StringGameReader.MoveCount == StringGameReader.BlastOffMove) BlockARocketOverlay.SetActive(true);
 
         while (SelectBuildOverlay.activeInHierarchy)
         {
@@ -174,13 +174,13 @@ public class TutorialPlayer : Player
         //only blink the top layer
         var levels = GameObject.Find(Coordinate.coordToString(currentTurn.BuildLocation)).GetComponentsInChildren<Level>();
         //blink whole rocket if it is the third level
-        if (levels.Length == 3)
+        if (g.getBoardHeightAtCoord(currentTurn.BuildLocation) == 3)
         {
             levels[0].GetComponentInParent<Rocket>().Blink();
         }
         else
         {
-            levels[levels.Length - 1].Blink();
+            levels[levels.Length - 1].OnlyBlinkThisLevel();
         }
 
         while (Game.clickLocation == null && !Game.cancelTurn)
@@ -203,7 +203,7 @@ public class TutorialPlayer : Player
     {
         currentTurn = StringGameReader.getCurrentTurn();
         //play the first 2 turns
-        if (StringGameReader.MoveCount <= 3 || StringGameReader.MoveCount == 5 || StringGameReader.MoveCount == 23)
+        if (StringGameReader.MoveCount <= 3 || StringGameReader.MoveCount == StringGameReader.BlastOffMove || StringGameReader.MoveCount == StringGameReader.lengthOfTutorialMoves())
         {
             // after activation choose a builder
             yield return StartCoroutine(SelectBuilder(g));
