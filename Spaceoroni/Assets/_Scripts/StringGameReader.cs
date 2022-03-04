@@ -123,7 +123,7 @@ public static class StringGameReader
                 gameLines = tutorialGameLines;
                 break;
             case GameSettings.GameType.Watch:
-                gameLines = watchGameLines;
+                gameLines = tutorialGameLines;//watchGameLines;
                 break;
         }
         player1builder1Location = Coordinate.stringToCoord(gameLines[0].Substring(gameLines[0].LastIndexOf(' ') + 1));
