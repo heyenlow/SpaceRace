@@ -21,16 +21,20 @@ public class CinemachineCamSwitcher : MonoBehaviour
     private CinemachineVirtualCamera TruckFollowVCam;
     [SerializeField]
     private CinemachineVirtualCamera TruckDoorVCam;
+    [SerializeField]
+    private CinemachineVirtualCamera ElonTextVCam;
+    [SerializeField]
+    private CinemachineVirtualCamera JeffTextVCam;
+
+    private MoveTruck Truck;
 
     private List<CinemachineVirtualCamera> IntroSceneCams;
 
 
-    private IntroSceneManager IntroSceneManager;
-
     void Start()
     {
-        IntroSceneManager = GameObject.Find("IntroSceneManager").GetComponent<IntroSceneManager>();
         IntroSceneCams = new List<CinemachineVirtualCamera>();
+        Truck = GameObject.Find("CyberTruck").GetComponentInChildren<MoveTruck>();
         var cams = GameObject.FindGameObjectsWithTag("IntroVCam");
         foreach (var c in cams) IntroSceneCams.Add(c.GetComponent<CinemachineVirtualCamera>());
     }
@@ -38,13 +42,16 @@ public class CinemachineCamSwitcher : MonoBehaviour
     private void ResetAllPriorities()
     {
         foreach (var c in IntroSceneCams) { c.Priority = 1; }
-        TruckFollowVCam.Priority = 1;
-        TruckDoorVCam.Priority = 1;
-        SolarSystemCam.Priority = 1;
-        CenterEarthCamera.Priority = 1;
-        EndOfGameCamera.Priority = 1;
-        BoardCamera.Priority = 1;
-        SpaceCamera.Priority = 1;
+        //reset all cameras priorities to 1;
+            TruckFollowVCam.Priority = 1;
+            TruckDoorVCam.Priority = 1;
+            SolarSystemCam.Priority = 1;
+            CenterEarthCamera.Priority = 1;
+            EndOfGameCamera.Priority = 1;
+            BoardCamera.Priority = 1;
+            SpaceCamera.Priority = 1;
+            ElonTextVCam.Priority = 1;
+            JeffTextVCam.Priority = 1;
     }
 
     public void MoveToGameBoard()
@@ -73,22 +80,9 @@ public class CinemachineCamSwitcher : MonoBehaviour
         ResetAllPriorities();
         SolarSystemCam.Priority = 2;
     }
-
-    public IEnumerator MoveToFollowTruck()
+    public void startIntroScene()
     {
-        ResetAllPriorities();
-        TruckFollowVCam.Priority = 2;
-        IntroSceneManager.MoveTruck();
-        yield return new WaitForSeconds(4);
-        yield return StartCoroutine(MoveToTruckDoor());
-    }
-
-    public IEnumerator MoveToTruckDoor()
-    {
-        ResetAllPriorities();
-        TruckDoorVCam.Priority = 2;
-        yield return new WaitForSeconds(4);
-        MoveToStart();
+        StartCoroutine(moveThroughSolarSystem());
     }
 
     private IEnumerator moveThroughSolarSystem()
@@ -97,13 +91,39 @@ public class CinemachineCamSwitcher : MonoBehaviour
         {
             ResetAllPriorities();
             c.Priority = 2;
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(2.5f);
         }
-        yield return StartCoroutine(MoveToFollowTruck());
+        StartCoroutine(MoveToFollowTruck());
     }
 
-    public void startIntroScene()
+    private IEnumerator MoveToFollowTruck()
     {
-        StartCoroutine(moveThroughSolarSystem());
+        ResetAllPriorities();
+        TruckFollowVCam.Priority = 2;
+        yield return new WaitForSeconds(3f);
+        Truck.Move();
+    }
+
+    private IEnumerator MoveToTruckDoor()
+    {
+        ResetAllPriorities();
+        TruckDoorVCam.Priority = 2;
+        yield return new WaitForSeconds(6);
+        yield return StartCoroutine(MoveToElonText());
+    }
+
+    public IEnumerator MoveToElonText()
+    {
+        ResetAllPriorities();
+        ElonTextVCam.Priority = 2;
+        yield return new WaitForSeconds(3);
+        yield return StartCoroutine(MoveToJeffText());
+    }
+    private IEnumerator MoveToJeffText()
+    {
+        ResetAllPriorities();
+        JeffTextVCam.Priority = 2;
+        yield return new WaitForSeconds(3);
+        MoveToStart();
     }
 }
