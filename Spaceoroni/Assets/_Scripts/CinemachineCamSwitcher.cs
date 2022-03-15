@@ -16,6 +16,14 @@ public class CinemachineCamSwitcher : MonoBehaviour
     [SerializeField]
     private CinemachineVirtualCamera SolarSystemCam;
 
+    private List<CinemachineVirtualCamera> IntroSceneCams;
+
+    private void Start()
+    {
+        var cams = GameObject.FindGameObjectsWithTag("IntroVcam");
+        foreach (var c in cams) IntroSceneCams.Add(c.GetComponent<CinemachineVirtualCamera>());
+    }
+
     public void MoveToGameBoard()
     {
         BoardCamera.Priority = 2;

@@ -11,6 +11,7 @@ TagManager:
   - Debug
   - MusicVolumeSlider
   - TurnText
+  - IntroVCam
   layers:
   - Default
   - TransparentFX
