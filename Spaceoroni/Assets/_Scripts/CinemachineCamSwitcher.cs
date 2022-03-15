@@ -16,53 +16,94 @@ public class CinemachineCamSwitcher : MonoBehaviour
     [SerializeField]
     private CinemachineVirtualCamera SolarSystemCam;
 
+
+    [SerializeField]
+    private CinemachineVirtualCamera TruckFollowVCam;
+    [SerializeField]
+    private CinemachineVirtualCamera TruckDoorVCam;
+
     private List<CinemachineVirtualCamera> IntroSceneCams;
 
-    private void Start()
+
+    private IntroSceneManager IntroSceneManager;
+
+    void Start()
     {
-        var cams = GameObject.FindGameObjectsWithTag("IntroVcam");
+        IntroSceneManager = GameObject.Find("IntroSceneManager").GetComponent<IntroSceneManager>();
+        IntroSceneCams = new List<CinemachineVirtualCamera>();
+        var cams = GameObject.FindGameObjectsWithTag("IntroVCam");
         foreach (var c in cams) IntroSceneCams.Add(c.GetComponent<CinemachineVirtualCamera>());
+    }
+
+    private void ResetAllPriorities()
+    {
+        foreach (var c in IntroSceneCams) { c.Priority = 1; }
+        TruckFollowVCam.Priority = 1;
+        TruckDoorVCam.Priority = 1;
+        SolarSystemCam.Priority = 1;
+        CenterEarthCamera.Priority = 1;
+        EndOfGameCamera.Priority = 1;
+        BoardCamera.Priority = 1;
+        SpaceCamera.Priority = 1;
     }
 
     public void MoveToGameBoard()
     {
+        ResetAllPriorities();
         BoardCamera.Priority = 2;
-        SpaceCamera.Priority = 1;
-        EndOfGameCamera.Priority = 1;
-        SolarSystemCam.Priority = 1;
-        CenterEarthCamera.Priority = 1;
     }
     public void MoveToStart()
     {
+        ResetAllPriorities();
         SpaceCamera.Priority = 2;
-        BoardCamera.Priority = 1;
-        EndOfGameCamera.Priority = 1;
-        SolarSystemCam.Priority = 1;
-        CenterEarthCamera.Priority = 1;
     }
     public void MoveToEnd()
     {
+        ResetAllPriorities();
         EndOfGameCamera.Priority = 2;
-        BoardCamera.Priority = 1;
-        SpaceCamera.Priority = 1;
-        SolarSystemCam.Priority = 1;
-        CenterEarthCamera.Priority = 1;
     }
     public void MoveToCenterEarth()
     {
+        ResetAllPriorities();
         CenterEarthCamera.Priority = 2;
-        EndOfGameCamera.Priority = 1;
-        BoardCamera.Priority = 1;
-        SpaceCamera.Priority = 1;
-        SolarSystemCam.Priority = 1;
     }
 
     public void MoveToSolarSystem()
     {
+        ResetAllPriorities();
         SolarSystemCam.Priority = 2;
-        CenterEarthCamera.Priority = 1;
-        EndOfGameCamera.Priority = 1;
-        BoardCamera.Priority = 1;
-        SpaceCamera.Priority = 1;
+    }
+
+    public IEnumerator MoveToFollowTruck()
+    {
+        ResetAllPriorities();
+        TruckFollowVCam.Priority = 2;
+        IntroSceneManager.MoveTruck();
+        yield return new WaitForSeconds(4);
+        yield return StartCoroutine(MoveToTruckDoor());
+    }
+
+    public IEnumerator MoveToTruckDoor()
+    {
+        ResetAllPriorities();
+        TruckDoorVCam.Priority = 2;
+        yield return new WaitForSeconds(4);
+        MoveToStart();
+    }
+
+    private IEnumerator moveThroughSolarSystem()
+    {
+        foreach (var c in IntroSceneCams)
+        {
+            ResetAllPriorities();
+            c.Priority = 2;
+            yield return new WaitForSeconds(3);
+        }
+        yield return StartCoroutine(MoveToFollowTruck());
+    }
+
+    public void startIntroScene()
+    {
+        StartCoroutine(moveThroughSolarSystem());
     }
 }
