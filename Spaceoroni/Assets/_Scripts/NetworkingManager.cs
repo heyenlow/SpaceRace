@@ -150,12 +150,19 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         Debug.Log("OnJoinedRoom() called by PUN. Now this client is in a room.");
         Debug.Log(PhotonNetwork.CurrentRoom.PlayerCount);
 
+        RoomListingsContent.DestroyChildren();
+
         if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
         {
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
             gameManager.StartGame();
         }
 
+    }
+
+    public override void OnLeftRoom()
+    {
+        RoomListingsContent.DestroyChildren();
     }
 
     public override void OnCreatedRoom()
@@ -168,6 +175,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
        if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
         {
             WaitingForPlayer.SetActive(false);
+            PhotonNetwork.CurrentRoom.IsVisible = false;
             gameManager.StartGame();
         }
     }
@@ -175,16 +183,15 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
     {
         Debug.LogFormat("OnPlayerLeftRoom() ", otherPlayer);
-
         gameManager.QuitGame();
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
         base.OnRoomListUpdate(roomList);
-        Debug.Log("OnRoomListUpdate called by PUN...");
+        Debug.Log("OnRoomListUpdate called by PUN..." );
 
-        foreach(RoomInfo info in roomList)
+        foreach (RoomInfo info in roomList)
         {
             //Removed from rooms list.
             if (info.RemovedFromList)
@@ -194,6 +201,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
                 {
                     Destroy(_listings[index].gameObject);
                     _listings.RemoveAt(index);
+                    Debug.Log("Room name, " + info.Name + ", has been removed from roomList");
                 }
             }
 
@@ -205,6 +213,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
                 {
                     newListing.SetRoomInfo(info);
                     _listings.Add(newListing);
+                    Debug.Log("Room name, " + info.Name + ", has been added to roomList ");
                 }
             }
         }
