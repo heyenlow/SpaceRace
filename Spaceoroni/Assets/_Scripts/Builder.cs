@@ -65,7 +65,7 @@ public class Builder : MonoBehaviour
             if (VeryCloseObject(transform.position, newLocation))
             {
                 transform.position = newLocation;
-             
+                Debug.Log(newLocation.x + " " + newLocation.y + " " + newLocation.z);
                 finishedMoving = true;
                 anim.SetInteger("AnimationPar", 0);
                 dust.Stop();

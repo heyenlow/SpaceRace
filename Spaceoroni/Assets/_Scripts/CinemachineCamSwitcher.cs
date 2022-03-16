@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using TMPro;
 
 public class CinemachineCamSwitcher : MonoBehaviour
 {
@@ -26,9 +27,14 @@ public class CinemachineCamSwitcher : MonoBehaviour
     [SerializeField]
     private CinemachineVirtualCamera JeffTextVCam;
 
+    protected TextMeshProUGUI turnText;
+
+
     private MoveTruck Truck;
 
     private List<CinemachineVirtualCamera> IntroSceneCams;
+
+    bool introRunning = false;
 
 
     void Start()
@@ -37,6 +43,16 @@ public class CinemachineCamSwitcher : MonoBehaviour
         Truck = GameObject.Find("CyberTruck").GetComponentInChildren<MoveTruck>();
         var cams = GameObject.FindGameObjectsWithTag("IntroVCam");
         foreach (var c in cams) IntroSceneCams.Add(c.GetComponent<CinemachineVirtualCamera>());
+        turnText = GameObject.FindGameObjectWithTag("TurnText").GetComponent<TextMeshProUGUI>();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown("space") && introRunning)
+        {
+            turnText.text = "";
+            SpaceCamera.Priority = 3;
+        }
     }
 
     private void ResetAllPriorities()
@@ -49,7 +65,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
             CenterEarthCamera.Priority = 1;
             EndOfGameCamera.Priority = 1;
             BoardCamera.Priority = 1;
-            SpaceCamera.Priority = 1;
+            if(!introRunning) SpaceCamera.Priority = 1;
             ElonTextVCam.Priority = 1;
             JeffTextVCam.Priority = 1;
     }
@@ -82,6 +98,8 @@ public class CinemachineCamSwitcher : MonoBehaviour
     }
     public void startIntroScene()
     {
+        introRunning = true;
+        turnText.text = "Press Space to Skip Intro";
         StartCoroutine(moveThroughSolarSystem());
     }
 
@@ -124,6 +142,8 @@ public class CinemachineCamSwitcher : MonoBehaviour
         ResetAllPriorities();
         JeffTextVCam.Priority = 2;
         yield return new WaitForSeconds(3);
+        introRunning = false;
+        turnText.text = "";
         MoveToStart();
     }
 }
