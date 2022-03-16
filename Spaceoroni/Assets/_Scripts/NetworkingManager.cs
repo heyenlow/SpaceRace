@@ -17,6 +17,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     bool isConnecting;
     string gameVersion = "1";
 
+    private List<Listing> _listings = new List<Listing>(); 
+
     #endregion
 
     [SerializeField]
@@ -33,6 +35,11 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     private GameObject Host;
     [SerializeField]
     private GameObject hostRoomName;
+    [SerializeField]
+    private Transform RoomListingsContent;
+    [SerializeField]
+    private Listing listing;
+
     [SerializeField]
     private Game gameManager;
 
@@ -85,10 +92,11 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         {
             RoomOptions options = new RoomOptions();
             options.MaxPlayers = 2;
-            string name = hostRoomName.GetComponent<TMP_InputField>().ToString();
+            options.IsVisible = true;
+            string name = hostRoomName.GetComponent<TMP_InputField>().text;
 
-            Debug.Log("CreateRoom called with name:");// + HostName.GetComponent<TextMeshPro>().text);
-            PhotonNetwork.CreateRoom(name, options, TypedLobby.Default);
+            Debug.Log("CreateRoom called with name:" + name);
+            PhotonNetwork.CreateRoom(name, options);
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToCenterEarth();
 
         }
@@ -97,16 +105,6 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
             Debug.Log("Not Connected");
         }
        
-    }
-
-    public void JoinGame()
-    {
-        if(PhotonNetwork.IsConnected)
-        {
-            PhotonNetwork.JoinRandomRoom();
-            isConnecting = false;
-            netinfo += "Joined Room";
-        }
     }
 
     public static void LeaveRoom()
@@ -125,11 +123,13 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         {
             isConnecting = false;
             Debug.Log("Connected to master");
-            PhotonNetwork.JoinLobby();
+
             Connecting.SetActive(false);
             Join.SetActive(true);
             Host.SetActive(true);
         }
+
+        PhotonNetwork.JoinLobby(TypedLobby.Default);
     }
 
         public override void OnDisconnected(DisconnectCause cause)
@@ -177,6 +177,43 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         Debug.LogFormat("OnPlayerLeftRoom() ", otherPlayer);
 
         gameManager.QuitGame();
+    }
+
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        base.OnRoomListUpdate(roomList);
+        Debug.Log("OnRoomListUpdate called by PUN...");
+
+        foreach(RoomInfo info in roomList)
+        {
+            //Removed from rooms list.
+            if (info.RemovedFromList)
+            {
+                int index = _listings.FindIndex(x => x.RoomInfo.Name == info.Name);
+                if(index != -1)
+                {
+                    Destroy(_listings[index].gameObject);
+                    _listings.RemoveAt(index);
+                }
+            }
+
+            //Added to rooms list.
+            else
+            {
+                Listing newListing = Instantiate(listing, RoomListingsContent);
+                if (listing != null)
+                {
+                    newListing.SetRoomInfo(info);
+                    _listings.Add(newListing);
+                }
+            }
+        }
+
+    }
+
+    public override void OnJoinedLobby()
+    {
+        Debug.Log("You joined a PUN lobby! ");
     }
 
     #endregion
