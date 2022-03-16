@@ -6,13 +6,11 @@ public class Builder : MonoBehaviour
 {
     public ParticleSystem dust; //Dust Effect
     public Coordinate coord = new Coordinate();
-    private GameObject movingBuilder;
-    private Vector3 newLocation;
-    private Quaternion newRotation;
     private Vector3 homeLocation;
     private Quaternion homeRotation;
     static float Speed = 8f;
     private Animator anim;
+    private bool finishedMoving = false;
 
     static Builder BlinkingBuilder = null;
     static float BlinkTime = 1f;
@@ -25,24 +23,6 @@ public class Builder : MonoBehaviour
 
 		anim = gameObject.GetComponentInChildren<Animator>();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (movingBuilder != null)
-        {
-            movingBuilder.transform.position = Vector3.MoveTowards(movingBuilder.transform.position, newLocation, Speed * Time.deltaTime);
-            //movingBuilder.transform.rotation = Quaternion.RotateTowards(movingBuilder.transform.rotation, newRotation, RotationSpeed * Time.deltaTime);
-
-            if (movingBuilder.transform.position == newLocation)
-            {
-                movingBuilder = null;
-                anim.SetInteger("AnimationPar", 0);
-                dust.Stop();
-            }
-        }
-    }
-
     public void move(Coordinate c, Game g)
     {
         createDust(); //Create Dust when object moves 
@@ -56,7 +36,7 @@ public class Builder : MonoBehaviour
         Coordinate coordinateOfSquare = Coordinate.stringToCoord(Square.name);
         //this next line will need to be adjusted for the height of each level object
         Vector3 heightDiff = new Vector3(0, (g.heightAtCoordinate(coordinateOfSquare)), 0);
-        newLocation = Square.transform.position + heightDiff;
+        var newLocation = Square.transform.position + heightDiff;
 
         var x_diff = (Square.transform.position.x - GamePiece.transform.position.x);
         var y_diff = (Square.transform.position.y - GamePiece.transform.position.y);
@@ -66,12 +46,41 @@ public class Builder : MonoBehaviour
         {
             Vector3 direction = new Vector3(x_diff, 0f, z_diff);
 
-            newRotation = Quaternion.LookRotation(direction);
+            var newRotation = Quaternion.LookRotation(direction);
             GamePiece.transform.rotation = newRotation;
         }
 
         anim.SetInteger("AnimationPar", 1);
-        movingBuilder = GamePiece;
+        finishedMoving = false;
+        StartCoroutine(moveToNextPoint(newLocation));
+    }
+
+    private IEnumerator moveToNextPoint(Vector3 newLocation)
+    {
+        while (!finishedMoving)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, newLocation, Speed * Time.deltaTime);
+            //movingBuilder.transform.rotation = Quaternion.RotateTowards(movingBuilder.transform.rotation, newRotation, RotationSpeed * Time.deltaTime);
+
+            if (VeryCloseObject(transform.position, newLocation))
+            {
+                transform.position = newLocation;
+             
+                finishedMoving = true;
+                anim.SetInteger("AnimationPar", 0);
+                dust.Stop();
+            }
+            yield return null;
+        }
+    }
+    private bool VeryCloseObject(Vector3 a, Vector3 b)
+    {
+        float maxDiff = .01f;
+        var xdiff = Mathf.Abs(a.x - b.x) < maxDiff;
+        var ydiff = Mathf.Abs(a.y - b.y) < maxDiff;
+        var zdiff = Mathf.Abs(a.z - b.z) < maxDiff;
+
+        return xdiff && ydiff && zdiff;
     }
 
     public GameObject findSquare(Coordinate c)
@@ -85,10 +94,10 @@ public class Builder : MonoBehaviour
     }
     public void returnHome()
     {
-        newLocation = homeLocation;
-        newRotation = homeRotation;
-        movingBuilder = this.gameObject;
+        transform.rotation = homeRotation;
         coord = new Coordinate();
+        finishedMoving = false;
+        StartCoroutine(moveToNextPoint(homeLocation));
     }
 
     private void OnMouseOver()
