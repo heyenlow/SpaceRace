@@ -216,9 +216,15 @@ public class NeatPlayer : IPlayer
         var possim = g.getAllPossibleMoves(currentTurn.BuilderLocation);
         for (int i = 0; i < possim.Count; i++)
         {
+            // tmp coordinate evaluating the current possible move that could be taken
+            move.x = Coordinate.stringToCoord(possim[i]).x; move.y = Coordinate.stringToCoord(possim[i]).y;
+            if (g.isWin(move))
+            {
+                // the height here is 3, and it's a possible move... TAKE IT
+                break;
+            }
             if (Brain.OutputSignalArray[i+2] >= max)
             {
-                move = Coordinate.stringToCoord(possim[i]);
                 max = Brain.OutputSignalArray[i+2];
             }
         }
