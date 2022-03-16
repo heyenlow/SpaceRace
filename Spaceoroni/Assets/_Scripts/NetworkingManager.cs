@@ -183,6 +183,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
     {
         Debug.LogFormat("OnPlayerLeftRoom() ", otherPlayer);
+        RoomListingsContent.DestroyChildren();
         gameManager.QuitGame();
     }
 
