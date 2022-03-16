@@ -85,9 +85,10 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         {
             RoomOptions options = new RoomOptions();
             options.MaxPlayers = 2;
-            string name = hostRoomName.GetComponent<TMP_InputField>().ToString();
+            options.IsVisible = true;
+            string name = hostRoomName.GetComponent<TMP_InputField>().text;
 
-            Debug.Log("CreateRoom called with name:");// + HostName.GetComponent<TextMeshPro>().text);
+            Debug.Log("CreateRoom called with name:" + name);// + HostName.GetComponent<TextMeshPro>().text);
             PhotonNetwork.CreateRoom(name, options, TypedLobby.Default);
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToCenterEarth();
 
