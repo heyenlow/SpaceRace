@@ -107,16 +107,6 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
        
     }
 
-    public void JoinGame()
-    {
-        if(PhotonNetwork.IsConnected)
-        {
-            PhotonNetwork.JoinRandomRoom();
-            isConnecting = false;
-            netinfo += "Joined Room";
-        }
-    }
-
     public static void LeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
