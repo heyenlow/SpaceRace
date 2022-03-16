@@ -54,8 +54,8 @@ public class MoveTruck : MonoBehaviour
     {
         float maxDiff = .1f;
         var xdiff = Mathf.Abs(a.position.x - b.position.x) < maxDiff;
-        var ydiff = Mathf.Abs(a.position.x - b.position.x) < maxDiff;
-        var zdiff = Mathf.Abs(a.position.x - b.position.x) < maxDiff;
+        var ydiff = Mathf.Abs(a.position.y - b.position.y) < maxDiff;
+        var zdiff = Mathf.Abs(a.position.z - b.position.z) < maxDiff;
 
         return xdiff && ydiff && zdiff;
     }
