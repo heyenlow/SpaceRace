@@ -16,7 +16,11 @@ public class Listing : MonoBehaviour
     public void SetRoomInfo(RoomInfo roomInfo)
     {
         RoomInfo = roomInfo;
-        _text.text = roomInfo.Name;// + ": " + roomInfo.PlayerCount + "/" + roomInfo.MaxPlayers + " players";
+        string displayName = roomInfo.Name;
+        int index = roomInfo.Name.LastIndexOf('_');
+        displayName = displayName.Substring(0, index);
+
+        _text.text = displayName;
     }
 
     public void OnClick_Button()
