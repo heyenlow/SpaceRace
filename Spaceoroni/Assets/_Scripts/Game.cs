@@ -145,6 +145,9 @@ public class Game : MonoBehaviour
     }
     public void QuitGame()
     {
+        Player1.ClearTurnText();
+        Player2.ClearTurnText();
+
         if(GameSettings.gameType == GameSettings.GameType.Multiplayer)
         {
             NetworkingManager.LeaveRoom();

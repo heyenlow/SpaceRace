@@ -80,4 +80,6 @@ public abstract class IPlayer : MonoBehaviour
         Builder1.returnHome();
         Builder2.returnHome();
     }
+
+    public void ClearTurnText() { turnText.text = ""; }
 }
