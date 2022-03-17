@@ -93,7 +93,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
             RoomOptions options = new RoomOptions();
             options.MaxPlayers = 2;
             options.IsVisible = true;
-            string name = hostRoomName.GetComponent<TMP_InputField>().text;
+
+            string name = hostRoomName.GetComponent<TMP_InputField>().text + "_"+ System.Guid.NewGuid().ToString();
 
             Debug.Log("CreateRoom called with name:" + name);
             PhotonNetwork.CreateRoom(name, options);
@@ -109,7 +110,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
 
     public static void LeaveRoom()
     {
-        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.LeaveRoom(true);
     }
     #endregion
 
@@ -175,9 +176,9 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
        if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
         {
             WaitingForPlayer.SetActive(false);
-            PhotonNetwork.CurrentRoom.IsVisible = false;
             gameManager.StartGame();
         }
+        PhotonNetwork.CurrentRoom.IsVisible = false;
     }
 
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
