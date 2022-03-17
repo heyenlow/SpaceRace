@@ -34,8 +34,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
 
     private List<CinemachineVirtualCamera> IntroSceneCams;
 
-    bool introRunning = false;
-
+    private bool introRunning = false;
 
     void Start()
     {
@@ -51,7 +50,9 @@ public class CinemachineCamSwitcher : MonoBehaviour
         if (Input.GetKeyDown("space") && introRunning)
         {
             turnText.text = "";
-            SpaceCamera.Priority = 3;
+            ResetAllPriorities();
+            introRunning = false;
+            SpaceCamera.Priority = 2;
         }
     }
 
@@ -107,43 +108,43 @@ public class CinemachineCamSwitcher : MonoBehaviour
     {
         foreach (var c in IntroSceneCams)
         {
-            ResetAllPriorities();
-            c.Priority = 2;
-            yield return new WaitForSeconds(2.5f);
+            if (introRunning) ResetAllPriorities();
+            if (introRunning) c.Priority = 2;
+            if (introRunning) yield return new WaitForSeconds(2.5f);
         }
-        StartCoroutine(MoveToFollowTruck());
+        if (introRunning) StartCoroutine(MoveToFollowTruck());
     }
 
     private IEnumerator MoveToFollowTruck()
     {
-        ResetAllPriorities();
-        TruckFollowVCam.Priority = 2;
-        yield return new WaitForSeconds(3f);
-        Truck.Move();
+        if (introRunning) ResetAllPriorities();
+        if (introRunning) TruckFollowVCam.Priority = 2;
+        if (introRunning) yield return new WaitForSeconds(3f);
+        if (introRunning) Truck.Move();
     }
 
     private IEnumerator MoveToTruckDoor()
     {
-        ResetAllPriorities();
-        TruckDoorVCam.Priority = 2;
-        yield return new WaitForSeconds(6);
-        yield return StartCoroutine(MoveToElonText());
+        if (introRunning) ResetAllPriorities();
+        if (introRunning) TruckDoorVCam.Priority = 2;
+        if (introRunning) yield return new WaitForSeconds(6);
+        if (introRunning) yield return StartCoroutine(MoveToElonText());
     }
 
     public IEnumerator MoveToElonText()
     {
-        ResetAllPriorities();
-        ElonTextVCam.Priority = 2;
-        yield return new WaitForSeconds(3);
-        yield return StartCoroutine(MoveToJeffText());
+        if (introRunning) ResetAllPriorities();
+        if (introRunning) ElonTextVCam.Priority = 2;
+        if (introRunning) yield return new WaitForSeconds(3);
+        if (introRunning) yield return StartCoroutine(MoveToJeffText());
     }
     private IEnumerator MoveToJeffText()
     {
-        ResetAllPriorities();
-        JeffTextVCam.Priority = 2;
-        yield return new WaitForSeconds(3);
-        introRunning = false;
-        turnText.text = "";
-        MoveToStart();
+        if (introRunning) ResetAllPriorities();
+        if (introRunning) JeffTextVCam.Priority = 2;
+        if (introRunning) yield return new WaitForSeconds(3);
+        if (introRunning) introRunning = false;
+        if (introRunning) turnText.text = "";
+        if (introRunning) MoveToStart();
     }
 }
