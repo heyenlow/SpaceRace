@@ -135,19 +135,22 @@ public class TutorialPlayer : Player
 
             bool matchedMove = false;
 
-            while (!matchedMove)
+            while (!matchedMove && !Game.cancelTurn)
             {
                 while (Game.clickLocation == null && !Game.cancelTurn)
                 {
                     yield return new WaitForEndOfFrame();
                 }
-                if (Coordinate.Equals(Game.clickLocation, currentTurn.MoveLocation)) matchedMove = true;
-                else
+                if (!Game.cancelTurn)
                 {
-                    Game.clickLocation = null;
-                    HighlightManager.highlightPlayersBuilder(this);
-                    HighlightManager.highlightAllPossibleMoveLocations(allMoves);
-                    GameObject.Find(Coordinate.coordToString(currentTurn.MoveLocation)).GetComponent<Location>().Blink();
+                    if (Coordinate.Equals(Game.clickLocation, currentTurn.MoveLocation)) matchedMove = true;
+                    else
+                    {
+                        Game.clickLocation = null;
+                        HighlightManager.highlightPlayersBuilder(this);
+                        HighlightManager.highlightAllPossibleMoveLocations(allMoves);
+                        GameObject.Find(Coordinate.coordToString(currentTurn.MoveLocation)).GetComponent<Location>().Blink();
+                    }
                 }
             }
             if (!Game.cancelTurn)

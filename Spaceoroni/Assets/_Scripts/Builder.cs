@@ -12,7 +12,7 @@ public class Builder : MonoBehaviour
     private Animator anim;
     private bool finishedMoving = false;
 
-    static Builder BlinkingBuilder = null;
+    public static Builder BlinkingBuilder = null;
 
     void Start()
     {
@@ -93,6 +93,7 @@ public class Builder : MonoBehaviour
     }
     public void returnHome()
     {
+        removeHighlight();
         transform.rotation = homeRotation;
         coord = new Coordinate();
         finishedMoving = false;

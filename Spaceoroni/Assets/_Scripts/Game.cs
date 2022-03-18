@@ -151,6 +151,10 @@ public class Game : MonoBehaviour
     {
         Player1.ClearTurnText();
         Player2.ClearTurnText();
+        Location.LocationBlinking = null;
+        Rocket.blinkingRocket = null;
+        Builder.BlinkingBuilder = null;
+        Level.BlinkingLevel = null;
 
         if(GameSettings.gameType == GameSettings.GameType.Multiplayer)
         {
