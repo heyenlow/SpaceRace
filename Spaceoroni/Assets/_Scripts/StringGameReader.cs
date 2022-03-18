@@ -29,9 +29,29 @@ public static class StringGameReader
 
     static string[] tutorialGameLines =
     {
-    "Player1: D0B0",
-    "Player2: C0C1",
-    "NEAT MOVE: D0E1D2",
+    "Player1: B1D3",
+    "Player2: D1B3",
+    "move and build: B1C2C3",
+    "p2: B3C3D2",
+    "moving up a level: D3D2C1",
+    "p2: D1D0C1",
+    "move to level 2: D2C1D2",
+    "p2: C3D2E2",
+    "p1: C2C3C2",
+    "p2: D0E1D1",
+    "MOVING DOWN 2 LEVELS: C1B2D3",
+    "P2 BUILD ROCKET: D2C1D2",
+    "BLOCK ROCKET: C3D3D2",
+    "P2: C1D0C1",
+    "P1: C2B2C2",
+    "P2: E1E2D1",
+    "P1: D3C2D3",
+    "P2: E2D1E2",
+    "WIN: C2C1"
+
+
+    /*
+    "NEAT  MOVE: D0E1D2",
     "NEAT MOVE: C0D1C2",
     "NEAT MOVE: E1E0D0",
     "NEAT MOVE: D1D0E1",
@@ -93,6 +113,7 @@ public static class StringGameReader
     "NEAT MOVE: D0C0D0",
     "NEAT MOVE: B3B2B3",
     "NEAT MOVE: C0D0"
+    */
     };
 
     public static int BlastOffMove = 13;

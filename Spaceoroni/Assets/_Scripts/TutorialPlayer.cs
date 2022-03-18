@@ -18,7 +18,6 @@ public class TutorialPlayer : Player
     private GameObject MoveToWinOverlay;
 
 
-
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
         if (builder == 1) PlacingBuilderOverlay.SetActive(true);
