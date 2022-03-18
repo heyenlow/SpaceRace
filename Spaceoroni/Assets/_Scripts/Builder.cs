@@ -13,7 +13,6 @@ public class Builder : MonoBehaviour
     private bool finishedMoving = false;
 
     static Builder BlinkingBuilder = null;
-    static float BlinkTime = 1f;
 
     void Start()
     {
@@ -65,7 +64,7 @@ public class Builder : MonoBehaviour
             if (VeryCloseObject(transform.position, newLocation))
             {
                 transform.position = newLocation;
-                Debug.Log(newLocation.x + " " + newLocation.y + " " + newLocation.z);
+                //Debug.Log(newLocation.x + " " + newLocation.y + " " + newLocation.z);
                 finishedMoving = true;
                 anim.SetInteger("AnimationPar", 0);
                 dust.Stop();
@@ -123,8 +122,11 @@ public class Builder : MonoBehaviour
     void OnMouseDown()
     {
         //Output to console the clicked GameObject's name and the following message. You can replace this with your own actions for when clicking the GameObject.
-        if(HighlightManager.isHighlightObj(this.gameObject) && (BlinkingBuilder == null || this == BlinkingBuilder)) Game.recieveLocationClick(coord);
-        BlinkingBuilder = null;
+        if (HighlightManager.isHighlightObj(this.gameObject) && (BlinkingBuilder == null || this == BlinkingBuilder))
+        {
+            Game.recieveLocationClick(coord);
+            BlinkingBuilder = null;
+        }
     }
 
     void createDust(){

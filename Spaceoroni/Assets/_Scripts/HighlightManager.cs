@@ -5,16 +5,8 @@ using UnityEngine;
 public static class HighlightManager
 {
     public static List<GameObject> highlightedObjects = new List<GameObject>();
-    private static Material highlight;
-    private static Material possibleHighlight;
     private static List<GameObject> pauseHoldObjects = new List<GameObject>();
 
-    public static void highlightPossibleMoveLocations(Coordinate location)
-    {
-        GameObject obj = GameObject.Find(Coordinate.coordToString(location));
-        obj.GetComponent<Renderer>().material = possibleHighlight;
-        highlightedObjects.Add(obj);
-    }
     public static void highlightAllPossibleMoveLocations(List<string> locations)
     {
         foreach (string coord in locations)
@@ -114,10 +106,6 @@ public static class HighlightManager
     {
         highlightedObjects.Add(p.getBuilders().Item1.gameObject);
         highlightedObjects.Add(p.getBuilders().Item2.gameObject);
-    }
-    public static Material getHighlightMat()
-    {
-        return highlight;
     }
     public static bool isHighlightObj(GameObject obj)
     {

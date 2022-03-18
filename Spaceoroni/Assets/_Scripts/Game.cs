@@ -28,6 +28,10 @@ public class Game : MonoBehaviour
     [SerializeField]
     private GameObject JoinMenu;
 
+    [SerializeField]
+    private TextMeshProUGUI WinText;
+
+
     public enum PlayerState
     {
         Winner,
@@ -281,8 +285,18 @@ public class Game : MonoBehaviour
 
                 if (t.isWin)
                 {
-                    BlastOffRocket(t.MoveLocation);
                     winner = curPlayer;
+                    
+                    if (winner == Player1) { WinText.text = "You Win!"; }
+                    else { WinText.text = "Better Luck Next Time"; }
+                    
+                    //wait to move then set buidler inactive
+                    yield return new WaitForSeconds(0.6f);
+                    curPlayer.setBuilderAtLocationInactive(t.MoveLocation);
+                    
+                    yield return new WaitForSeconds(2);
+                    BlastOffRocket(t.MoveLocation);
+                    goToEndOfGameScreen();
                 }
 
                 //Check if win
@@ -291,7 +305,7 @@ public class Game : MonoBehaviour
             }
 
         }
-        goToEndOfGameScreen();
+        
         yield return winner;
     }
 

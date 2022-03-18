@@ -16,12 +16,29 @@ public class TutorialPlayer : Player
     private GameObject BlockARocketOverlay;
     [SerializeField]
     private GameObject MoveToWinOverlay;
+    [SerializeField]
+    private GameObject MoveUpALevel;
+    [SerializeField]
+    private GameObject MoveDownLevels;
+    private bool OverlayISActive()
+    {
+        return SelectMoveOverlay.activeInHierarchy ||
+                MoveUpALevel.activeInHierarchy ||
+                MoveDownLevels.activeInHierarchy ||
+                MoveToWinOverlay.activeInHierarchy ||
+                PlacingBuilderOverlay.activeInHierarchy ||
+                SelectBuilderOverlay.activeInHierarchy ||
+                SelectBuildOverlay.activeInHierarchy ||
+                BlockARocketOverlay.activeInHierarchy;
+    }
+
+
 
 
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
         if (builder == 1) PlacingBuilderOverlay.SetActive(true);
-        while (PlacingBuilderOverlay.activeInHierarchy)
+        while (OverlayISActive())
         {
             yield return new WaitForEndOfFrame();
         }
@@ -60,8 +77,8 @@ public class TutorialPlayer : Player
 
     public override IEnumerator SelectBuilder(Game g)
     {
-        if (StringGameReader.MoveCount == 1) SelectBuilderOverlay.SetActive(true);
-        while (SelectBuilderOverlay.activeInHierarchy)
+        if (StringGameReader.MoveCount == StringGameReader.firstMove) SelectBuilderOverlay.SetActive(true);
+        while (OverlayISActive())
         {
             yield return new WaitForEndOfFrame();
         }
@@ -70,30 +87,33 @@ public class TutorialPlayer : Player
         //Select Builder
         Game.clickLocation = null;   //Reset click
 
+        HighlightManager.highlightPlayersBuilder(this);
         if (Coordinate.Equals(Builder1.getLocation(), currentTurn.BuilderLocation)) Builder1.Blink();
         if (Coordinate.Equals(Builder2.getLocation(), currentTurn.BuilderLocation)) Builder2.Blink();
 
-        HighlightManager.highlightPlayersBuilder(this);
+        //checks to make sure it is the blinking item in the builder script
         while (Game.clickLocation == null && !Game.cancelTurn)
         {
             yield return new WaitForEndOfFrame();
         }
         if (!Game.cancelTurn)
         {
-            currentTurn.BuilderLocation = Game.clickLocation;
             Game.clickLocation = null;
         }
-        // after choosing a builder, find the best square you can move to from it.
+
         turnText.text = "";
         yield return null;
     }
 
+
     public override IEnumerator chooseMove(Game g)
     {
-        if (StringGameReader.MoveCount == 1) SelectMoveOverlay.SetActive(true);
-        if (StringGameReader.MoveCount == StringGameReader.lengthOfTutorialMoves()) MoveToWinOverlay.SetActive(true);
+        if (StringGameReader.MoveCount == StringGameReader.firstMove) SelectMoveOverlay.SetActive(true);
+        if (StringGameReader.MoveCount == StringGameReader.MoveUpaLevel) MoveUpALevel.SetActive(true);
+        if (StringGameReader.MoveCount == StringGameReader.MoveDownALevel) MoveDownLevels.SetActive(true);
+        if (StringGameReader.MoveCount == StringGameReader.MoveToWin) MoveToWinOverlay.SetActive(true);
 
-        while (SelectMoveOverlay.activeInHierarchy)
+        while (OverlayISActive())
         {
             yield return new WaitForEndOfFrame();
         }
@@ -113,23 +133,34 @@ public class TutorialPlayer : Player
 
             GameObject.Find(Coordinate.coordToString(currentTurn.MoveLocation)).GetComponent<Location>().Blink();
 
-            while (Game.clickLocation == null && !Game.cancelTurn)
+            bool matchedMove = false;
+
+            while (!matchedMove)
             {
-                yield return new WaitForEndOfFrame();
+                while (Game.clickLocation == null && !Game.cancelTurn)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
+                if (Coordinate.Equals(Game.clickLocation, currentTurn.MoveLocation)) matchedMove = true;
+                else
+                {
+                    Game.clickLocation = null;
+                    HighlightManager.highlightPlayersBuilder(this);
+                    HighlightManager.highlightAllPossibleMoveLocations(allMoves);
+                    GameObject.Find(Coordinate.coordToString(currentTurn.MoveLocation)).GetComponent<Location>().Blink();
+                }
             }
             if (!Game.cancelTurn)
             {
-
-                if (clickedBuilder(Game.clickLocation))
+                //depreciated for tutorial
+                if (false)//clickedBuilder(Game.clickLocation))
                 {
-                    currentTurn.BuilderLocation = Game.clickLocation;
                     Game.clickLocation = null;
                     HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
                     yield return StartCoroutine(chooseMove(g));
                 }
                 else
                 {
-                    currentTurn.MoveLocation = Game.clickLocation;
                     Game.clickLocation = null;
 
                     HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
@@ -160,8 +191,8 @@ public class TutorialPlayer : Player
 
     public override IEnumerator chooseBuild(Game g)
     {
-        if (StringGameReader.MoveCount == 1) SelectBuildOverlay.SetActive(true);
-        if (StringGameReader.MoveCount == StringGameReader.BlastOffMove) BlockARocketOverlay.SetActive(true);
+        if (StringGameReader.MoveCount == StringGameReader.firstMove) SelectBuildOverlay.SetActive(true);
+        if (StringGameReader.MoveCount == StringGameReader.BlastOffRocket) BlockARocketOverlay.SetActive(true);
 
         while (SelectBuildOverlay.activeInHierarchy)
         {
@@ -195,7 +226,6 @@ public class TutorialPlayer : Player
 
         if (!Game.cancelTurn)
         {
-            currentTurn.BuildLocation = Game.clickLocation;
             Game.clickLocation = null;
 
             HighlightManager.unhighlightAllPossibleBuildLocations(allBuildLevels);
@@ -208,7 +238,7 @@ public class TutorialPlayer : Player
     {
         currentTurn = StringGameReader.getCurrentTurn();
         //play the first 2 turns
-        if (StringGameReader.MoveCount <= 3 || StringGameReader.MoveCount == StringGameReader.BlastOffMove || StringGameReader.MoveCount == StringGameReader.lengthOfTutorialMoves())
+        if (StringGameReader.isSpecialMove(StringGameReader.MoveCount))
         {
             // after activation choose a builder
             yield return StartCoroutine(SelectBuilder(g));
@@ -239,7 +269,7 @@ public class TutorialPlayer : Player
         }
         else
         {
-            turnText.text = ">>";
+            turnText.text = "Fast Forwarding...";
             yield return new WaitForSeconds(1);
             moveBuidler(getBuilderInt(currentTurn.BuilderLocation), currentTurn.MoveLocation, g);
             yield return new WaitForSeconds(1);
