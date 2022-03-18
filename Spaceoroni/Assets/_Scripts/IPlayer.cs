@@ -82,4 +82,24 @@ public abstract class IPlayer : MonoBehaviour
     }
 
     public void ClearTurnText() { turnText.text = ""; }
+
+    /// <summary>
+    /// used to make the builder disapear on a win
+    /// </summary>
+    public void setBuilderAtLocationInactive(Coordinate c) 
+    { 
+        if(Coordinate.Equals(Builder1.getLocation(), c))
+        {
+            Builder1.gameObject.SetActive(false);
+        }
+        else if(Coordinate.Equals(Builder1.getLocation(), c))
+        {
+            Builder2.gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("No builder found at the given coordinate. Give Coordinate:" + c + " Builder Locations: " + getBuilderLocations());
+        }
+            
+    }
 }

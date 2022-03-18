@@ -27,7 +27,6 @@ public class Rocket : MonoBehaviour
     {
         Vector3 heightDiff = new Vector3(0, 100, 0);
         newLocation = this.gameObject.transform.position + heightDiff;
-
         movingRocket = this.gameObject;
     }
 
