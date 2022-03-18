@@ -5,7 +5,7 @@ using UnityEngine;
 public class Level : MonoBehaviour
 {
     private Vector3 homeLocation;
-    static Level BlinkingLevel;
+    public static Level BlinkingLevel;
     private void Start()
     {
         homeLocation = this.transform.position;

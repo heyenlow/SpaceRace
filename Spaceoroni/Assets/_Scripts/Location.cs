@@ -49,6 +49,10 @@ public class Location : MonoBehaviour
                 removeHighlight();
             }
         }
+        else
+        {
+            removeHighlight();
+        }
     }
 
     void OnMouseDown()
