@@ -7,12 +7,14 @@ public class Location : MonoBehaviour
 {
     private bool isMove = false;
     public static Location LocationBlinking = null;
+    private bool deadLocation = false;
 
     public void blastOffRocket()
     {
         var rocket = this.GetComponentInChildren<Rocket>();
         StartCoroutine(blastOffAnimatin());
         rocket.blastOffRocket();
+        deadLocation = true;
         this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("FX/Flare");
     }
 
@@ -26,7 +28,7 @@ public class Location : MonoBehaviour
 
     private void OnMouseOver()
     {
-        if(HighlightManager.isHighlightObj(this.gameObject)) 
+        if(HighlightManager.isHighlightObj(this.gameObject) && !deadLocation) 
         {
             mouseOverHighlight();
         }
@@ -34,30 +36,33 @@ public class Location : MonoBehaviour
 
     private void OnMouseExit()
     {
-        if (HighlightManager.isHighlightObj(this.gameObject))
+        if (!deadLocation)
         {
-            if (this == LocationBlinking)
+            if (HighlightManager.isHighlightObj(this.gameObject))
             {
-                Blink();
-            }
-            else if (isMove)
-            {
-                highlightLocation();
+                if (this == LocationBlinking)
+                {
+                    Blink();
+                }
+                else if (isMove)
+                {
+                    highlightLocation();
+                }
+                else
+                {
+                    removeHighlight();
+                }
             }
             else
             {
                 removeHighlight();
             }
         }
-        else
-        {
-            removeHighlight();
-        }
     }
 
     void OnMouseDown()
     {
-        if (HighlightManager.isHighlightObj(this.gameObject) && (LocationBlinking == null || this == LocationBlinking)) 
+        if (HighlightManager.isHighlightObj(this.gameObject) && (LocationBlinking == null || this == LocationBlinking) && !deadLocation) 
         {
             Game.recieveLocationClick(Coordinate.stringToCoord(this.name));
             LocationBlinking = null;

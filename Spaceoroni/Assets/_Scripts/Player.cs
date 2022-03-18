@@ -65,16 +65,29 @@ public class Player : IPlayer
         Game.clickLocation = null;   //Reset click
 
         HighlightManager.highlightPlayersBuilder(this);
-        while (Game.clickLocation == null && !Game.cancelTurn)
+        
+        bool locationHasMoves = false;
+        while (!locationHasMoves && !Game.cancelTurn)
         {
-            yield return new WaitForEndOfFrame();
+            while (Game.clickLocation == null && !Game.cancelTurn)
+            {
+                yield return new WaitForEndOfFrame();
+            }
+            if (!Game.cancelTurn)
+            {
+                if (g.getAllPossibleMoves(Game.clickLocation).Count > 0) locationHasMoves = true;
+                else
+                {
+                    HighlightManager.highlightPlayersBuilder(this);
+                    Game.clickLocation = null;
+                    turnText.text = "That Builder Cannot Move Select Another Builder";
+                }
+            }
         }
         if (!Game.cancelTurn)
         {
             currentTurn.BuilderLocation = Game.clickLocation;
             Game.clickLocation = null;
-            var v = GameObject.Find("VCamTarget").GetComponent<CinemachineTargetGroup>().m_Targets[0];
-            v.weight = 100;
         }
         // after choosing a builder, find the best square you can move to from it.
         turnText.text = "";
@@ -88,12 +101,9 @@ public class Player : IPlayer
         Coordinate temp = new Coordinate(currentTurn.BuilderLocation);
         List<string> allMoves = g.getAllPossibleMoves(currentTurn.BuilderLocation);
 
-        //Debug.Log((this.gameObject.GetComponentsInChildren<Builder>())[0]);
         //Debug.Log(Coordinate.coordToString(this.gameObject.GetComponentsInChildren<Builder>()[1].coord));
         //allMoves.ForEach(m => Debug.Log(m));
 
-        if (g.canMove(currentTurn.BuilderLocation))
-        {
             HighlightManager.highlightPlayersBuilder(this);
             HighlightManager.highlightAllPossibleMoveLocations(allMoves);
             while (Game.clickLocation == null && !Game.cancelTurn)
@@ -128,17 +138,9 @@ public class Player : IPlayer
                     }
                 }
             }
-        }
-        else
-        {
-            currentTurn.canPerformTurn = false;
-            yield return StartCoroutine(SelectBuilder(g));
-            Debug.Log("Cant Move");
-        }
 
         currentTurn.BuilderLocation = temp;
         turnText.text = "";
-
     }
 
     public override IEnumerator chooseBuild(Game g)
@@ -176,6 +178,10 @@ public class Player : IPlayer
 
         //choose a move
         yield return StartCoroutine(chooseMove(g));
+        while (BuildersAreMoving())
+        {
+            yield return new WaitForEndOfFrame();
+        }
 
         // after choosing a move, need to find the best square to build on. What do I do about this?
         if (!currentTurn.canPerformTurn)
@@ -213,4 +219,5 @@ public class Player : IPlayer
         PhotonNetwork.RaiseEvent(NetworkingManager.RAISE_TURN, datas, RaiseEventOptions.Default, SendOptions.SendReliable);
         Debug.Log("Raising Turn" + t.ToString());
     }
+
 }

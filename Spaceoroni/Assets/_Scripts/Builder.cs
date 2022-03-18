@@ -10,15 +10,13 @@ public class Builder : MonoBehaviour
     private Quaternion homeRotation;
     static float Speed = 8f;
     private Animator anim;
-    private bool finishedMoving = false;
-
+    public bool currentlyMoving = false;
     public static Builder BlinkingBuilder = null;
 
     void Start()
     {
         homeLocation = this.transform.position;
         homeRotation = this.transform.rotation;
-
 
 		anim = gameObject.GetComponentInChildren<Animator>();
     }
@@ -50,13 +48,13 @@ public class Builder : MonoBehaviour
         }
 
         anim.SetInteger("AnimationPar", 1);
-        finishedMoving = false;
         StartCoroutine(moveToNextPoint(newLocation));
     }
 
     private IEnumerator moveToNextPoint(Vector3 newLocation)
     {
-        while (!finishedMoving)
+        currentlyMoving = true;
+        while (currentlyMoving)
         {
             transform.position = Vector3.MoveTowards(transform.position, newLocation, Speed * Time.deltaTime);
             //movingBuilder.transform.rotation = Quaternion.RotateTowards(movingBuilder.transform.rotation, newRotation, RotationSpeed * Time.deltaTime);
@@ -65,7 +63,7 @@ public class Builder : MonoBehaviour
             {
                 transform.position = newLocation;
                 //Debug.Log(newLocation.x + " " + newLocation.y + " " + newLocation.z);
-                finishedMoving = true;
+                currentlyMoving = false;
                 anim.SetInteger("AnimationPar", 0);
                 dust.Stop();
             }
@@ -96,7 +94,6 @@ public class Builder : MonoBehaviour
         removeHighlight();
         transform.rotation = homeRotation;
         coord = new Coordinate();
-        finishedMoving = false;
         StartCoroutine(moveToNextPoint(homeLocation));
     }
 
