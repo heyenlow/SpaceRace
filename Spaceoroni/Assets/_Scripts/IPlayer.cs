@@ -36,7 +36,7 @@ public abstract class IPlayer : MonoBehaviour
 
         builderToMove.move(to, g);
     }
-    
+
     public virtual Turn getNextTurn()
     {
         return turns[turns.Count - 1];
@@ -48,8 +48,8 @@ public abstract class IPlayer : MonoBehaviour
 
     public int getBuilderInt(Coordinate location)
     {
-        if (Coordinate.Equals(Builder1.getLocation(),location)) return 1;
-        if (Coordinate.Equals(Builder2.getLocation(),location)) return 2;
+        if (Coordinate.Equals(Builder1.getLocation(), location)) return 1;
+        if (Coordinate.Equals(Builder2.getLocation(), location)) return 2;
         throw new Exception("No builder at this location");
     }
 
@@ -76,6 +76,7 @@ public abstract class IPlayer : MonoBehaviour
     }
     public void resetPlayer()
     {
+        setAllBuildersActive();
         turns.Clear();
         Builder1.returnHome();
         Builder2.returnHome();
@@ -86,20 +87,21 @@ public abstract class IPlayer : MonoBehaviour
     /// <summary>
     /// used to make the builder disapear on a win
     /// </summary>
-    public void setBuilderAtLocationInactive(Coordinate c) 
-    { 
-        if(Coordinate.Equals(Builder1.getLocation(), c))
+    public void setBuilderAtLocationInactive(Coordinate c)
+    {
+        if (Coordinate.Equals(Builder1.getLocation(), c))
         {
             Builder1.gameObject.SetActive(false);
         }
-        else if(Coordinate.Equals(Builder1.getLocation(), c))
+        else if (Coordinate.Equals(Builder1.getLocation(), c))
         {
             Builder2.gameObject.SetActive(false);
         }
         else
         {
-            Debug.LogError("No builder found at the given coordinate. Give Coordinate:" + c + " Builder Locations: " + getBuilderLocations());
+            Debug.LogError("No builder found at the given coordinate. Give Coordinate:" + Coordinate.coordToString(c) + " Builder Locations: " + getBuilderLocations());
         }
-            
     }
+    private void setAllBuildersActive() { Builder1.gameObject.SetActive(true); Builder2.gameObject.SetActive(true); }
+    public bool BuildersAreMoving() { return Builder1.currentlyMoving || Builder2.currentlyMoving; }
 }

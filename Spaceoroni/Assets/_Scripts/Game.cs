@@ -1,8 +1,8 @@
 using System;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 using TMPro;
@@ -224,22 +224,34 @@ public class Game : MonoBehaviour
 
         Debug.Log("Player1: " + Player1 + ", Player2: " + Player2);
     }
-    
-    public IEnumerator processTurnString(Turn turn, IPlayer curPlayer, Game g)
+
+    public void processTurnString(Turn turn, IPlayer curPlayer, Game g)
     {
-        //players already move the builders
-        if (!(curPlayer is Player)) curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
+        //players already move the builders and so does neatplayer
+        if (!(curPlayer is Player) && !(curPlayer is NeatPlayer)) curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
-        if(!(curPlayer is Player)) yield return new WaitForSeconds(timeToTurn/2);
 
-        // If not over Where to build?
-        if (!turn.isWin)
+        // if (!(curPlayer is Player)) yield return new WaitForSeconds(timeToTurn/2);
+        if (curPlayer is Player)
         {
-            BuildLevel(turn.BuildLocation);
+            // If not over Where to build?
+            if (!turn.isWin)
+            {
+                BuildLevel(turn.BuildLocation);
+            }
         }
+        else
+        { 
+            StartCoroutine(WaitBuildLevel(turn.BuildLocation));
+        }  
 
+        //yield return true;
+    }
 
-        yield return true;
+    private IEnumerator WaitBuildLevel(Coordinate c)
+    {
+        yield return new WaitForSeconds(1.3f);
+        BuildLevel(c);
     }
 
     private void BlastOffRocket(Coordinate c)
@@ -252,6 +264,7 @@ public class Game : MonoBehaviour
     public IEnumerator PlayGameToEnd()
     {
         IPlayer curPlayer;
+        IPlayer othPlayer;
         IPlayer winner = null;
 
         yield return null;
@@ -260,10 +273,12 @@ public class Game : MonoBehaviour
         // Play until we have a winner or tie?
         for (int moveNum = 0; winner == null; moveNum++)
         {
-
+            yield return StartCoroutine(waitForBuildersToMove());
             // Determine who's turn it is.
             curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
+            othPlayer = (moveNum % 2 == 0) ? Player2 : Player1;
 
+            
             //Check if last turn lost
             if (playerState == PlayerState.Loser)
             {
@@ -271,46 +286,85 @@ public class Game : MonoBehaviour
             }
             else
             {
-                // string turn BUILDERMOVEBUILD string
-                PhotonView photonView = PhotonView.Get(this);
-                if(curPlayer is StringPlayer)
-                {
-                    yield return new WaitForSeconds(timeToTurn);
-                }
-                else
-                {
-                    yield return StartCoroutine(curPlayer.beginTurn(this));
-                }
-                
-                Turn t = curPlayer.getNextTurn();
-                // update the board with the current player's move
-                Debug.Log("Processing Turn: " + t.ToString());
-                StartCoroutine(processTurnString(t, curPlayer, this));
+                    if (hasPossibleTurns(curPlayer))
+                    {
+                        // string turn BUILDERMOVEBUILD string
+                        PhotonView photonView = PhotonView.Get(this);
+                        if (curPlayer is StringPlayer)
+                        {
+                            yield return new WaitForSeconds(timeToTurn);
+                        }
+                        else
+                        {
+                            //yield return StartCoroutine(waitForBuildersToMove());
+                            yield return StartCoroutine(curPlayer.beginTurn(this));
+                            //yield return StartCoroutine(waitForBuildersToMove());
+                        }
 
-                if (t.isWin)
-                {
-                    winner = curPlayer;
-                    
+                        Turn t = curPlayer.getNextTurn();
+                        // update the board with the current player's move
+                        Debug.Log("Processing Turn: " + t.ToString());
+                        //StartCoroutine(processTurnString(t, curPlayer, this));
+                        processTurnString(t, curPlayer, this);
+                        if (t.isWin)
+                        {
+                            winner = curPlayer;
+                            //wait to move then set buidler inactive
+                            yield return new WaitForSeconds(0.6f);
+                            curPlayer.setBuilderAtLocationInactive(t.MoveLocation);
+
+                            yield return new WaitForSeconds(2);
+                            BlastOffRocket(t.MoveLocation);
+                        }
+                    }
+                    else { winner = othPlayer; }
+
+                if(winner != null){
                     if (winner == Player1) { WinText.text = "You Win!"; }
                     else { WinText.text = "Better Luck Next Time"; }
-                    
-                    //wait to move then set buidler inactive
-                    yield return new WaitForSeconds(0.6f);
-                    curPlayer.setBuilderAtLocationInactive(t.MoveLocation);
-                    
-                    yield return new WaitForSeconds(2);
-                    BlastOffRocket(t.MoveLocation);
                     goToEndOfGameScreen();
                 }
 
                 //Check if win
-                if(playerState == PlayerState.Winner)
-                        winner = curPlayer;
+                if (playerState == PlayerState.Winner)
+                {
+                    winner = curPlayer;
+                }
             }
-
         }
         
         yield return winner;
+    }
+
+    private bool hasPossibleTurns(IPlayer p)
+    {
+        Coordinate BuilderOneLocation = Coordinate.stringToCoord(p.getBuilderLocations().Substring(0,2));
+        Coordinate BuilderTwoLocation = Coordinate.stringToCoord(p.getBuilderLocations().Substring(2, 2));
+
+        var builderOneMoves = getAllPossibleMoves(BuilderOneLocation);
+        foreach (var coord in builderOneMoves) {
+            if(getAllPossibleBuilds(Coordinate.stringToCoord(coord)).Count > 0) return true;
+        }
+
+        var builderTwoMoves = getAllPossibleMoves(BuilderTwoLocation);
+        foreach (var coord in builderTwoMoves)
+        {
+            if (getAllPossibleBuilds(Coordinate.stringToCoord(coord)).Count > 0) return true;
+        }
+
+        return false;
+    }
+
+    private IEnumerator waitForBuildersToMove()
+    {
+        while (Player1.BuildersAreMoving() && Player2.BuildersAreMoving())
+        {
+            Debug.Log("waiting");
+
+            yield return new WaitForEndOfFrame();
+        }
+        Debug.Log("done");
+
     }
 
     public void goToEndOfGameScreen()
@@ -355,10 +409,15 @@ public class Game : MonoBehaviour
 
     private IEnumerator PlaceBuilders()
     {
+        yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player1.PlaceBuilder(1, 1, this));
+        yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player1.PlaceBuilder(2, 1, this));
+        yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player2.PlaceBuilder(1, 2, this));
+        yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player2.PlaceBuilder(2, 2, this));
+        yield return StartCoroutine(waitForBuildersToMove());
         yield return null;
     }
 

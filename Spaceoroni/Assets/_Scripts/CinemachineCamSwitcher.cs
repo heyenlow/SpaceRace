@@ -78,6 +78,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
     }
     public void MoveToStart()
     {
+        if (introRunning) introRunning = false;
         ResetAllPriorities();
         SpaceCamera.Priority = 2;
     }
@@ -143,7 +144,6 @@ public class CinemachineCamSwitcher : MonoBehaviour
         if (introRunning) ResetAllPriorities();
         if (introRunning) JeffTextVCam.Priority = 2;
         if (introRunning) yield return new WaitForSeconds(3);
-        if (introRunning) introRunning = false;
         if (introRunning) turnText.text = "";
         if (introRunning) MoveToStart();
     }

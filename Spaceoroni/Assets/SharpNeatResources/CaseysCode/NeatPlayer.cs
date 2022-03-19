@@ -202,13 +202,24 @@ public class NeatPlayer : IPlayer
 
     public override IEnumerator chooseMove(Game g)
     {
-        // this function has a chance to return {-1,-1} (shouldn't be possible?)   
-        var possibleMoves = g.getAllPossibleMoves(currentTurn.BuilderLocation);
-        if (possibleMoves.Count == 0)
+
+        Coordinate temp = new Coordinate(currentTurn.BuilderLocation);
+
+        //DONT NEED THIS ANYMORE because we check to see if a turn is possible when we are getting the next turn from a player in the Game.cs ---
+        //
         {
-            currentTurn.canPerformTurn = false;
-            yield return null;
+            // this function has a chance to return {-1,-1} (shouldn't be possible?)   
+            var possibleMoves = g.getAllPossibleMoves(currentTurn.BuilderLocation);
+            if (possibleMoves.Count == 0)
+            {
+                currentTurn.canPerformTurn = false;
+                yield return null;
+            }
+            //
+            // END DONT NEED ---
         }
+        
+
         // outputs 2-11 are the 9 possible move locations confidence values
         // find most confident move
         Coordinate move = new Coordinate();
@@ -228,9 +239,12 @@ public class NeatPlayer : IPlayer
                 max = Brain.OutputSignalArray[i+2];
             }
         }
+       // Debug.Log(Coordinate.coordToString(currentTurn.BuilderLocation));
         // return highest scoring move to go to next.
         currentTurn.MoveLocation = move;
         moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), move, g);
+        //Debug.Log(Coordinate.coordToString(currentTurn.BuilderLocation));
+        currentTurn.BuilderLocation = temp;
         yield return null;
     }
 
@@ -317,6 +331,7 @@ public class NeatPlayer : IPlayer
             }
         }
 
+        while (BuildersAreMoving()) yield return new WaitForEndOfFrame();
         // after choosing a builder, find the best square you can move to from it.
         setInputSignalArrayMove(Brain.InputSignalArray, possim, g);
         Brain.Activate();
@@ -347,7 +362,7 @@ public class NeatPlayer : IPlayer
 
             yield return StartCoroutine(chooseBuild(g)); // might return -1,-1? shouldn't though....
 
-            if (currentTurn.MoveLocation == currentTurn.BuildLocation)
+            if (Coordinate.Equals(currentTurn.MoveLocation, currentTurn.BuildLocation))
             {
                 Debug.LogError("This shouldn't be possible!");
             }
