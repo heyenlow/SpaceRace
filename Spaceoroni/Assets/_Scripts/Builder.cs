@@ -46,6 +46,10 @@ public class Builder : MonoBehaviour
             var newRotation = Quaternion.LookRotation(direction);
             GamePiece.transform.rotation = newRotation;
         }
+      //  Debug.Log("Moving to: " + Square.name + "  with height: " + g.heightAtCoordinate(coordinateOfSquare));
+      //  Debug.Log(transform.position.x + " " + transform.position.y + " " + transform.position.z);
+
+       // Debug.Log(newLocation.x + " " + newLocation.y + " " + newLocation.z);
 
         anim.SetInteger("AnimationPar", 1);
         StartCoroutine(moveToNextPoint(newLocation));
@@ -62,7 +66,6 @@ public class Builder : MonoBehaviour
             if (VeryCloseObject(transform.position, newLocation))
             {
                 transform.position = newLocation;
-                //Debug.Log(newLocation.x + " " + newLocation.y + " " + newLocation.z);
                 currentlyMoving = false;
                 anim.SetInteger("AnimationPar", 0);
                 dust.Stop();

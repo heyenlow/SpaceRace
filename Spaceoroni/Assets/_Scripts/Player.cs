@@ -130,6 +130,7 @@ public class Player : IPlayer
                     if (g.canBuild(currentTurn.BuilderLocation))
                     {
                         moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
+                        while (BuildersAreMoving()) yield return new WaitForEndOfFrame();
                     }
                     else
                     {
@@ -178,10 +179,10 @@ public class Player : IPlayer
 
         //choose a move
         yield return StartCoroutine(chooseMove(g));
-        while (BuildersAreMoving())
-        {
-            yield return new WaitForEndOfFrame();
-        }
+        //while (BuildersAreMoving())
+        //{
+        //    yield return new WaitForEndOfFrame();
+        //}
 
         // after choosing a move, need to find the best square to build on. What do I do about this?
         if (!currentTurn.canPerformTurn)

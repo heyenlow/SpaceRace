@@ -331,6 +331,7 @@ public class NeatPlayer : IPlayer
             }
         }
 
+        while (BuildersAreMoving()) yield return new WaitForEndOfFrame();
         // after choosing a builder, find the best square you can move to from it.
         setInputSignalArrayMove(Brain.InputSignalArray, possim, g);
         Brain.Activate();
