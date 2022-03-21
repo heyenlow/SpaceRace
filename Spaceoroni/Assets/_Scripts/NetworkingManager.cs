@@ -39,6 +39,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     private Transform RoomListingsContent;
     [SerializeField]
     private Listing listing;
+    [SerializeField]
+    private GameObject Chat;
 
     [SerializeField]
     private Game gameManager;
@@ -156,6 +158,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
         {
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
+            Chat.SetActive(true);
             gameManager.StartGame();
         }
 
@@ -164,6 +167,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     public override void OnLeftRoom()
     {
         RoomListingsContent.DestroyChildren();
+        Chat.SetActive(false);
     }
 
     public override void OnCreatedRoom()
@@ -177,6 +181,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         {
             WaitingForPlayer.SetActive(false);
             gameManager.StartGame();
+            Chat.SetActive(true);
         }
         PhotonNetwork.CurrentRoom.IsVisible = false;
     }
@@ -186,6 +191,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         Debug.LogFormat("OnPlayerLeftRoom() ", otherPlayer);
         RoomListingsContent.DestroyChildren();
         gameManager.QuitGame();
+        Chat.SetActive(false);
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
