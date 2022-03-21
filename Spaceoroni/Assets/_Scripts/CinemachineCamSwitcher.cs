@@ -26,10 +26,11 @@ public class CinemachineCamSwitcher : MonoBehaviour
     private CinemachineVirtualCamera ElonTextVCam;
     [SerializeField]
     private CinemachineVirtualCamera JeffTextVCam;
-
+    [SerializeField]
+    private Jeff JeffAnimator;
     protected TextMeshProUGUI turnText;
 
-
+    
     private MoveTruck Truck;
 
     private List<CinemachineVirtualCamera> IntroSceneCams;
@@ -143,6 +144,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
     {
         if (introRunning) ResetAllPriorities();
         if (introRunning) JeffTextVCam.Priority = 2;
+        if (introRunning) JeffAnimator.runAnimation();
         if (introRunning) yield return new WaitForSeconds(3);
         if (introRunning) turnText.text = "";
         if (introRunning) MoveToStart();
