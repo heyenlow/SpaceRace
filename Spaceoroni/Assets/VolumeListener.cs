@@ -5,10 +5,24 @@ using UnityEngine.UI;
 
 public class VolumeListener : MonoBehaviour
 {
-    public Slider MusicVolumeSlider;
+    public Slider MusicVolumeSliderMain;
+    public Slider MusicVolumeSliderInGame;
 
-    public void updateVolume()
+    public void UpdateVolume(string whichSlider)
     {
-        GetComponent<AudioSource>().volume = MusicVolumeSlider.value;
+        if (whichSlider == "MainMenu")
+        {
+            MusicVolumeSliderInGame.value = MusicVolumeSliderMain.value;
+            GetComponent<AudioSource>().volume = MusicVolumeSliderMain.value;
+        }
+        else if (whichSlider == "InGame")
+        {
+            MusicVolumeSliderMain.value = MusicVolumeSliderInGame.value;
+            GetComponent<AudioSource>().volume = MusicVolumeSliderInGame.value;
+        }
+        else
+        {
+            Debug.LogError("The String passed to update volume is not found: " + whichSlider);
+        }
     }
 }
