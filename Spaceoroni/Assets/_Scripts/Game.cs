@@ -227,8 +227,8 @@ public class Game : MonoBehaviour
 
     public void processTurnString(Turn turn, IPlayer curPlayer, Game g)
     {
-        //players already move the builders
-        if (!(curPlayer is Player)) curPlayer.moveBuilder(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
+        //players already move the builders and so does neatplayer
+        if (!(curPlayer is Player) && !(curPlayer is NeatPlayer)) curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
 
         // if (!(curPlayer is Player)) yield return new WaitForSeconds(timeToTurn/2);

@@ -35,7 +35,7 @@ public class OtherPlayer : IPlayer
 
         if (!Game.cancelTurn)
         {
-            moveBuilder(builder, builderCoord, g);
+            moveBuidler(builder, builderCoord, g);
 
             Debug.Log("Moving builder " + builder + " to " + Coordinate.coordToString(builderCoord));
         }

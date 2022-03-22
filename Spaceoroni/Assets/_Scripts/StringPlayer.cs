@@ -23,7 +23,7 @@ public class StringPlayer : IPlayer
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
         setBuilderLocations(player);
-        moveBuilder(builder, builder == 1 ? startLocationBuilder1 : startLocationBuilder2, g);
+        moveBuidler(builder, builder == 1 ? startLocationBuilder1 : startLocationBuilder2, g);
         yield return null;
     }
 
