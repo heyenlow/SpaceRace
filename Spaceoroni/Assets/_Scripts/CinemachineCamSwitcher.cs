@@ -25,13 +25,15 @@ public class CinemachineCamSwitcher : MonoBehaviour
     [SerializeField]
     private CinemachineVirtualCamera ElonTextVCam;
     [SerializeField]
+    private Elon ElonAnimator;
+    [SerializeField]
     private CinemachineVirtualCamera JeffTextVCam;
     [SerializeField]
     private Jeff JeffAnimator;
     protected TextMeshProUGUI turnText;
 
     
-    private MoveTruck Truck;
+    //private MoveTruck Truck;
 
     private List<CinemachineVirtualCamera> IntroSceneCams;
 
@@ -40,7 +42,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
     void Start()
     {
         IntroSceneCams = new List<CinemachineVirtualCamera>();
-        Truck = GameObject.Find("CyberTruck").GetComponentInChildren<MoveTruck>();
+        //Truck = GameObject.Find("CyberTruck").GetComponentInChildren<MoveTruck>();
         var cams = GameObject.FindGameObjectsWithTag("IntroVCam");
         foreach (var c in cams) IntroSceneCams.Add(c.GetComponent<CinemachineVirtualCamera>());
         turnText = GameObject.FindGameObjectWithTag("TurnText").GetComponent<TextMeshProUGUI>();
@@ -114,7 +116,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
             if (introRunning) c.Priority = 2;
             if (introRunning) yield return new WaitForSeconds(2.5f);
         }
-        if (introRunning) StartCoroutine(MoveToFollowTruck());
+        if (introRunning) StartCoroutine(MoveToElonText());
     }
 
     private IEnumerator MoveToFollowTruck()
@@ -122,7 +124,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
         if (introRunning) ResetAllPriorities();
         if (introRunning) TruckFollowVCam.Priority = 2;
         if (introRunning) yield return new WaitForSeconds(3f);
-        if (introRunning) Truck.Move();
+        //if (introRunning) Truck.Move();
     }
 
     private IEnumerator MoveToTruckDoor()
@@ -137,6 +139,8 @@ public class CinemachineCamSwitcher : MonoBehaviour
     {
         if (introRunning) ResetAllPriorities();
         if (introRunning) ElonTextVCam.Priority = 2;
+        if (introRunning) yield return new WaitForSeconds(1.3f);
+        if (introRunning) ElonAnimator.runAnimation();
         if (introRunning) yield return new WaitForSeconds(3);
         if (introRunning) yield return StartCoroutine(MoveToJeffText());
     }
@@ -144,6 +148,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
     {
         if (introRunning) ResetAllPriorities();
         if (introRunning) JeffTextVCam.Priority = 2;
+        if (introRunning) yield return new WaitForSeconds(1.3f);
         if (introRunning) JeffAnimator.runAnimation();
         if (introRunning) yield return new WaitForSeconds(3);
         if (introRunning) turnText.text = "";
