@@ -53,6 +53,8 @@ public class CinemachineCamSwitcher : MonoBehaviour
         if (Input.GetKeyDown("space") && introRunning)
         {
             turnText.text = "";
+            JeffAnimator.runAnimation();
+            ElonAnimator.runAnimation();
             ResetAllPriorities();
             introRunning = false;
             SpaceCamera.Priority = 2;
