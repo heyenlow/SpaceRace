@@ -273,7 +273,7 @@ public class TutorialPlayer : Player
         else
         {
             turnText.text = "Fast Forwarding...";
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(3);
             moveBuidler(getBuilderInt(currentTurn.BuilderLocation), currentTurn.MoveLocation, g);
             yield return new WaitForSeconds(1);
             turns.Add(currentTurn);
