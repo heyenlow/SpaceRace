@@ -33,6 +33,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - Texture2D_e8d04d10815a49ee82a4a9fcacda2341:
+        m_Texture: {fileID: 2800000, guid: c1f3227f61efcd54a9aebf78334f696a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BaseMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -73,6 +77,14 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SampleTexture2DLOD_0213e8357fcb4fb99cc26016860f0086_Texture_1:
+        m_Texture: {fileID: 2800000, guid: cef916fe00231bd4da9d72ccf4b2f7c0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_1ac4804479cd4aebb11119f72b10c2e5_Texture_1:
+        m_Texture: {fileID: 2800000, guid: fdb030aff50704949a035e890f8e014d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -92,6 +104,7 @@ Material:
     m_Floats:
     - Vector1_73b702b4a4c74e13832568930cbbbe06: 2.5
     - Vector1_967cf42486754bf6aa4c7236dfa9ce8f: 0.1
+    - Vector1_b87ba213e69c4167a63eb626b1c8c979: 1.1
     - Vector1_d9d03a9c5bc1436a9304254cf910748c: 1.1
     - _AlphaClip: 0
     - _Blend: 0
@@ -113,6 +126,7 @@ Material:
     - _Parallax: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _SampleGI: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -125,6 +139,7 @@ Material:
     - Color_0ca61496551c466a8b4c949e9ee0627c: {r: 0, g: 0, b: 0, a: 0}
     - Color_3323974f0091468faef0b6da7fda9d26: {r: 1, g: 0, b: 0, a: 0.6235294}
     - Color_5e40fbbc0ddf497b97caa892f71b6fbd: {r: 1, g: 0, b: 0, a: 0.8}
+    - Color_d3bf9d9c2607456ea1a3cb701ce823db: {r: 0.30588236, g: 0.58431375, b: 0.015686275, a: 1}
     - Color_dc1dc5d9cc444ef1b01d02fbea142a47: {r: 1, g: 1, b: 1, a: 0.8431373}
     - _BaseColor: {r: 0.1764706, g: 0.5372549, b: 0.015686275, a: 1}
     - _Color: {r: 0.00027801862, g: 0.05660379, b: 0, a: 1}
