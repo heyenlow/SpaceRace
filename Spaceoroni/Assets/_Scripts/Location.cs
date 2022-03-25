@@ -84,7 +84,7 @@ public class Location : MonoBehaviour
     }
     public void mouseOverHighlight()
     {
-        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");
+        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");//Shader Graphs/HighlightSquare"); 
     }
 
     public void Blink()
