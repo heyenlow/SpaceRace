@@ -106,9 +106,10 @@ public class Game : MonoBehaviour
         //cancel current turn
         cancelTurn = true;
         StopAllCoroutines();
-
+        
         //needs to reset the reader to the first move
         StringGameReader.MoveCount = 0;
+        resetAllLocationsAlive();
 
         if (Player1 != null && Player2!= null) clearPlayersTurnsAndSendBuildersHome();
 
@@ -131,7 +132,6 @@ public class Game : MonoBehaviour
 
         //needs to reset the reader to the first move
         StringGameReader.MoveCount = 0;
-
         HighlightManager.unHighlightEverything();
         HighlightManager.highlightedObjects.Clear();
         if (Player1 != null && Player2 != null) clearPlayersTurnsAndSendBuildersHome();
@@ -419,6 +419,18 @@ public class Game : MonoBehaviour
         yield return StartCoroutine(Player2.PlaceBuilder(2, 2, this));
         yield return StartCoroutine(waitForBuildersToMove());
         yield return null;
+    }
+
+    /// <summary>
+    /// Resets the bool DeadLocation to false when a game is restarted.
+    /// </summary>
+    public void resetAllLocationsAlive()
+    {
+        var locations = GameObject.FindGameObjectsWithTag("Square");
+        foreach (var l in locations)
+        {
+            l.GetComponent<Location>().setLocationAlive();
+        }
     }
 
     public void addAllLocationsWithoutBuildersToHighlight()
