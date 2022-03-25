@@ -106,9 +106,10 @@ public class Game : MonoBehaviour
         //cancel current turn
         cancelTurn = true;
         StopAllCoroutines();
-
+        
         //needs to reset the reader to the first move
         StringGameReader.MoveCount = 0;
+        resetAllLocationsAlive();
 
         if (Player1 != null && Player2!= null) clearPlayersTurnsAndSendBuildersHome();
 
@@ -128,10 +129,10 @@ public class Game : MonoBehaviour
     {
         cancelTurn = true;
         StopAllCoroutines();
+        resetAllLocationsAlive();
 
         //needs to reset the reader to the first move
         StringGameReader.MoveCount = 0;
-
         HighlightManager.unHighlightEverything();
         HighlightManager.highlightedObjects.Clear();
         if (Player1 != null && Player2 != null) clearPlayersTurnsAndSendBuildersHome();
@@ -243,9 +244,7 @@ public class Game : MonoBehaviour
         else
         { 
             StartCoroutine(WaitBuildLevel(turn.BuildLocation));
-        }  
-
-        //yield return true;
+        }
     }
 
     private IEnumerator WaitBuildLevel(Coordinate c)
@@ -261,6 +260,8 @@ public class Game : MonoBehaviour
         location.blastOffRocket();
     }
 
+    bool built = true;
+
     public IEnumerator PlayGameToEnd()
     {
         IPlayer curPlayer;
@@ -268,12 +269,15 @@ public class Game : MonoBehaviour
         IPlayer winner = null;
 
         yield return null;
-        yield return StartCoroutine(PlaceBuilders()); 
+        yield return StartCoroutine(PlaceBuilders());
 
         // Play until we have a winner or tie?
         for (int moveNum = 0; winner == null; moveNum++)
         {
+
             yield return StartCoroutine(waitForBuildersToMove());
+            yield return StartCoroutine(waitForBuildersToBuild());
+
             // Determine who's turn it is.
             curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
             othPlayer = (moveNum % 2 == 0) ? Player2 : Player1;
@@ -290,29 +294,32 @@ public class Game : MonoBehaviour
                     {
                         // string turn BUILDERMOVEBUILD string
                         PhotonView photonView = PhotonView.Get(this);
+
+                        //if it is a string player we just need to wait before getting the turn and processing it
                         if (curPlayer is StringPlayer)
                         {
                             yield return new WaitForSeconds(timeToTurn);
                         }
-                        else
+                        else //if it is any other player we need to start getting the turn
                         {
-                            //yield return StartCoroutine(waitForBuildersToMove());
                             yield return StartCoroutine(curPlayer.beginTurn(this));
-                            //yield return StartCoroutine(waitForBuildersToMove());
                         }
 
                         Turn t = curPlayer.getNextTurn();
                         // update the board with the current player's move
                         Debug.Log("Processing Turn: " + t.ToString());
-                        //StartCoroutine(processTurnString(t, curPlayer, this));
+                        
+                        built = false;
                         processTurnString(t, curPlayer, this);
+                        
                         if (t.isWin)
                         {
+                            built = true;
                             winner = curPlayer;
                             //wait to move then set buidler inactive
                             yield return new WaitForSeconds(0.6f);
                             curPlayer.setBuilderAtLocationInactive(t.MoveLocation);
-
+                            
                             yield return new WaitForSeconds(2);
                             BlastOffRocket(t.MoveLocation);
                         }
@@ -359,12 +366,15 @@ public class Game : MonoBehaviour
     {
         while (Player1.BuildersAreMoving() && Player2.BuildersAreMoving())
         {
-            Debug.Log("waiting");
-
             yield return new WaitForEndOfFrame();
         }
-        Debug.Log("done");
-
+    }
+    private IEnumerator waitForBuildersToBuild()
+    {
+        while (!built)
+        {
+            yield return new WaitForEndOfFrame();
+        }
     }
 
     public void goToEndOfGameScreen()
@@ -421,6 +431,18 @@ public class Game : MonoBehaviour
         yield return null;
     }
 
+    /// <summary>
+    /// Resets the bool DeadLocation to false when a game is restarted.
+    /// </summary>
+    public void resetAllLocationsAlive()
+    {
+        var locations = GameObject.FindGameObjectsWithTag("Square");
+        foreach (var l in locations)
+        {
+            l.GetComponent<Location>().setLocationAlive();
+        }
+    }
+
     public void addAllLocationsWithoutBuildersToHighlight()
     {
         var locations = GameObject.FindGameObjectsWithTag("Square");
@@ -459,6 +481,7 @@ public class Game : MonoBehaviour
         GameObject level = GameObject.Find(Coordinate.coordToString(c));
         if(Board[c.x,c.y] < 4) level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
         else { BlastOffRocket(c); }
+        built = true;
     }
     public int getBoardHeightAtCoord(Coordinate c)
     {
