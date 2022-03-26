@@ -86,7 +86,7 @@ public class Player : IPlayer
         }
         if (!Game.cancelTurn)
         {
-            currentTurn.BuilderLocation = Game.clickLocation;
+            currentTurn.BuilderLocation = new Coordinate(Game.clickLocation);
             Game.clickLocation = null;
         }
         // after choosing a builder, find the best square you can move to from it.
@@ -115,14 +115,14 @@ public class Player : IPlayer
 
                 if (clickedBuilder(Game.clickLocation))
                 {
-                    currentTurn.BuilderLocation = Game.clickLocation;
+                    currentTurn.BuilderLocation = new Coordinate(Game.clickLocation);
                     Game.clickLocation = null;
                     HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
                     yield return StartCoroutine(chooseMove(g));
                 }
                 else
                 {
-                    currentTurn.MoveLocation = Game.clickLocation;
+                    currentTurn.MoveLocation = new Coordinate(Game.clickLocation);
                     Game.clickLocation = null;
 
                     HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
@@ -137,11 +137,11 @@ public class Player : IPlayer
                         currentTurn.canPerformTurn = false;
                         Debug.Log("Cant Build");
                     }
+
+                    currentTurn.BuilderLocation = temp;
+                    turnText.text = "";
                 }
             }
-
-        currentTurn.BuilderLocation = temp;
-        turnText.text = "";
     }
 
     public override IEnumerator chooseBuild(Game g)
@@ -161,7 +161,7 @@ public class Player : IPlayer
 
         if (!Game.cancelTurn)
         {
-            currentTurn.BuildLocation = Game.clickLocation;
+            currentTurn.BuildLocation = new Coordinate(Game.clickLocation);
             Game.clickLocation = null;
 
             HighlightManager.unhighlightAllPossibleBuildLocations(allBuildLevels);
