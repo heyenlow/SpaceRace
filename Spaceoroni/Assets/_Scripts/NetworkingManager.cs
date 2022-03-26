@@ -32,6 +32,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject Join;
     [SerializeField]
+    private GameObject HostMenu;
+    [SerializeField]
     private GameObject Host;
     [SerializeField]
     private GameObject hostRoomName;
@@ -43,6 +45,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     private GameObject Chat;
     [SerializeField]
     private GameObject PlayerDisconnect;
+    [SerializeField]
+    private GameObject PostGamePanel;
 
     [SerializeField]
     private Game gameManager;
@@ -66,6 +70,19 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     private void Update()
     {
         NewtorkingInfo.GetComponent<TextMeshProUGUI>().text = netinfo + " " + PhotonNetwork.CountOfRooms.ToString();
+
+        if(HostMenu.activeSelf)
+        {
+            if(hostRoomName.GetComponent<TMP_InputField>().text != "" && hostRoomName.GetComponent<TMP_InputField>().text != null)
+            {
+                if (Input.GetKeyUp(KeyCode.Return))
+                {
+                    HostGame();
+                    HostMenu.SetActive(false);
+                    WaitingForPlayer.SetActive(true);
+                }
+            }
+        }
     }
 
 
@@ -192,7 +209,11 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     {
         Debug.LogFormat("OnPlayerLeftRoom() ", otherPlayer);
         RoomListingsContent.DestroyChildren();
-        PlayerDisconnect.SetActive(true);
+        if (!PostGamePanel.activeSelf)
+        {
+            PlayerDisconnect.SetActive(true);
+            HighlightManager.unHighlightEverything();
+        }
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
