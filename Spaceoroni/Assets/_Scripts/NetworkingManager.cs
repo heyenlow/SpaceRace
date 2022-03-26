@@ -41,6 +41,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     private Listing listing;
     [SerializeField]
     private GameObject Chat;
+    [SerializeField]
+    private GameObject PlayerDisconnect;
 
     [SerializeField]
     private Game gameManager;
@@ -190,8 +192,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     {
         Debug.LogFormat("OnPlayerLeftRoom() ", otherPlayer);
         RoomListingsContent.DestroyChildren();
-        gameManager.QuitGame();
-        Chat.SetActive(false);
+        PlayerDisconnect.SetActive(true);
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
