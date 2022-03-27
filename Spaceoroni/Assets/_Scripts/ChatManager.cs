@@ -31,16 +31,19 @@ public class ChatManager : MonoBehaviour
     public void SendChat(string msg)
     {
         string sender = "";
+        string chatColor = "";
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             sender = "Elon Musk";
+            chatColor = "red";
         }
         else
         {
             sender = "Jeff Bezos";
+            chatColor = "blue";
         }
 
-        string NewMessage = sender + ": " + msg;
+        string NewMessage = "<color=" + chatColor + ">" + sender + ": " + msg + "</color>";
         _photon.RPC("RPC_AddNewMessage", RpcTarget.All, NewMessage);
     }
 
