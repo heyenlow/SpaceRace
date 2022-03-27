@@ -22,7 +22,6 @@ public class Builder : MonoBehaviour
     }
     public void move(Coordinate c, Game g)
     {
-        createDust(); //Create Dust when object moves 
         moveBuilderToNewSquare(this.gameObject, findSquare(c), g); //moves the object to the new square
         coord.x = c.x;
         coord.y = c.y;
@@ -46,12 +45,24 @@ public class Builder : MonoBehaviour
             var newRotation = Quaternion.LookRotation(direction);
             GamePiece.transform.rotation = newRotation;
         }
-      //  Debug.Log("Moving to: " + Square.name + "  with height: " + g.heightAtCoordinate(coordinateOfSquare));
-      //  Debug.Log(transform.position.x + " " + transform.position.y + " " + transform.position.z);
+        //  Debug.Log("Moving to: " + Square.name + "  with height: " + g.heightAtCoordinate(coordinateOfSquare));
+        //  Debug.Log(transform.position.x + " " + transform.position.y + " " + transform.position.z);
 
-       // Debug.Log(newLocation.x + " " + newLocation.y + " " + newLocation.z);
-
-        anim.SetInteger("AnimationPar", 1);
+        // Debug.Log(newLocation.x + " " + newLocation.y + " " + newLocation.z);
+        if (this.transform.position == homeLocation)
+        {
+            createDust(); //Create Dust when object moves 
+            anim.SetBool("Run", true);
+        }
+        else if (g.heightAtCoordinate(coordinateOfSquare) > 2 || g.heightAtCoordinate(coord) > 2)
+        {
+            anim.SetBool("Jump", true);
+        }
+        else
+        {
+            createDust(); //Create Dust when object moves 
+            anim.SetBool("Run", true);
+        }
         StartCoroutine(moveToNextPoint(newLocation));
     }
 
@@ -67,7 +78,10 @@ public class Builder : MonoBehaviour
             {
                 transform.position = newLocation;
                 currentlyMoving = false;
-                anim.SetInteger("AnimationPar", 0);
+
+                anim.SetBool("Run", false);
+                anim.SetBool("Jump", false);
+
                 dust.Stop();
             }
             yield return null;
