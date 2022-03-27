@@ -49,7 +49,7 @@ public class Builder : MonoBehaviour
         //  Debug.Log(transform.position.x + " " + transform.position.y + " " + transform.position.z);
 
         // Debug.Log(newLocation.x + " " + newLocation.y + " " + newLocation.z);
-        if (this.transform.position == homeLocation)
+        if (Coordinate.Equals(coord, new Coordinate()))
         {
             createDust(); //Create Dust when object moves 
             anim.SetBool("Run", true);

@@ -270,6 +270,7 @@ public class Game : MonoBehaviour
 
         yield return null;
         yield return StartCoroutine(PlaceBuilders());
+        built = true;
 
         // Play until we have a winner or tie?
         for (int moveNum = 0; winner == null; moveNum++)
