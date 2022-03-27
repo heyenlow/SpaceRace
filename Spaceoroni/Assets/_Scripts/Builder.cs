@@ -51,7 +51,7 @@ public class Builder : MonoBehaviour
 
        // Debug.Log(newLocation.x + " " + newLocation.y + " " + newLocation.z);
 
-        anim.SetInteger("AnimationPar", 1);
+        anim.SetBool("Run", true);
         StartCoroutine(moveToNextPoint(newLocation));
     }
 
@@ -67,7 +67,7 @@ public class Builder : MonoBehaviour
             {
                 transform.position = newLocation;
                 currentlyMoving = false;
-                anim.SetInteger("AnimationPar", 0);
+                anim.SetBool("Run", false);
                 dust.Stop();
             }
             yield return null;
