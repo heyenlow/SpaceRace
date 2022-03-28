@@ -32,6 +32,8 @@ public class CinemachineCamSwitcher : MonoBehaviour
     private Jeff JeffAnimator;
     protected TextMeshProUGUI turnText;
 
+    [SerializeField]
+    private AudioSource panNoise;
     
     //private MoveTruck Truck;
 
@@ -63,6 +65,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
 
     private void ResetAllPriorities()
     {
+        panNoise.Play();
         foreach (var c in IntroSceneCams) { c.Priority = 1; }
         //reset all cameras priorities to 1;
             TruckFollowVCam.Priority = 1;
