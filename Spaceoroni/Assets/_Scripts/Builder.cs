@@ -13,8 +13,14 @@ public class Builder : MonoBehaviour
     public bool currentlyMoving = false;
     public static Builder BlinkingBuilder = null;
 
+    public Builder(Coordinate b)
+    {
+        coord = new Coordinate(b);
+    }
+
     void Start()
     {
+        coord = new Coordinate();
         homeLocation = this.transform.position;
         homeRotation = this.transform.rotation;
 

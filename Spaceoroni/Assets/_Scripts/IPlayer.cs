@@ -10,6 +10,16 @@ public abstract class IPlayer : MonoBehaviour
     protected Builder Builder2;
     protected List<Turn> turns;
     protected TextMeshProUGUI turnText;
+    public int ID;
+    public enum States
+    {
+        Winner,
+        Loser,
+        Tied,
+        Undetermined
+    }
+    public States state = States.Undetermined;
+
 
 
     private void Start()
@@ -30,7 +40,7 @@ public abstract class IPlayer : MonoBehaviour
         return (Coordinate.coordToString(Builder1.getLocation()) + Coordinate.coordToString(Builder2.getLocation()));
     }
 
-    public void moveBuidler(int Builder, Coordinate to, Game g)
+    public void moveBuilder(int Builder, Coordinate to, Game g)
     {
         Builder builderToMove = Builder == 1 ? Builder1 : Builder2;
 

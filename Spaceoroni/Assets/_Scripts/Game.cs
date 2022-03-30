@@ -1,4 +1,3 @@
-using System;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using SharpNeat.Core;
 using SharpNeat.Genomes.Neat;
 using SharpNeat.Phenomes;
 using AI_SpaceRace;
+using Assets._Scripts.MCTS;
 
 public class Game : MonoBehaviour
 {
@@ -28,9 +28,11 @@ public class Game : MonoBehaviour
     [SerializeField]
     private GameObject JoinMenu;
 
+    static long[,,] ZobristTable = null;
+
     [SerializeField]
     private TextMeshProUGUI WinText;
-
+    public bool simulationRunning;
 
     public enum PlayerState
     {
@@ -43,20 +45,36 @@ public class Game : MonoBehaviour
     public float level1Height = 0.8f;
     public float level2Height = 0.5f;
     public float level3Height = 0.3f;
+    public long Hash => computeHash();
     public int timeToTurn = 2;
 
     int[,] Board;
-    public int[,] state { get
+    public int[,] state { 
+        get 
         {
             return Board;
-        } }
+        }
+        set { }
+    }
     public IPlayer Player1;
     public IPlayer Player2;
-    public IPlayer curPlayer, rival;
+    public int moveNum = 0;
+
+    public IPlayer CurrentPlayer => (moveNum % 2 == 0) ? Player1 : Player2;
+    public IPlayer Rival => (moveNum % 2 == 0) ? Player2 : Player1;
     public static bool cancelTurn = false;
 
     public SantoriniCoevolutionExperiment _experiment { get; private set; }
     
+    public Game(Game g)
+    {
+        Board = new int[5, 5];
+        System.Array.Copy(g.state, g.state.GetLowerBound(0), Board, Board.GetLowerBound(0), 25);
+        Player1 = new MCTSPlayer(g.Player1);
+        Player2 = new MCTSPlayer(g.Player2);
+
+    }
+
 
     public static Coordinate clickLocation;
     private bool isDebug = false;
@@ -88,7 +106,7 @@ public class Game : MonoBehaviour
     {
         GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
 
-
+        initTable();
         Board = new int[5, 5];
         ClearBoard();
 
@@ -119,8 +137,6 @@ public class Game : MonoBehaviour
         //reset game variables
         Player1 = null;
         Player2 = null;
-        curPlayer = null;
-        rival = null;
         clickLocation = null;
         
     }
@@ -136,8 +152,6 @@ public class Game : MonoBehaviour
         HighlightManager.unHighlightEverything();
         HighlightManager.highlightedObjects.Clear();
         if (Player1 != null && Player2 != null) clearPlayersTurnsAndSendBuildersHome();
-        curPlayer = null;
-        rival = null;
         clickLocation = null;
 
         StartGame();
@@ -174,6 +188,25 @@ public class Game : MonoBehaviour
 
     }
 
+    private void setAIDifficulty()
+    {
+        switch(GameSettings.difficulty)
+        {
+            case GameSettings.AIDifficulty.Easy:
+                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
+                Player2.loadNEATPlayer("coevolution_champion");
+                break;
+            case GameSettings.AIDifficulty.Hard:
+            case GameSettings.AIDifficulty.Med:
+
+                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<MCTSPlayer>();
+                break;
+
+        }
+    }
+
     //reads the settings that will be set by the UI
     private void setupGameSettings()
     {
@@ -198,9 +231,7 @@ public class Game : MonoBehaviour
                 StringGameReader.setGameLines();
                 break;
             case GameSettings.GameType.Singleplayer:
-                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
-                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
-                Player2.loadNEATPlayer("coevolution_champion");
+                setAIDifficulty();
                 break;
             case GameSettings.GameType.Multiplayer:
                 setupMultiplayerSettings();
@@ -229,7 +260,7 @@ public class Game : MonoBehaviour
     public void processTurnString(Turn turn, IPlayer curPlayer, Game g)
     {
         //players already move the builders and so does neatplayer
-        if (!(curPlayer is Player) && !(curPlayer is NeatPlayer)) curPlayer.moveBuidler(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
+        if (!(curPlayer is Player) && !(curPlayer is NeatPlayer)) curPlayer.moveBuilder(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
 
         // if (!(curPlayer is Player)) yield return new WaitForSeconds(timeToTurn/2);
@@ -425,10 +456,12 @@ public class Game : MonoBehaviour
         yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player1.PlaceBuilder(2, 1, this));
         yield return StartCoroutine(waitForBuildersToMove());
+        moveNum++;
         yield return StartCoroutine(Player2.PlaceBuilder(1, 2, this));
         yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player2.PlaceBuilder(2, 2, this));
         yield return StartCoroutine(waitForBuildersToMove());
+        moveNum--;
         yield return null;
     }
 
@@ -499,13 +532,6 @@ public class Game : MonoBehaviour
         int possibleMoves = getAllPossibleMoves(c).Count;
 
         return (possibleMoves > 0);
-    }
-
-    public bool canBuild(Coordinate c)
-    {
-        int possibleBuilds = getAllPossibleBuilds(c).Count;
-
-        return (possibleBuilds > 0);
     }
 
     // PULLS 4 BUILDER LOCATIONS and returns string ie. A2B3C4D3
@@ -589,4 +615,290 @@ public class Game : MonoBehaviour
     public void pauseGame() { HighlightManager.pauseGameHighlights(); }
     public void resumeGame() { HighlightManager.resumeGameHighlights(); }
 
+    // ===================================================================================
+
+    public long computeHash()
+    {
+        char[,] board = TranslateState();
+        long h = 0;
+        for (int i = 0; i < 5; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                if (board[i, j] != '-')
+                {
+                    int piece = indexOf(board[i, j]);
+                    h ^= ZobristTable[i, j, piece];
+                }
+            }
+        }
+        return h;
+    }
+
+    public char[,] TranslateState()
+    {
+        char[,] ret = new char[5, 5];
+
+        // takes the Game g.state int matrix and converts it to a char matrix with representations for builders on board
+        Coordinate tmp = new Coordinate();
+        for (int i = 0; i < 5; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                tmp.x = i; tmp.y = j;
+                if (locationClearOfAllBuilders(tmp))
+                {
+                    ret[i, j] = (char)(state[i, j] + 48);
+                }
+                else
+                {
+                    char piece = '0';
+                    switch (state[i, j])
+                    {
+                        case 0:
+                            if (Equals(tmp, Coordinate.stringToCoord(Player1.getBuilderLocations().Substring(0, 2)))) piece = 'A';
+                            else if (Equals(tmp, Coordinate.stringToCoord(Player1.getBuilderLocations().Substring(2, 2)))) piece = 'E';
+                            else if (Equals(tmp, Coordinate.stringToCoord(Player2.getBuilderLocations().Substring(0, 2)))) piece = 'a';
+                            else if (Equals(tmp, Coordinate.stringToCoord(Player2.getBuilderLocations().Substring(2, 2)))) piece = 'e';
+                            break;
+                        case 1:
+                            if (Equals(tmp, Coordinate.stringToCoord(Player1.getBuilderLocations().Substring(0, 2)))) piece = 'B';
+                            else if (Equals(tmp, Coordinate.stringToCoord(Player1.getBuilderLocations().Substring(2, 2)))) piece = 'F';
+                            else if (Equals(tmp, Coordinate.stringToCoord(Player2.getBuilderLocations().Substring(0, 2)))) piece = 'b';
+                            else if (Equals(tmp, Coordinate.stringToCoord(Player2.getBuilderLocations().Substring(2, 2)))) piece = 'f';
+                            break;
+                        case 2:
+                            if (Equals(tmp, Coordinate.stringToCoord(Player1.getBuilderLocations().Substring(0, 2)))) piece = 'C';
+                            else if (Equals(tmp, Coordinate.stringToCoord(Player1.getBuilderLocations().Substring(2, 2)))) piece = 'G';
+                            else if (Equals(tmp, Coordinate.stringToCoord(Player2.getBuilderLocations().Substring(0, 2)))) piece = 'c';
+                            else if (Equals(tmp, Coordinate.stringToCoord(Player2.getBuilderLocations().Substring(2, 2)))) piece = 'g';
+                            break;
+                        case 3:
+                            if (Equals(tmp, Coordinate.stringToCoord(Player1.getBuilderLocations().Substring(0, 2)))) piece = 'D';
+                            else if (Equals(tmp, Coordinate.stringToCoord(Player1.getBuilderLocations().Substring(2, 2)))) piece = 'H';
+                            else if (Equals(tmp, Coordinate.stringToCoord(Player2.getBuilderLocations().Substring(0, 2)))) piece = 'd';
+                            else if (Equals(tmp, Coordinate.stringToCoord(Player2.getBuilderLocations().Substring(2, 2)))) piece = 'h';
+                            break;
+                    }
+                    ret[i, j] = piece;
+                }
+            }
+
+        }
+
+        return ret;
+    }
+
+    public Game DeepCopy()
+    {
+        Game copy = new Game(this);
+
+        return copy;
+    }
+
+    void initTable()
+    {
+        if (ZobristTable != null) return;
+        ZobristTable = new long[5,5,21];
+        System.Random rnd = new System.Random(System.Guid.NewGuid().GetHashCode());
+        for (int i = 0; i < 5; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                for (int k = 0; k < 21; k++)
+                {
+                    System.Random rng = new System.Random();
+                    byte[] bytes = new byte[8];
+                    rng.NextBytes(bytes);
+                    long uint64 = System.BitConverter.ToInt64(bytes, 0);
+                    ZobristTable[i, j, k] = uint64;
+                }
+
+            }
+
+        }
+    }
+
+    static int indexOf(char piece)
+    {// this node's character array `state` uses letters to represent builders at different heights
+     // convert these letters numbers we can use for easy height calculations and such
+        switch (piece)
+        {
+            case 'A':               // player 1 builder 1 height 0
+                return 0;
+            case 'B':
+                return 1;
+            case 'C':
+                return 2;
+            case 'D':               // player 1 builder 1 height 3
+                return 3;
+            case 'E':               // player 1 builder 2 height 0
+                return 4;
+            case 'F':
+                return 5;
+            case 'G':
+                return 6;
+            case 'H':               // player 1 builder 2 height 3
+                return 7;
+            case 'a':               // player 2 builder 1 height 0
+                return 8;
+            case 'b':
+                return 9;
+            case 'c':
+                return 10;
+            case 'd':               // player 2 builder 1 height 3
+                return 11;
+            case 'e':               // player 2 builder 2 height 0
+                return 12;
+            case 'f':
+                return 13;
+            case 'g':
+                return 14;
+            case 'h':               // player 2 builder 2 height 3
+                return 15;
+            case '0':               // player - height 0
+                return 16;
+            case '1':
+                return 17;
+            case '2':
+                return 18;
+            case '3':
+                return 19;
+            case '4':               // player - height 4
+                return 20;
+            default:
+                return -1;
+        }
+    }
+
+    public bool IsWinner(IPlayer player)
+    {
+        IPlayer winner;
+        if (Player1.state == IPlayer.States.Winner) winner = Player1;
+        else if (Player2.state == IPlayer.States.Winner) winner = Player2;
+        else if (Player1.state == IPlayer.States.Loser) winner = Player2;
+        else if (Player2.state == IPlayer.States.Loser) winner = Player1;
+        else winner = null;
+
+        if (winner != null) return true;
+
+        return false;
+    }
+
+    public List<UCB1Tree.Transition> GetLegalTransitions()
+    {
+        List<UCB1Tree.Transition> ret = new List<UCB1Tree.Transition>();
+        // get all possible moves from each builder including new build locations....
+        // builder 1...
+        List<string> moves = getAllPossibleMoves(Coordinate.stringToCoord(CurrentPlayer.getBuilderLocations().Substring(0, 2)));
+        for (int i = 0; i < moves.Count; i++)
+        {
+            List<string> builds = getAllPossibleBuilds(Coordinate.stringToCoord(moves[i]));
+            for (int j = 0; j < builds.Count; j++)
+            {
+                // create transition representing this possible move
+                UCB1Tree.Transition tmp = new UCB1Tree.Transition(Coordinate.stringToCoord(CurrentPlayer.getBuilderLocations().Substring(0, 2)), Coordinate.stringToCoord(moves[i]), Coordinate.stringToCoord(builds[j]), Hash);
+                // Hash Values are currently this current game's state hash
+
+                // need to change it to be the hash value of a game resulting from the move taking place.  without actually making the move?
+                Game tmpState = DeepCopy(); //copy current game state
+                string turnString = Coordinate.coordToString(tmp.Builder) + Coordinate.coordToString(tmp.Move) + Coordinate.coordToString(tmp.Build); // create turn string from this transition
+                Turn currTurn = new Turn(tmp.Builder, tmp.Move, tmp.Build);
+                tmpState.processTurnString(currTurn, tmpState.CurrentPlayer, tmpState); // execute transition on copy board
+                tmp.Hash = tmpState.computeHash(); // this transition hash equals the hash of the copy state's Hash
+
+                ret.Add(tmp);
+            }
+        }
+        // builder 2...
+        moves = getAllPossibleMoves(Coordinate.stringToCoord(CurrentPlayer.getBuilderLocations().Substring(2, 2)));
+        for (int i = 0; i < moves.Count; i++)
+        {
+            List<string> builds = getAllPossibleBuilds(Coordinate.stringToCoord(moves[i]));
+            for (int j = 0; j < builds.Count; j++)
+            {
+                UCB1Tree.Transition tmp = new UCB1Tree.Transition(Coordinate.stringToCoord(CurrentPlayer.getBuilderLocations().Substring(2, 2)), Coordinate.stringToCoord(moves[i]), Coordinate.stringToCoord(builds[j]), Hash);
+                // Hash Values are currently this current game's state hash
+                // need to change it to be the hash value of a game resulting from the move taking place.  without actually making the move?
+                Game tmpState = DeepCopy();
+                Turn currTurn = new Turn(tmp.Builder, tmp.Move, tmp.Build);
+                tmpState.processTurnString(currTurn, tmpState.CurrentPlayer, tmpState);
+                tmp.Hash = tmpState.computeHash();
+
+                ret.Add(tmp);
+            }
+        }
+        if (ret.Count == 0)
+        {
+            CurrentPlayer.state = IPlayer.States.Loser; // if you can't move you're a loser.
+            Rival.state = IPlayer.States.Winner;
+        }
+        return ret;
+    }
+
+    public void Rollout()
+    {
+        IPlayer winner = null;
+
+        System.Random rnd = RandomFactory.Create();
+        simulationRunning = false;
+        for (; winner == null; moveNum++)
+        {
+            var allPossibleMoves = GetLegalTransitions();
+            if (allPossibleMoves.Count == 0)
+            {
+                winner = Rival;
+                CurrentPlayer.state = IPlayer.States.Loser;
+                Rival.state = IPlayer.States.Winner;
+                break;
+            }
+            var randomMove = allPossibleMoves[rnd.Next(0, allPossibleMoves.Count)];
+            Turn currTurn = new Turn(randomMove.Builder, randomMove.Move, randomMove.Build);
+
+            bool won = isWin(randomMove.Move);
+            if (won)
+            {
+                CurrentPlayer.state = IPlayer.States.Winner;
+                Rival.state = IPlayer.States.Loser;
+                winner = CurrentPlayer;
+                break;
+            }
+
+            processTurnString(currTurn, CurrentPlayer, this);
+
+            if (CurrentPlayer.state == IPlayer.States.Winner)
+            {
+                Rival.state = IPlayer.States.Loser;
+                winner = CurrentPlayer;
+            }
+            else if (CurrentPlayer.state == IPlayer.States.Loser)
+            {
+                Rival.state = IPlayer.States.Winner;
+                winner = Rival;
+            }
+
+        }
+
+    }
+
+    public void Transition(UCB1Tree.Transition t)
+    {
+        bool isWin = false;
+        processTurnString(new Turn(t.Builder, t.Move, t.Build), CurrentPlayer, this);
+
+        moveNum++;
+    }
+
+    public bool IsGameOver()
+    {
+        if (CurrentPlayer.state != IPlayer.States.Undetermined)
+        {
+            return true;
+        }
+        else if (Rival.state != IPlayer.States.Undetermined)
+        {
+            return true;
+        }
+        return false;
+    }
 }

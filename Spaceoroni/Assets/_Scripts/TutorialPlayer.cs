@@ -64,7 +64,7 @@ public class TutorialPlayer : Player
 
             if (moveLocation != null)
             {
-                moveBuidler(builder, moveLocation, g);
+                moveBuilder(builder, moveLocation, g);
 
                 HighlightManager.highlightedObjects.Clear();
             }
@@ -168,9 +168,9 @@ public class TutorialPlayer : Player
 
                     HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
 
-                    if (g.canBuild(currentTurn.BuilderLocation))
+                    if (g.getAllPossibleBuilds(currentTurn.MoveLocation).Count > 0)
                     {
-                        moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
+                        moveBuilder(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
                     }
                     else
                     {
@@ -274,7 +274,7 @@ public class TutorialPlayer : Player
         {
             turnText.text = "Fast Forwarding...";
             yield return new WaitForSeconds(3);
-            moveBuidler(getBuilderInt(currentTurn.BuilderLocation), currentTurn.MoveLocation, g);
+            moveBuilder(getBuilderInt(currentTurn.BuilderLocation), currentTurn.MoveLocation, g);
             yield return new WaitForSeconds(1);
             turns.Add(currentTurn);
         }
