@@ -5,7 +5,28 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class UCB1Tree : MonoBehaviour
-{ 
+{
+    public class CoroutineWithData
+    {
+        public Coroutine coroutine { get; private set; }
+        public Transition result;
+        private IEnumerator target;
+        public CoroutineWithData(MonoBehaviour owner, IEnumerator target)
+        {
+            this.target = target;
+            this.coroutine = owner.StartCoroutine(Run());
+        }
+
+        private IEnumerator Run()
+        {
+            while (target.MoveNext())
+            {
+                result = (Transition)target.Current;
+                yield return result;
+            }
+        }
+    }
+
     public class Transition
     {
         public Coordinate Builder;
@@ -51,9 +72,11 @@ public class UCB1Tree : MonoBehaviour
         }
     }
 
+    public UCB1Tree() { }
+
     private static double UCB1(double childWins, double childPlays, double parentPlays) => (childWins / childPlays) + Math.Sqrt(2f * Math.Log(parentPlays) / childPlays);
 
-    public static Transition Search(Game game, int simulations)
+    public IEnumerator Search(Game game, int simulations, Turn currentTurn, List<Turn> turns)
     {
         Dictionary<long, Node> tree = new Dictionary<long, Node>
         {
@@ -146,7 +169,14 @@ public class UCB1Tree : MonoBehaviour
                 bestIndex = i;
             }
         }
-        if (allTransitions.Count == 0) return null;
-        return allTransitions[bestIndex];
+        if (allTransitions.Count == 0) yield return null;
+        
+        Transition tran = allTransitions[bestIndex];
+
+        //yield return tran;
+
+        currentTurn = new Turn(tran.Builder, tran.Build, tran.Move);
+
+        turns.Add(currentTurn);
     }
 }

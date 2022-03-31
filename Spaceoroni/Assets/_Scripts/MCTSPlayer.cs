@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets._Scripts.MCTS
@@ -11,7 +7,6 @@ namespace Assets._Scripts.MCTS
     public class MCTSPlayer : IPlayer
     {
         protected Turn currentTurn;
-
         public MCTSPlayer() { }
 
         public MCTSPlayer(IPlayer p)
@@ -21,6 +16,8 @@ namespace Assets._Scripts.MCTS
             state = p.state;
             ID = p.ID;
         }
+
+        public UCB1Tree tree = new UCB1Tree();
 
         public override IEnumerator PlaceBuilder(int builder, int player, Game g)
         {
@@ -107,13 +104,22 @@ namespace Assets._Scripts.MCTS
                 yield return null;
             }
             Game tmpState = g.DeepCopy();
-            UCB1Tree.Transition t = UCB1Tree.Search(tmpState, 500);
+
+            //UCB1Tree.CoroutineWithData cd = new UCB1Tree.CoroutineWithData(this, tree.Search(tmpState, 500));
+
+
+            yield return StartCoroutine(tree.Search(tmpState, 500, currentTurn, turns));
+
+            //yield return cd.coroutine;
+
+            //UCB1Tree.Transition t = cd.result;
             // search a new clone of the current state.
             // DEBUG Console.WriteLine(Coordinate.coordToString(t.Builder) + Coordinate.coordToString(t.Move) + Coordinate.coordToString(t.Build));
-            currentTurn = new Turn(t.Builder, t.Build, t.Move);
+            
+            //currentTurn = new Turn(t.Builder, t.Build, t.Move);
 
-            turns.Add(currentTurn);
-            yield return null;
+            //turns.Add(currentTurn);
+            //yield return null;
         }
     }
 }
