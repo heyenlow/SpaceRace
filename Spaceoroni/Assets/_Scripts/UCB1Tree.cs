@@ -78,10 +78,12 @@ public class UCB1Tree : MonoBehaviour
 
     public IEnumerator Search(Game game, int simulations, Turn currentTurn, List<Turn> turns)
     {
+
         Dictionary<long, Node> tree = new Dictionary<long, Node>
         {
             { game.Hash, new Node(game.CurrentPlayer) }
         };
+
         List<Node> path = new List<Node>();
         Game copy;
         List<Transition> allTransitions;
@@ -96,18 +98,28 @@ public class UCB1Tree : MonoBehaviour
 
             while (!copy.IsGameOver())
             {
+                Debug.Log("Enters while loop");
                 allTransitions = copy.GetLegalTransitions();
-                if (allTransitions.Count == 0) break;
+
+                if (allTransitions.Count == 0)
+                {
+                    Debug.Log("trans == 0");
+                    break;
+                }
+                
                 transitionNoStats = new List<Transition>();
                 foreach (Transition t in allTransitions)
                 {
                     if (!tree.ContainsKey(t.Hash))
                         transitionNoStats.Add(t);
+
+                    Debug.Log(transitionNoStats);
                 }
 
                 // SELECTION
                 if (transitionNoStats.Count == 0)
                 {
+                    Debug.Log("Count ==0 ");
                     double bestScore = float.MinValue;
                     int parentPlays = path[path.Count - 1].plays;
                     double ucb1Score;
@@ -129,6 +141,7 @@ public class UCB1Tree : MonoBehaviour
                 // EXPANSION
                 else
                 {
+                    Debug.Log("Expansdion");
                     Transition t = transitionNoStats.RandomItem(rng);
                     copy.Transition(t);
                     Node node = new Node(copy.CurrentPlayer);

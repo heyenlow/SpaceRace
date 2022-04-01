@@ -2,8 +2,6 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Assets._Scripts.MCTS
-{
     public class MCTSPlayer : IPlayer
     {
         protected Turn currentTurn;
@@ -16,8 +14,6 @@ namespace Assets._Scripts.MCTS
             state = p.state;
             ID = p.ID;
         }
-
-        public UCB1Tree tree = new UCB1Tree();
 
         public override IEnumerator PlaceBuilder(int builder, int player, Game g)
         {
@@ -97,6 +93,7 @@ namespace Assets._Scripts.MCTS
 
         public override IEnumerator beginTurn(Game g)
         {
+            UCB1Tree tree = new UCB1Tree();
             // this is the current player
             // opp is rival
             if (state != States.Undetermined)
@@ -122,4 +119,3 @@ namespace Assets._Scripts.MCTS
             //yield return null;
         }
     }
-}

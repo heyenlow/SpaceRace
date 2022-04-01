@@ -260,7 +260,10 @@ public class Game : MonoBehaviour
     public void processTurnString(Turn turn, IPlayer curPlayer, Game g)
     {
         //players already move the builders and so does neatplayer
-        if (!(curPlayer is Player) && !(curPlayer is NeatPlayer)) curPlayer.moveBuilder(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
+        if (!(curPlayer is Player) && !(curPlayer is NeatPlayer))
+        {
+            curPlayer.moveBuilder(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
+        }
 
 
         // if (!(curPlayer is Player)) yield return new WaitForSeconds(timeToTurn/2);
@@ -791,11 +794,13 @@ public class Game : MonoBehaviour
         // get all possible moves from each builder including new build locations....
         // builder 1...
         List<string> moves = getAllPossibleMoves(Coordinate.stringToCoord(CurrentPlayer.getBuilderLocations().Substring(0, 2)));
+        
         for (int i = 0; i < moves.Count; i++)
         {
             List<string> builds = getAllPossibleBuilds(Coordinate.stringToCoord(moves[i]));
             for (int j = 0; j < builds.Count; j++)
             {
+                
                 // create transition representing this possible move
                 UCB1Tree.Transition tmp = new UCB1Tree.Transition(Coordinate.stringToCoord(CurrentPlayer.getBuilderLocations().Substring(0, 2)), Coordinate.stringToCoord(moves[i]), Coordinate.stringToCoord(builds[j]), Hash);
                 // Hash Values are currently this current game's state hash
@@ -806,7 +811,6 @@ public class Game : MonoBehaviour
                 Turn currTurn = new Turn(tmp.Builder, tmp.Move, tmp.Build);
                 tmpState.processTurnString(currTurn, tmpState.CurrentPlayer, tmpState); // execute transition on copy board
                 tmp.Hash = tmpState.computeHash(); // this transition hash equals the hash of the copy state's Hash
-
                 ret.Add(tmp);
             }
         }

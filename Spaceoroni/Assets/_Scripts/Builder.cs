@@ -28,6 +28,7 @@ public class Builder : MonoBehaviour
     }
     public void move(Coordinate c, Game g)
     {
+        Debug.Log(c.x + " " + c.y + " - " + g);
         moveBuilderToNewSquare(this.gameObject, findSquare(c), g); //moves the object to the new square
         coord.x = c.x;
         coord.y = c.y;
