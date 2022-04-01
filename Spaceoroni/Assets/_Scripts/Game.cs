@@ -27,6 +27,8 @@ public class Game : MonoBehaviour
     private GameObject MainMenu;
     [SerializeField]
     private GameObject JoinMenu;
+    [SerializeField]
+    private TextMeshProUGUI TurnIndicator;
 
     [SerializeField]
     private TextMeshProUGUI WinText;
@@ -106,7 +108,9 @@ public class Game : MonoBehaviour
         //cancel current turn
         cancelTurn = true;
         StopAllCoroutines();
-        
+        TurnIndicator.text = "";
+
+
         //needs to reset the reader to the first move
         StringGameReader.MoveCount = 0;
         resetAllLocationsAlive();
@@ -152,12 +156,13 @@ public class Game : MonoBehaviour
     {
         Player1.ClearTurnText();
         Player2.ClearTurnText();
+        TurnIndicator.text = "";
         Location.LocationBlinking = null;
         Rocket.blinkingRocket = null;
         Builder.BlinkingBuilder = null;
         Level.BlinkingLevel = null;
 
-        if(GameSettings.gameType == GameSettings.GameType.Multiplayer)
+        if(GameSettings.gameType == GameSettings.GameType.Multiplayer && GameSettings.netMode != GameSettings.NetworkMode.Local)
         {
             NetworkingManager.LeaveRoom();
         }
@@ -218,6 +223,10 @@ public class Game : MonoBehaviour
                 break;
             case GameSettings.NetworkMode.Join:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<OtherPlayer>();
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
+                break;
+            case GameSettings.NetworkMode.Local:
+                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
                 break;
         }
@@ -283,9 +292,10 @@ public class Game : MonoBehaviour
             curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
             othPlayer = (moveNum % 2 == 0) ? Player2 : Player1;
 
-            
-            //Check if last turn lost
-            if (playerState == PlayerState.Loser)
+            if (GameSettings.netMode == GameSettings.NetworkMode.Local) { setTurnIndicator(curPlayer); }
+
+                //Check if last turn lost
+                if (playerState == PlayerState.Loser)
             {
                 winner = curPlayer;
             }
@@ -344,6 +354,22 @@ public class Game : MonoBehaviour
         yield return winner;
     }
 
+    private void setTurnIndicator(IPlayer curPlayer)
+    {
+        if (GameSettings.netMode == GameSettings.NetworkMode.Local)
+        {
+            if (curPlayer == Player1) { TurnIndicator.text = "Player 1's Turn"; TurnIndicator.color = Color.white; }
+            else if (curPlayer == Player2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = new Color(0, 75, 255); }
+        }
+    }
+    private void setTurnIndicator(int PlayerInt)
+    {
+        if (GameSettings.netMode == GameSettings.NetworkMode.Local)
+        {
+            if (PlayerInt == 1) { TurnIndicator.text = "Player 1's Turn"; TurnIndicator.color = Color.white; }
+            else if (PlayerInt == 2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = new Color(0, 75, 255); }
+        }
+    }
     private bool hasPossibleTurns(IPlayer p)
     {
         Coordinate BuilderOneLocation = Coordinate.stringToCoord(p.getBuilderLocations().Substring(0,2));
@@ -420,11 +446,13 @@ public class Game : MonoBehaviour
 
     private IEnumerator PlaceBuilders()
     {
+        setTurnIndicator(1);
         yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player1.PlaceBuilder(1, 1, this));
         yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player1.PlaceBuilder(2, 1, this));
         yield return StartCoroutine(waitForBuildersToMove());
+        setTurnIndicator(2);
         yield return StartCoroutine(Player2.PlaceBuilder(1, 2, this));
         yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player2.PlaceBuilder(2, 2, this));

@@ -203,7 +203,7 @@ public class Player : IPlayer
             turns.Add(currentTurn);
         }
 
-        if (GameSettings.gameType == GameSettings.GameType.Multiplayer) RaiseTurnSelected(currentTurn);
+        if (GameSettings.gameType == GameSettings.GameType.Multiplayer && GameSettings.netMode != GameSettings.NetworkMode.Local) RaiseTurnSelected(currentTurn);
         yield return null;
     }
 
