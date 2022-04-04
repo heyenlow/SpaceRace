@@ -13,6 +13,6 @@ public class Jeff : MonoBehaviour
 
     public void runAnimation()
     {
-        anim.SetBool("RunBoxJump", true);
+        anim.SetTrigger("RunBoxJump");
     }
 }

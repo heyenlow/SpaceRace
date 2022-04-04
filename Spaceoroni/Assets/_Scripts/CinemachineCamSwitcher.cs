@@ -56,7 +56,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
         {
             turnText.text = "";
             JeffAnimator.runAnimation();
-            ElonAnimator.runAnimation();
+            ElonAnimator.runGetOutOfCarAnimation();
             ResetAllPriorities();
             introRunning = false;
             SpaceCamera.Priority = 2;
@@ -145,7 +145,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
         if (introRunning) ResetAllPriorities();
         if (introRunning) ElonTextVCam.Priority = 2;
         if (introRunning) yield return new WaitForSeconds(1.3f);
-        if (introRunning) ElonAnimator.runAnimation();
+        if (introRunning) ElonAnimator.runGetOutOfCarAnimation();
         if (introRunning) yield return new WaitForSeconds(3);
         if (introRunning) yield return StartCoroutine(MoveToJeffText());
     }
