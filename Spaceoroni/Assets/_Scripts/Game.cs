@@ -28,6 +28,8 @@ public class Game : MonoBehaviour
     [SerializeField]
     private GameObject JoinMenu;
     [SerializeField]
+    private GameObject ThingsToRemember;
+    [SerializeField]
     private TextMeshProUGUI TurnIndicator;
 
     [SerializeField]
@@ -89,7 +91,7 @@ public class Game : MonoBehaviour
     public void StartGame()
     {
         GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
-
+        TutorailRestart = false;
 
         Board = new int[5, 5];
         ClearBoard();
@@ -168,15 +170,34 @@ public class Game : MonoBehaviour
         }
         Player1.GetComponent<TutorialPlayer>().setAllOverlaysInactive();
 
+        //if tutorial we wait for the okay to be clicked on the few things to rememeber
+        if (GameSettings.gameType != GameSettings.GameType.Tutorial) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToStart(); }
+
         SettingChanger.resetGameSettings();
         ResetGame();
-        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToStart();
         EndOfGameScreen.SetActive(false);
         PauseButton.SetActive(false);
         JoinMenu.SetActive(false);
         Rotator.SetActive(true);
         MainMenu.SetActive(true);
+    }
 
+    bool TutorailRestart = false;
+    public void bringUpAFewThingsScreen()
+    {
+        if (GameSettings.gameType == GameSettings.GameType.Tutorial) { ThingsToRemember.SetActive(true); }
+    }
+    public void restartTuotialBoolTrue() { TutorailRestart = true; }
+    public void manageAfewThingsToRemeberOkayClick()
+    {
+        if (TutorailRestart)
+        {
+            RestartGame();
+        }
+        else
+        {
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToStart();
+        }
     }
 
     //reads the settings that will be set by the UI
