@@ -171,7 +171,7 @@ public class Game : MonoBehaviour
         Player1.GetComponent<TutorialPlayer>().setAllOverlaysInactive();
 
         //if tutorial we wait for the okay to be clicked on the few things to rememeber
-        if (GameSettings.gameType != GameSettings.GameType.Tutorial) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToStart(); }
+        if (!ThingsToRemeberActive) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToStart(); }
 
         SettingChanger.resetGameSettings();
         ResetGame();
@@ -183,13 +183,17 @@ public class Game : MonoBehaviour
     }
 
     bool TutorailRestart = false;
+    bool ThingsToRemeberActive = false;
     public void bringUpAFewThingsScreen()
     {
+        ThingsToRemeberActive = true;
         if (GameSettings.gameType == GameSettings.GameType.Tutorial) { ThingsToRemember.SetActive(true); }
     }
     public void restartTuotialBoolTrue() { TutorailRestart = true; }
     public void manageAfewThingsToRemeberOkayClick()
     {
+        ThingsToRemember.SetActive(false);
+        ThingsToRemeberActive = false;
         if (TutorailRestart)
         {
             RestartGame();
