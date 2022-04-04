@@ -11,6 +11,8 @@ public class CinemachineCamSwitcher : MonoBehaviour
     [SerializeField]
     private CinemachineVirtualCamera BoardCamera;
     [SerializeField]
+    private CinemachineVirtualCamera BoardCameraHigh;
+    [SerializeField]
     private CinemachineVirtualCamera EndOfGameCamera;
     [SerializeField]
     private CinemachineVirtualCamera CenterEarthCamera;
@@ -68,6 +70,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
         panNoise.Play();
         foreach (var c in IntroSceneCams) { c.Priority = 1; }
         //reset all cameras priorities to 1;
+            BoardCameraHigh.Priority = 1;
             TruckFollowVCam.Priority = 1;
             TruckDoorVCam.Priority = 1;
             SolarSystemCam.Priority = 1;
@@ -83,6 +86,11 @@ public class CinemachineCamSwitcher : MonoBehaviour
     {
         ResetAllPriorities();
         BoardCamera.Priority = 2;
+    }
+    public void MoveToGameBoardHigh()
+    {
+        ResetAllPriorities();
+        BoardCameraHigh.Priority = 2;
     }
     public void MoveToStart()
     {

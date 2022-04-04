@@ -529,7 +529,11 @@ public class Game : MonoBehaviour
     {
         Board[c.x, c.y] += 1;
         GameObject level = GameObject.Find(Coordinate.coordToString(c));
-        if(Board[c.x,c.y] < 4) level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
+
+        if (isAtThree()) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoardHigh(); }
+        else { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard(); }
+
+        if (Board[c.x,c.y] < 4) level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
         else { BlastOffRocket(c); }
         built = true;
     }
@@ -567,6 +571,19 @@ public class Game : MonoBehaviour
     public bool locationClearOfAllBuilders(Coordinate c)
     {
         return !getAllBuildersString().Contains(Coordinate.coordToString(c));
+    }
+
+    private bool isAtThree()
+    {
+        for(int i = 0; i < 5; i++)
+        {
+            for(int j = 0; j < 5; j++)
+            {
+                //(5 - i) + j < 5 && 
+                if (Board[i, j] == 3) return true;
+            }
+        }
+        return false;
     }
 
     //returns all the posible positions able to move from the passed coord
