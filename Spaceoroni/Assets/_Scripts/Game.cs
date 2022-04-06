@@ -97,6 +97,7 @@ public class Game : MonoBehaviour
     public void StartGame()
     {
         panNoise.Play();
+        PAUSED = false;
         GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
         TutorailRestart = false;
 
@@ -545,8 +546,8 @@ public class Game : MonoBehaviour
         Board[c.x, c.y] += 1;
         GameObject level = GameObject.Find(Coordinate.coordToString(c));
 
-        if (isAtThree()) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoardHigh(); }
-        else { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard(); }
+        if (isAtThree()) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().moveToHigh(); }
+        else { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().moveToLow(); }
 
         if (Board[c.x,c.y] < 4) level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
         else { BlastOffRocket(c); }

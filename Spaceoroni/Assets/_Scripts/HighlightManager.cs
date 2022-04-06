@@ -144,6 +144,13 @@ public static class HighlightManager
             square.GetComponent<Location>().removeHighlight();
             highlightedObjects.Remove(square);
         }
-        if (highlightedObjects.Count > 0) Debug.Log("Did not unhighlight everything");
+        if (highlightedObjects.Count > 0)
+        {
+            Debug.Log("Did not unhighlight everything");
+            foreach(GameObject go in highlightedObjects)
+            {
+                Debug.Log(go.name);
+            }
+        }
     }
 }

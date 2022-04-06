@@ -12,6 +12,12 @@ public class CinemachineCamSwitcher : MonoBehaviour
     private CinemachineVirtualCamera BoardCamera;
     [SerializeField]
     private CinemachineVirtualCamera BoardCameraHigh;
+
+
+    [SerializeField]
+    private CinemachineVirtualCamera BoardCameraOther;
+    [SerializeField]
+    private CinemachineVirtualCamera BoardCameraHighOther;
     [SerializeField]
     private CinemachineVirtualCamera EndOfGameCamera;
     [SerializeField]
@@ -36,7 +42,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
 
     [SerializeField]
     private AudioSource panNoise;
-    
+
     //private MoveTruck Truck;
 
     private List<CinemachineVirtualCamera> IntroSceneCams;
@@ -52,6 +58,17 @@ public class CinemachineCamSwitcher : MonoBehaviour
         turnText = GameObject.FindGameObjectWithTag("TurnText").GetComponent<TextMeshProUGUI>();
     }
 
+    enum GameCameraLocations
+    {
+        main,
+        mainHigh,
+        other,
+        otherHigh,
+        none
+    };
+
+    GameCameraLocations CameraGameBoardPosition = GameCameraLocations.none;
+
     private void Update()
     {
         if (Input.GetKeyDown("space") && introRunning)
@@ -64,6 +81,25 @@ public class CinemachineCamSwitcher : MonoBehaviour
             introRunning = false;
             SpaceCamera.Priority = 2;
         }
+
+        if (Input.GetKeyDown("space") && CameraGameBoardPosition != GameCameraLocations.none)
+        {
+            switch (CameraGameBoardPosition)
+            {
+                case GameCameraLocations.main:
+                    MoveToGameBoardOther();
+                    break;
+                case GameCameraLocations.mainHigh:
+                    MoveToGameBoardHighOther();
+                    break;
+                case GameCameraLocations.other:
+                    MoveToGameBoard();
+                    break;
+                case GameCameraLocations.otherHigh:
+                    MoveToGameBoardHigh();
+                    break;
+            }
+        }
     }
 
     private void ResetAllPriorities()
@@ -74,27 +110,73 @@ public class CinemachineCamSwitcher : MonoBehaviour
             TruckFollowVCam.Priority = 1;
             TruckDoorVCam.Priority = 1;
             SolarSystemCam.Priority = 1;
+            BoardCameraOther.Priority = 1;
             CenterEarthCamera.Priority = 1;
             EndOfGameCamera.Priority = 1;
             BoardCamera.Priority = 1;
             if(!introRunning) SpaceCamera.Priority = 1;
+            BoardCameraHighOther.Priority = 1;
             ElonTextVCam.Priority = 1;
             JeffTextVCam.Priority = 1;
     }
 
+    public void moveToHigh()
+    {
+        switch (CameraGameBoardPosition)
+        {
+            case GameCameraLocations.main:
+                MoveToGameBoardHigh();
+                break;
+            case GameCameraLocations.other:
+                MoveToGameBoardHighOther();
+                break;
+        }
+    }
+
+    public void moveToLow()
+    {
+        switch (CameraGameBoardPosition)
+        {
+            case GameCameraLocations.mainHigh:
+                MoveToGameBoard();
+                break;
+            case GameCameraLocations.otherHigh:
+                MoveToGameBoardOther();
+                break;
+        }
+    }
+
     public void MoveToGameBoard()
     {
+        CameraGameBoardPosition = GameCameraLocations.main;
         ResetAllPriorities();
         BoardCamera.Priority = 2;
     }
+    public void MoveToGameBoardOther()
+    {
+        CameraGameBoardPosition = GameCameraLocations.other;
+
+        ResetAllPriorities();
+        BoardCameraOther.Priority = 2;
+    }
     public void MoveToGameBoardHigh()
     {
+        CameraGameBoardPosition = GameCameraLocations.mainHigh;
+
         ResetAllPriorities();
         BoardCameraHigh.Priority = 2;
+    }
+    public void MoveToGameBoardHighOther()
+    {
+        CameraGameBoardPosition = GameCameraLocations.otherHigh;
+
+        ResetAllPriorities();
+        BoardCameraHighOther.Priority = 2;
     }
     public void MoveToMainMenu()
     {
         panNoise.Play();
+        CameraGameBoardPosition = GameCameraLocations.none;
 
         if (introRunning) introRunning = false;
         ResetAllPriorities();
@@ -102,6 +184,8 @@ public class CinemachineCamSwitcher : MonoBehaviour
     }
     public void MoveToEnd()
     {
+        CameraGameBoardPosition = GameCameraLocations.none;
+
         ResetAllPriorities();
         EndOfGameCamera.Priority = 2;
     }
