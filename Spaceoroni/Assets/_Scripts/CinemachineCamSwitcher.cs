@@ -102,22 +102,24 @@ public class CinemachineCamSwitcher : MonoBehaviour
         }
     }
 
+        //reset all cameras priorities to 1;
     private void ResetAllPriorities()
     {
         foreach (var c in IntroSceneCams) { c.Priority = 1; }
-        //reset all cameras priorities to 1;
-            BoardCameraHigh.Priority = 1;
-            TruckFollowVCam.Priority = 1;
-            TruckDoorVCam.Priority = 1;
-            SolarSystemCam.Priority = 1;
-            BoardCameraOther.Priority = 1;
-            CenterEarthCamera.Priority = 1;
-            EndOfGameCamera.Priority = 1;
-            BoardCamera.Priority = 1;
-            if(!introRunning) SpaceCamera.Priority = 1;
-            BoardCameraHighOther.Priority = 1;
-            ElonTextVCam.Priority = 1;
-            JeffTextVCam.Priority = 1;
+        
+        BoardCamera.Priority = 1;
+        BoardCameraHigh.Priority = 1;
+        BoardCameraOther.Priority = 1;
+        BoardCameraHighOther.Priority = 1;
+
+        TruckFollowVCam.Priority = 1;
+        TruckDoorVCam.Priority = 1;
+        SolarSystemCam.Priority = 1;
+        CenterEarthCamera.Priority = 1;
+        EndOfGameCamera.Priority = 1;
+        if(!introRunning) SpaceCamera.Priority = 1;
+        ElonTextVCam.Priority = 1;
+        JeffTextVCam.Priority = 1;
     }
 
     public void moveToHigh()
