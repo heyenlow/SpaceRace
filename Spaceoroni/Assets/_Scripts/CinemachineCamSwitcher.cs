@@ -11,6 +11,14 @@ public class CinemachineCamSwitcher : MonoBehaviour
     [SerializeField]
     private CinemachineVirtualCamera BoardCamera;
     [SerializeField]
+    private CinemachineVirtualCamera BoardCameraHigh;
+
+
+    [SerializeField]
+    private CinemachineVirtualCamera BoardCameraOther;
+    [SerializeField]
+    private CinemachineVirtualCamera BoardCameraHighOther;
+    [SerializeField]
     private CinemachineVirtualCamera EndOfGameCamera;
     [SerializeField]
     private CinemachineVirtualCamera CenterEarthCamera;
@@ -32,7 +40,9 @@ public class CinemachineCamSwitcher : MonoBehaviour
     private Jeff JeffAnimator;
     protected TextMeshProUGUI turnText;
 
-    
+    [SerializeField]
+    private AudioSource panNoise;
+
     //private MoveTruck Truck;
 
     private List<CinemachineVirtualCamera> IntroSceneCams;
@@ -48,16 +58,47 @@ public class CinemachineCamSwitcher : MonoBehaviour
         turnText = GameObject.FindGameObjectWithTag("TurnText").GetComponent<TextMeshProUGUI>();
     }
 
+    enum GameCameraLocations
+    {
+        main,
+        mainHigh,
+        other,
+        otherHigh,
+        none
+    };
+
+    GameCameraLocations CameraGameBoardPosition = GameCameraLocations.none;
+
     private void Update()
     {
         if (Input.GetKeyDown("space") && introRunning)
         {
+            panNoise.Play();
             turnText.text = "";
             JeffAnimator.runAnimation();
-            ElonAnimator.runAnimation();
+            ElonAnimator.runGetOutOfCarAnimation();
             ResetAllPriorities();
             introRunning = false;
             SpaceCamera.Priority = 2;
+        }
+
+        if (Input.GetKeyDown("space") && CameraGameBoardPosition != GameCameraLocations.none)
+        {
+            switch (CameraGameBoardPosition)
+            {
+                case GameCameraLocations.main:
+                    MoveToGameBoardOther();
+                    break;
+                case GameCameraLocations.mainHigh:
+                    MoveToGameBoardHighOther();
+                    break;
+                case GameCameraLocations.other:
+                    MoveToGameBoard();
+                    break;
+                case GameCameraLocations.otherHigh:
+                    MoveToGameBoardHigh();
+                    break;
+            }
         }
     }
 
@@ -65,30 +106,86 @@ public class CinemachineCamSwitcher : MonoBehaviour
     {
         foreach (var c in IntroSceneCams) { c.Priority = 1; }
         //reset all cameras priorities to 1;
+            BoardCameraHigh.Priority = 1;
             TruckFollowVCam.Priority = 1;
             TruckDoorVCam.Priority = 1;
             SolarSystemCam.Priority = 1;
+            BoardCameraOther.Priority = 1;
             CenterEarthCamera.Priority = 1;
             EndOfGameCamera.Priority = 1;
             BoardCamera.Priority = 1;
             if(!introRunning) SpaceCamera.Priority = 1;
+            BoardCameraHighOther.Priority = 1;
             ElonTextVCam.Priority = 1;
             JeffTextVCam.Priority = 1;
     }
 
+    public void moveToHigh()
+    {
+        switch (CameraGameBoardPosition)
+        {
+            case GameCameraLocations.main:
+                MoveToGameBoardHigh();
+                break;
+            case GameCameraLocations.other:
+                MoveToGameBoardHighOther();
+                break;
+        }
+    }
+
+    public void moveToLow()
+    {
+        switch (CameraGameBoardPosition)
+        {
+            case GameCameraLocations.mainHigh:
+                MoveToGameBoard();
+                break;
+            case GameCameraLocations.otherHigh:
+                MoveToGameBoardOther();
+                break;
+        }
+    }
+
     public void MoveToGameBoard()
     {
+        CameraGameBoardPosition = GameCameraLocations.main;
         ResetAllPriorities();
         BoardCamera.Priority = 2;
     }
-    public void MoveToStart()
+    public void MoveToGameBoardOther()
     {
+        CameraGameBoardPosition = GameCameraLocations.other;
+
+        ResetAllPriorities();
+        BoardCameraOther.Priority = 2;
+    }
+    public void MoveToGameBoardHigh()
+    {
+        CameraGameBoardPosition = GameCameraLocations.mainHigh;
+
+        ResetAllPriorities();
+        BoardCameraHigh.Priority = 2;
+    }
+    public void MoveToGameBoardHighOther()
+    {
+        CameraGameBoardPosition = GameCameraLocations.otherHigh;
+
+        ResetAllPriorities();
+        BoardCameraHighOther.Priority = 2;
+    }
+    public void MoveToMainMenu()
+    {
+        panNoise.Play();
+        CameraGameBoardPosition = GameCameraLocations.none;
+
         if (introRunning) introRunning = false;
         ResetAllPriorities();
         SpaceCamera.Priority = 2;
     }
     public void MoveToEnd()
     {
+        CameraGameBoardPosition = GameCameraLocations.none;
+
         ResetAllPriorities();
         EndOfGameCamera.Priority = 2;
     }
@@ -105,6 +202,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
     }
     public void startIntroScene()
     {
+        panNoise.Play();
         introRunning = true;
         turnText.text = "Press Space to Skip Intro";
         StartCoroutine(moveThroughSolarSystem());
@@ -142,7 +240,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
         if (introRunning) ResetAllPriorities();
         if (introRunning) ElonTextVCam.Priority = 2;
         if (introRunning) yield return new WaitForSeconds(1.3f);
-        if (introRunning) ElonAnimator.runAnimation();
+        if (introRunning) ElonAnimator.runGetOutOfCarAnimation();
         if (introRunning) yield return new WaitForSeconds(3);
         if (introRunning) yield return StartCoroutine(MoveToJeffText());
     }
@@ -154,6 +252,6 @@ public class CinemachineCamSwitcher : MonoBehaviour
         if (introRunning) JeffAnimator.runAnimation();
         if (introRunning) yield return new WaitForSeconds(3);
         if (introRunning) turnText.text = "";
-        if (introRunning) MoveToStart();
+        if (introRunning) MoveToMainMenu();
     }
 }

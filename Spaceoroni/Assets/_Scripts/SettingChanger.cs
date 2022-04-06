@@ -15,6 +15,7 @@ public class SettingChanger : MonoBehaviour
     //SET NETWORKING MODE FUNCTIONS ------------------------------------
     public void setNetworkingModeJoin () { GameSettings.netMode = GameSettings.NetworkMode.Join; }
     public void setNetworkingModeHost() { GameSettings.netMode = GameSettings.NetworkMode.Host; }
+    public void setNetworkingModeLocal() { GameSettings.netMode = GameSettings.NetworkMode.Local; }
     public static void setNetworkingModeReset() { GameSettings.netMode = GameSettings.NetworkMode.NotSet; }
 
 

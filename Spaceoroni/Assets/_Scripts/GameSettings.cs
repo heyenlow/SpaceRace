@@ -23,6 +23,7 @@ public static class GameSettings
     public enum NetworkMode
     {
         NotSet,
+        Local,
         Host,
         Join
     };

@@ -80,11 +80,11 @@ public class Location : MonoBehaviour
     public void highlightLocation()
     {
         isMove = true;
-        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Ultimate 10+ Shaders/Force Field");
+        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Shader Graphs/HighlightSquare");// "Ultimate 10+ Shaders/Force Field");
     }
     public void mouseOverHighlight()
     {
-        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");//Shader Graphs/HighlightSquare"); 
+        this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Ultimate 10+ Shaders/Plexus Line");// 
     }
 
     public void Blink()

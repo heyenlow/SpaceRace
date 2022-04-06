@@ -27,6 +27,12 @@ public class Game : MonoBehaviour
     private GameObject MainMenu;
     [SerializeField]
     private GameObject JoinMenu;
+    [SerializeField]
+    private GameObject ThingsToRemember;
+    [SerializeField]
+    private TextMeshProUGUI TurnIndicator;
+    [SerializeField]
+    private AudioSource panNoise;
 
     [SerializeField]
     private TextMeshProUGUI WinText;
@@ -54,6 +60,10 @@ public class Game : MonoBehaviour
     public IPlayer Player2;
     public IPlayer curPlayer, rival;
     public static bool cancelTurn = false;
+    public static bool PAUSED = false;
+    public static bool PLAYERinTURN = false;
+
+
 
     public SantoriniCoevolutionExperiment _experiment { get; private set; }
     
@@ -86,8 +96,10 @@ public class Game : MonoBehaviour
 
     public void StartGame()
     {
+        panNoise.Play();
+        PAUSED = false;
         GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
-
+        TutorailRestart = false;
 
         Board = new int[5, 5];
         ClearBoard();
@@ -106,7 +118,9 @@ public class Game : MonoBehaviour
         //cancel current turn
         cancelTurn = true;
         StopAllCoroutines();
-        
+        TurnIndicator.text = "";
+
+
         //needs to reset the reader to the first move
         StringGameReader.MoveCount = 0;
         resetAllLocationsAlive();
@@ -152,26 +166,50 @@ public class Game : MonoBehaviour
     {
         Player1.ClearTurnText();
         Player2.ClearTurnText();
+        TurnIndicator.text = "";
         Location.LocationBlinking = null;
         Rocket.blinkingRocket = null;
         Builder.BlinkingBuilder = null;
         Level.BlinkingLevel = null;
 
-        if(GameSettings.gameType == GameSettings.GameType.Multiplayer)
+        if(GameSettings.gameType == GameSettings.GameType.Multiplayer && GameSettings.netMode != GameSettings.NetworkMode.Local)
         {
             NetworkingManager.LeaveRoom();
         }
         Player1.GetComponent<TutorialPlayer>().setAllOverlaysInactive();
 
+        //if tutorial we wait for the okay to be clicked on the few things to rememeber
+        if (!ThingsToRemeberActive) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToMainMenu(); }
+
         SettingChanger.resetGameSettings();
         ResetGame();
-        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToStart();
         EndOfGameScreen.SetActive(false);
         PauseButton.SetActive(false);
         JoinMenu.SetActive(false);
         Rotator.SetActive(true);
         MainMenu.SetActive(true);
+    }
 
+    bool TutorailRestart = false;
+    bool ThingsToRemeberActive = false;
+    public void bringUpAFewThingsScreen()
+    {
+        ThingsToRemeberActive = true;
+        if (GameSettings.gameType == GameSettings.GameType.Tutorial) { ThingsToRemember.SetActive(true); }
+    }
+    public void restartTuotialBoolTrue() { TutorailRestart = true; }
+    public void manageAfewThingsToRemeberOkayClick()
+    {
+        ThingsToRemember.SetActive(false);
+        ThingsToRemeberActive = false;
+        if (TutorailRestart)
+        {
+            RestartGame();
+        }
+        else
+        {
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToMainMenu();
+        }
     }
 
     //reads the settings that will be set by the UI
@@ -218,6 +256,10 @@ public class Game : MonoBehaviour
                 break;
             case GameSettings.NetworkMode.Join:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<OtherPlayer>();
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
+                break;
+            case GameSettings.NetworkMode.Local:
+                Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
                 break;
         }
@@ -278,14 +320,14 @@ public class Game : MonoBehaviour
 
             yield return StartCoroutine(waitForBuildersToMove());
             yield return StartCoroutine(waitForBuildersToBuild());
-
             // Determine who's turn it is.
             curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
             othPlayer = (moveNum % 2 == 0) ? Player2 : Player1;
 
-            
-            //Check if last turn lost
-            if (playerState == PlayerState.Loser)
+            if (GameSettings.netMode == GameSettings.NetworkMode.Local) { setTurnIndicator(curPlayer); }
+
+                //Check if last turn lost
+                if (playerState == PlayerState.Loser)
             {
                 winner = curPlayer;
             }
@@ -309,10 +351,12 @@ public class Game : MonoBehaviour
                         Turn t = curPlayer.getNextTurn();
                         // update the board with the current player's move
                         Debug.Log("Processing Turn: " + t.ToString());
-                        
+    
+                        while (Game.PAUSED) { yield return new WaitForEndOfFrame(); }
+
                         built = false;
                         processTurnString(t, curPlayer, this);
-                        
+                    
                         if (t.isWin)
                         {
                             built = true;
@@ -344,6 +388,26 @@ public class Game : MonoBehaviour
         yield return winner;
     }
 
+    public void PAUSEGAME() { PAUSED = true; HighlightManager.pauseGameHighlights(); }
+    public void RESUMEGAME() { PAUSED = false; HighlightManager.resumeGameHighlights(); }
+
+
+    private void setTurnIndicator(IPlayer curPlayer)
+    {
+        if (GameSettings.netMode == GameSettings.NetworkMode.Local)
+        {
+            if (curPlayer == Player1) { TurnIndicator.text = "Player 1's Turn"; TurnIndicator.color = Color.white; }
+            else if (curPlayer == Player2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = new Color(0, 75, 255); }
+        }
+    }
+    private void setTurnIndicator(int PlayerInt)
+    {
+        if (GameSettings.netMode == GameSettings.NetworkMode.Local)
+        {
+            if (PlayerInt == 1) { TurnIndicator.text = "Player 1's Turn"; TurnIndicator.color = Color.white; }
+            else if (PlayerInt == 2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = new Color(0, 75, 255); }
+        }
+    }
     private bool hasPossibleTurns(IPlayer p)
     {
         Coordinate BuilderOneLocation = Coordinate.stringToCoord(p.getBuilderLocations().Substring(0,2));
@@ -365,7 +429,7 @@ public class Game : MonoBehaviour
 
     private IEnumerator waitForBuildersToMove()
     {
-        while (Player1.BuildersAreMoving() && Player2.BuildersAreMoving())
+        while (Player1.BuildersAreMoving() || Player2.BuildersAreMoving())
         {
             yield return new WaitForEndOfFrame();
         }
@@ -420,13 +484,14 @@ public class Game : MonoBehaviour
 
     private IEnumerator PlaceBuilders()
     {
+        setTurnIndicator(1);
         yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player1.PlaceBuilder(1, 1, this));
         yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player1.PlaceBuilder(2, 1, this));
         yield return StartCoroutine(waitForBuildersToMove());
+        setTurnIndicator(2);
         yield return StartCoroutine(Player2.PlaceBuilder(1, 2, this));
-        yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player2.PlaceBuilder(2, 2, this));
         yield return StartCoroutine(waitForBuildersToMove());
         yield return null;
@@ -480,7 +545,11 @@ public class Game : MonoBehaviour
     {
         Board[c.x, c.y] += 1;
         GameObject level = GameObject.Find(Coordinate.coordToString(c));
-        if(Board[c.x,c.y] < 4) level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
+
+        if (isAtThree()) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().moveToHigh(); }
+        else { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().moveToLow(); }
+
+        if (Board[c.x,c.y] < 4) level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
         else { BlastOffRocket(c); }
         built = true;
     }
@@ -518,6 +587,19 @@ public class Game : MonoBehaviour
     public bool locationClearOfAllBuilders(Coordinate c)
     {
         return !getAllBuildersString().Contains(Coordinate.coordToString(c));
+    }
+
+    private bool isAtThree()
+    {
+        for(int i = 0; i < 5; i++)
+        {
+            for(int j = 0; j < 5; j++)
+            {
+                //(5 - i) + j < 5 && 
+                if (Board[i, j] == 3) return true;
+            }
+        }
+        return false;
     }
 
     //returns all the posible positions able to move from the passed coord
@@ -585,8 +667,4 @@ public class Game : MonoBehaviour
         clickLocation = location;
         HighlightManager.highlightedObjects.Clear();
     }
-
-    public void pauseGame() { HighlightManager.pauseGameHighlights(); }
-    public void resumeGame() { HighlightManager.resumeGameHighlights(); }
-
 }
