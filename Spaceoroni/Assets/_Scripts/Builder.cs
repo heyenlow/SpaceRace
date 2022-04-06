@@ -66,10 +66,32 @@ public class Builder : MonoBehaviour
         StartCoroutine(moveToNextPoint(newLocation));
     }
 
-    private IEnumerator moveToNextPoint(Vector3 newLocation)
+    private IEnumerator moveToHomePoint()
     {
         currentlyMoving = true;
         while (currentlyMoving)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, homeLocation, Speed * Time.deltaTime);
+            //movingBuilder.transform.rotation = Quaternion.RotateTowards(movingBuilder.transform.rotation, newRotation, RotationSpeed * Time.deltaTime);
+
+            if (VeryCloseObject(transform.position, homeLocation))
+            {
+                transform.position = homeLocation;
+                currentlyMoving = false;
+
+                anim.SetBool("Run", false);
+                anim.SetBool("Jump", false);
+
+                dust.Stop();
+            }
+            yield return null;
+        }
+    }
+
+    private IEnumerator moveToNextPoint(Vector3 newLocation)
+    {
+        currentlyMoving = true;
+        while (currentlyMoving && !Game.cancelTurn)
         {
             transform.position = Vector3.MoveTowards(transform.position, newLocation, Speed * Time.deltaTime);
             //movingBuilder.transform.rotation = Quaternion.RotateTowards(movingBuilder.transform.rotation, newRotation, RotationSpeed * Time.deltaTime);
@@ -87,6 +109,7 @@ public class Builder : MonoBehaviour
             yield return null;
         }
     }
+
     private bool VeryCloseObject(Vector3 a, Vector3 b)
     {
         float maxDiff = .01f;
@@ -111,7 +134,7 @@ public class Builder : MonoBehaviour
         removeHighlight();
         transform.rotation = homeRotation;
         coord = new Coordinate();
-        StartCoroutine(moveToNextPoint(homeLocation));
+        StartCoroutine(moveToHomePoint());
     }
 
     private void OnMouseOver()
