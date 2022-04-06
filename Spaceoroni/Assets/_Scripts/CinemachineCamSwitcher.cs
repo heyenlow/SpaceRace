@@ -56,6 +56,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
     {
         if (Input.GetKeyDown("space") && introRunning)
         {
+            panNoise.Play();
             turnText.text = "";
             JeffAnimator.runAnimation();
             ElonAnimator.runGetOutOfCarAnimation();
