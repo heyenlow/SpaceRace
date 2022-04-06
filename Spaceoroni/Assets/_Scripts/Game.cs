@@ -429,7 +429,7 @@ public class Game : MonoBehaviour
 
     private IEnumerator waitForBuildersToMove()
     {
-        while (Player1.BuildersAreMoving() && Player2.BuildersAreMoving())
+        while (Player1.BuildersAreMoving() || Player2.BuildersAreMoving())
         {
             yield return new WaitForEndOfFrame();
         }
