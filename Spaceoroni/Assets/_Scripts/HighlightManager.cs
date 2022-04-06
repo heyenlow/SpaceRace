@@ -116,14 +116,14 @@ public static class HighlightManager
         //moves all the object to the pasue list
         pauseHoldObjects = new List<GameObject>(highlightedObjects);
         highlightedObjects.Clear();
-        Debug.Log("Pause: " + highlightedObjects.Count + " " + pauseHoldObjects.Count);
+        Debug.Log("Pause: numOfGameObjectsOnHold " + pauseHoldObjects.Count);
     }
     public static void resumeGameHighlights()
     {
         //restores the highlighted object list
         highlightedObjects = new List<GameObject>(pauseHoldObjects);
         pauseHoldObjects.Clear();
-        Debug.Log("Resume: " + highlightedObjects.Count + " " + pauseHoldObjects.Count);
+        Debug.Log("Resume: numOfGameObjectsReleasedFromHold " + highlightedObjects.Count);
 
     }
 

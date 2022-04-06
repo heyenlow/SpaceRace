@@ -197,7 +197,7 @@ public class TutorialPlayer : Player
         if (StringGameReader.MoveCount == StringGameReader.firstMove) SelectBuildOverlay.SetActive(true);
         if (StringGameReader.MoveCount == StringGameReader.BlastOffRocket) BlockARocketOverlay.SetActive(true);
 
-        while (SelectBuildOverlay.activeInHierarchy)
+        while (SelectBuildOverlay.activeInHierarchy || BlockARocketOverlay.activeInHierarchy)
         {
             yield return new WaitForEndOfFrame();
         }
@@ -239,6 +239,7 @@ public class TutorialPlayer : Player
 
     public override IEnumerator beginTurn(Game g)
     {
+        while (Game.PAUSED) { yield return new WaitForEndOfFrame(); }
         currentTurn = StringGameReader.getCurrentTurn();
         //play the first 2 turns
         if (StringGameReader.isSpecialMove(StringGameReader.MoveCount))
@@ -274,7 +275,11 @@ public class TutorialPlayer : Player
         {
             turnText.text = "Fast Forwarding...";
             yield return new WaitForSeconds(3);
+            
+            while (Game.PAUSED) { yield return new WaitForEndOfFrame(); }
             moveBuidler(getBuilderInt(currentTurn.BuilderLocation), currentTurn.MoveLocation, g);
+            
+            while (Game.PAUSED) { yield return new WaitForEndOfFrame(); }
             yield return new WaitForSeconds(1);
             turns.Add(currentTurn);
         }

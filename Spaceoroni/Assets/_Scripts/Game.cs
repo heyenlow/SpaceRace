@@ -58,6 +58,8 @@ public class Game : MonoBehaviour
     public IPlayer Player2;
     public IPlayer curPlayer, rival;
     public static bool cancelTurn = false;
+    public static bool PAUSED = false;
+
 
     public SantoriniCoevolutionExperiment _experiment { get; private set; }
     
@@ -344,10 +346,12 @@ public class Game : MonoBehaviour
                         Turn t = curPlayer.getNextTurn();
                         // update the board with the current player's move
                         Debug.Log("Processing Turn: " + t.ToString());
-                        
+    
+                        while (Game.PAUSED) { yield return new WaitForEndOfFrame(); }
+
                         built = false;
                         processTurnString(t, curPlayer, this);
-                        
+                    
                         if (t.isWin)
                         {
                             built = true;
@@ -378,6 +382,10 @@ public class Game : MonoBehaviour
         
         yield return winner;
     }
+
+    public void PAUSEGAME() { PAUSED = true; HighlightManager.pauseGameHighlights(); }
+    public void RESUMEGAME() { PAUSED = false; HighlightManager.resumeGameHighlights(); }
+
 
     private void setTurnIndicator(IPlayer curPlayer)
     {
@@ -479,7 +487,6 @@ public class Game : MonoBehaviour
         yield return StartCoroutine(waitForBuildersToMove());
         setTurnIndicator(2);
         yield return StartCoroutine(Player2.PlaceBuilder(1, 2, this));
-        yield return StartCoroutine(waitForBuildersToMove());
         yield return StartCoroutine(Player2.PlaceBuilder(2, 2, this));
         yield return StartCoroutine(waitForBuildersToMove());
         yield return null;
@@ -655,8 +662,4 @@ public class Game : MonoBehaviour
         clickLocation = location;
         HighlightManager.highlightedObjects.Clear();
     }
-
-    public void pauseGame() { HighlightManager.pauseGameHighlights(); }
-    public void resumeGame() { HighlightManager.resumeGameHighlights(); }
-
 }
