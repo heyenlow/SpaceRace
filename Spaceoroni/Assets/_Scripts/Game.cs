@@ -31,6 +31,8 @@ public class Game : MonoBehaviour
     private GameObject ThingsToRemember;
     [SerializeField]
     private TextMeshProUGUI TurnIndicator;
+    [SerializeField]
+    private AudioSource panNoise;
 
     [SerializeField]
     private TextMeshProUGUI WinText;
@@ -59,6 +61,8 @@ public class Game : MonoBehaviour
     public IPlayer curPlayer, rival;
     public static bool cancelTurn = false;
     public static bool PAUSED = false;
+    public static bool PLAYERinTURN = false;
+
 
 
     public SantoriniCoevolutionExperiment _experiment { get; private set; }
@@ -92,6 +96,7 @@ public class Game : MonoBehaviour
 
     public void StartGame()
     {
+        panNoise.Play();
         GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
         TutorailRestart = false;
 
@@ -173,7 +178,7 @@ public class Game : MonoBehaviour
         Player1.GetComponent<TutorialPlayer>().setAllOverlaysInactive();
 
         //if tutorial we wait for the okay to be clicked on the few things to rememeber
-        if (!ThingsToRemeberActive) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToStart(); }
+        if (!ThingsToRemeberActive) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToMainMenu(); }
 
         SettingChanger.resetGameSettings();
         ResetGame();
@@ -202,7 +207,7 @@ public class Game : MonoBehaviour
         }
         else
         {
-            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToStart();
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToMainMenu();
         }
     }
 
@@ -314,7 +319,6 @@ public class Game : MonoBehaviour
 
             yield return StartCoroutine(waitForBuildersToMove());
             yield return StartCoroutine(waitForBuildersToBuild());
-
             // Determine who's turn it is.
             curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
             othPlayer = (moveNum % 2 == 0) ? Player2 : Player1;

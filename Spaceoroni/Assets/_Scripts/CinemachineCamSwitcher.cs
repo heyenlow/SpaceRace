@@ -67,7 +67,6 @@ public class CinemachineCamSwitcher : MonoBehaviour
 
     private void ResetAllPriorities()
     {
-        panNoise.Play();
         foreach (var c in IntroSceneCams) { c.Priority = 1; }
         //reset all cameras priorities to 1;
             BoardCameraHigh.Priority = 1;
@@ -92,8 +91,10 @@ public class CinemachineCamSwitcher : MonoBehaviour
         ResetAllPriorities();
         BoardCameraHigh.Priority = 2;
     }
-    public void MoveToStart()
+    public void MoveToMainMenu()
     {
+        panNoise.Play();
+
         if (introRunning) introRunning = false;
         ResetAllPriorities();
         SpaceCamera.Priority = 2;
@@ -116,6 +117,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
     }
     public void startIntroScene()
     {
+        panNoise.Play();
         introRunning = true;
         turnText.text = "Press Space to Skip Intro";
         StartCoroutine(moveThroughSolarSystem());
@@ -165,6 +167,6 @@ public class CinemachineCamSwitcher : MonoBehaviour
         if (introRunning) JeffAnimator.runAnimation();
         if (introRunning) yield return new WaitForSeconds(3);
         if (introRunning) turnText.text = "";
-        if (introRunning) MoveToStart();
+        if (introRunning) MoveToMainMenu();
     }
 }

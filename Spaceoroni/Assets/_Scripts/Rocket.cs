@@ -25,7 +25,7 @@ public class Rocket : MonoBehaviour
 
     public void blastOffRocket()
     {
-        GetComponent<AudioSource>().Play();
+        if(!VolumeListener.MUTE) GetComponent<AudioSource>().Play();
         Vector3 heightDiff = new Vector3(0, 100, 0);
         newLocation = this.gameObject.transform.position + heightDiff;
         movingRocket = this.gameObject;

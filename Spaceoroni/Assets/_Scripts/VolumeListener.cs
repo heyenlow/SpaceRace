@@ -22,6 +22,8 @@ public class VolumeListener : MonoBehaviour
     [SerializeField]
     private GameObject UnmuteMainMenu;
 
+    public static bool MUTE = false;
+
 
     public void updateVolume(bool inGame)
     {
@@ -41,6 +43,7 @@ public class VolumeListener : MonoBehaviour
     public void Mute()
     {
         BackGroundMusic.mute = true;
+        MUTE = true;
         //set the mute button hidden
         MuteGameMenu.SetActive(false);
         MuteMainMenu.SetActive(false);
@@ -53,6 +56,7 @@ public class VolumeListener : MonoBehaviour
     public void Unmute(bool inGame)
     {
         BackGroundMusic.mute = false;
+        MUTE = false;
         //set the unmute button hidden
         UnmuteGameMenu.SetActive(false);
         UnmuteMainMenu.SetActive(false);
