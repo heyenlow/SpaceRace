@@ -13,9 +13,19 @@ public class SimGame : MonoBehaviour
         }
         set { }
     }
+
+    public enum PlayerState
+    {
+        Winner,
+        Loser,
+        Playing
+    };
+
+    public PlayerState playerState { get; set; }
     public IPlayer Player1;
     public IPlayer Player2;
     public int moveNum = 0;
+    public int timeToTurn = 2;
 
     public IPlayer CurrentPlayer => (moveNum % 2 == 0) ? Player1 : Player2;
     public IPlayer Rival => (moveNum % 2 == 0) ? Player2 : Player1;
@@ -39,7 +49,6 @@ public class SimGame : MonoBehaviour
         Player2 = new MCTSPlayer(g.Player2);
 
     }
-
 
     public void PlaceBuilder(IPlayer p, int i)
     {
@@ -71,5 +80,138 @@ public class SimGame : MonoBehaviour
             MCTSPlayer pltmp = (MCTSPlayer)p;
             pltmp.placeBuilders(this, i);
         }
+    }
+
+
+    public SimIPlayer PlayGameToEnd()
+    {
+        SimIPlayer curPlayer;
+        SimIPlayer othPlayer;
+        SimIPlayer winner = null;
+
+        PlaceBuilders();
+
+        // Play until we have a winner or tie?
+        for (int moveNum = 0; winner == null; moveNum++)
+        {
+            // Determine who's turn it is.
+            curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
+            othPlayer = (moveNum % 2 == 0) ? Player2 : Player1;
+
+
+            //Check if last turn lost
+            if (playerState == PlayerState.Loser)
+            {
+                winner = curPlayer;
+            }
+            else
+            {
+                if (hasPossibleTurns(curPlayer))
+                {
+
+                    //if it is a string player we just need to wait before getting the turn and processing it
+                    if (curPlayer is StringPlayer)
+                    {
+                        yield return new WaitForSeconds(timeToTurn);
+                    }
+                    else //if it is any other player we need to start getting the turn
+                    {
+                        curPlayer.beginTurn(this);
+                    }
+
+                    Turn t = curPlayer.getNextTurn();
+                    // update the board with the current player's move
+                    Debug.Log("Processing Turn: " + t.ToString());
+
+                    processTurnString(t, curPlayer, this);
+
+                    if (t.isWin)
+                    {
+                        built = true;
+                        winner = curPlayer;
+                        //wait to move then set buidler inactive
+                        yield return new WaitForSeconds(0.6f);
+                        curPlayer.setBuilderAtLocationInactive(t.MoveLocation);
+
+                        yield return new WaitForSeconds(2);
+                        BlastOffRocket(t.MoveLocation);
+                    }
+                }
+                else { winner = othPlayer; }
+
+                if (winner != null)
+                {
+                    if (winner == Player1) { WinText.text = "You Win!"; }
+                    else { WinText.text = "Better Luck Next Time"; }
+                    goToEndOfGameScreen();
+                }
+
+                //Check if win
+                if (playerState == PlayerState.Winner)
+                {
+                    winner = curPlayer;
+                }
+            }
+        }
+
+        return winner;
+    }
+
+
+    private bool hasPossibleTurns(IPlayer p)
+    {
+        Coordinate BuilderOneLocation = Coordinate.stringToCoord(p.getBuilderLocations().Substring(0, 2));
+        Coordinate BuilderTwoLocation = Coordinate.stringToCoord(p.getBuilderLocations().Substring(2, 2));
+
+        var builderOneMoves = getAllPossibleMoves(BuilderOneLocation);
+        foreach (var coord in builderOneMoves)
+        {
+            if (getAllPossibleBuilds(Coordinate.stringToCoord(coord)).Count > 0) return true;
+        }
+
+        var builderTwoMoves = getAllPossibleMoves(BuilderTwoLocation);
+        foreach (var coord in builderTwoMoves)
+        {
+            if (getAllPossibleBuilds(Coordinate.stringToCoord(coord)).Count > 0) return true;
+        }
+
+        return false;
+    }
+
+    public List<string> getAllPossibleMoves(Coordinate c)
+    {
+        List<string> allMoves = new List<string>();
+        for (int i = -1; i <= 1; ++i)
+        {
+            for (int j = -1; j <= 1; ++j)
+            {
+                Coordinate test = new Coordinate(c.x + i, c.y + j);
+                //isValidMove Function candidate
+                if (Coordinate.inBounds(test) && Board[test.x, test.y] <= (Board[c.x, c.y] + 1) && Board[test.x, test.y] < 4 && locationClearOfAllBuilders(test))
+                {
+                    allMoves.Add(Coordinate.coordToString(test));
+                }
+            }
+        }
+
+        return allMoves;
+    }
+
+    public List<string> getAllPossibleBuilds(Coordinate c)
+    {
+        List<string> allBuilds = new List<string>();
+        for (int i = -1; i <= 1; ++i)
+        {
+            for (int j = -1; j <= 1; ++j)
+            {
+                Coordinate test = new Coordinate(c.x + i, c.y + j);
+                if (Coordinate.inBounds(test) && Board[test.x, test.y] < 4 && locationClearOfAllBuilders(test) && !Coordinate.Equals(test, c))
+                {
+                    allBuilds.Add(Coordinate.coordToString(test));
+                }
+            }
+        }
+
+        return allBuilds;
     }
 }

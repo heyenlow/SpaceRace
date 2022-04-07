@@ -2,32 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SimPlayer : MonoBehaviour
+public class SimPlayer : SimIPlayer
 {
-    public Player()
+    public SimPlayer()
     {
         // nothing happens here...
     }
 
-    public Player(int id)
+    public SimPlayer(int id)
     {
         ID = id;
     }
 
-    public Player(IPlayer other)
+    public SimPlayer(SimIPlayer other)
     {
-        Builder1 = new Builder(other.Builder1);
-        Builder2 = new Builder(other.Builder2);
+        Builder1 = new SimBuilder(other.Builder1);
+        Builder2 = new SimBuilder(other.Builder2);
         state = other.state;
     }
     public override Coordinate SelectBuilder()
     {
         //which builder do you want to move
         string builderLocation;
-        Console.Write("Builder Location: ");
         do
         {
-            builderLocation = Console.ReadLine().ToUpper();
+            //builderLocation = Console.ReadLine().ToUpper();
         } while (!getBuilderLocations().Contains(builderLocation));
 
         return Coordinate.stringToCoord(builderLocation);
@@ -40,7 +39,6 @@ public class SimPlayer : MonoBehaviour
         string moveLocation;
         List<string> allMoves = g.getAllPossibleMoves(builder);
 
-        Console.Write("New Location: ");
         do
         {
             moveLocation = Console.ReadLine().ToUpper();
@@ -51,8 +49,6 @@ public class SimPlayer : MonoBehaviour
 
     public override Coordinate chooseBuild(ref Coordinate move, ref Coordinate oldLocation, Game g)
     {
-        //################################################################
-        // get build location if not win
 
         string buildLocation;
         List<string> allBuilds = g.getAllPossibleBuilds(move, oldLocation);
@@ -65,7 +61,7 @@ public class SimPlayer : MonoBehaviour
         return Coordinate.stringToCoord(buildLocation);
     }
 
-    public override string beginTurn(Game g, out bool isWin)
+    public override string beginTurn(SimGame g, out bool isWin)
     {
         // after activation choose a builder
         Coordinate builder = SelectBuilder();

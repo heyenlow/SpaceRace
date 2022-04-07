@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 public class SimIPlayer : MonoBehaviour
@@ -12,15 +14,15 @@ public class SimIPlayer : MonoBehaviour
         Tied,
         Undetermined
     }
-    public Builder Builder1 = new Builder();
-    public Builder Builder2 = new Builder();
+    public SimBuilder Builder1 = new SimBuilder();
+    public SimBuilder Builder2 = new SimBuilder();
     public States state = States.Undetermined;
     private bool _disposed;
 
     public abstract Coordinate SelectBuilder();
     public abstract Coordinate chooseMove(ref Coordinate builder, Game g);
     public abstract Coordinate chooseBuild(ref Coordinate builder, ref Coordinate oldLocatiion, Game g);
-    public abstract string beginTurn(Game g, out bool isWin);
+    public abstract string beginTurn(SimGame g, out bool isWin);
     /// <summary>
     /// Returns a string showing the current coordinates of this player's builders
     /// </summary>
@@ -66,8 +68,8 @@ public class SimIPlayer : MonoBehaviour
             ms.Position = 0;
             temp = (T)binaryFormatter.Deserialize(ms);
         }
-        temp.Builder1.move(Builder1.Location);
-        temp.Builder2.move(Builder2.Location);
+        Builder1.move(Builder1.Location);
+        Builder2.move(Builder2.Location);
 
         return temp;
     }
@@ -103,7 +105,7 @@ public class SimIPlayer : MonoBehaviour
     }
 
     // finalizer is called for very rare chance dispose is not called before the Garbage Collector comes for our object...
-    ~IPlayer() // finalizer
+    ~SimIPlayer() // finalizer
     {
         // clean up statements
         Dispose(false);

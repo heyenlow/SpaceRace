@@ -8,12 +8,12 @@ public class SimBuilder : MonoBehaviour
 
     public Coordinate Location { get { return coord; } }
 
-    public Builder()
+    public SimBuilder()
     {
         coord = new Coordinate();
     }
 
-    public Builder(Builder b)
+    public SimBuilder(SimBuilder b)
     {
         coord = new Coordinate(b.Location);
     }
