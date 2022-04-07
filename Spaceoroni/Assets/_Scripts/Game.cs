@@ -177,7 +177,7 @@ public class Game : MonoBehaviour
             NetworkingManager.LeaveRoom();
         }
         Player1.GetComponent<TutorialPlayer>().setAllOverlaysInactive();
-
+        bringUpAFewThingsScreen();
         //if tutorial we wait for the okay to be clicked on the few things to rememeber
         if (!ThingsToRemeberActive) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToMainMenu(); }
 
@@ -194,8 +194,11 @@ public class Game : MonoBehaviour
     bool ThingsToRemeberActive = false;
     public void bringUpAFewThingsScreen()
     {
-        ThingsToRemeberActive = true;
-        if (GameSettings.gameType == GameSettings.GameType.Tutorial) { ThingsToRemember.SetActive(true); }
+        if (GameSettings.gameType == GameSettings.GameType.Tutorial && !PAUSED)
+        {
+            ThingsToRemeberActive = true;
+            ThingsToRemember.SetActive(true);
+        }
     }
     public void restartTuotialBoolTrue() { TutorailRestart = true; }
     public void manageAfewThingsToRemeberOkayClick()
