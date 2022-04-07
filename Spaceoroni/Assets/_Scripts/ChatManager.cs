@@ -86,6 +86,12 @@ public class ChatManager : MonoBehaviour
                 BuildChatContents();
                 _buildDelay = Time.time + 0.25f;
             }
+
+            if (Input.GetKeyUp(KeyCode.Return))
+            {
+                SubmitChat();
+            }
+
         }
         else if(messages.Count>0)
         {
