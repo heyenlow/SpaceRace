@@ -23,4 +23,9 @@ public class EndOfGameAnimation : MonoBehaviour
         jeff.SetActive(true);
         anim.SetTrigger("Jeff");
     }
+
+    public void resetAnim()
+    {
+        anim.SetTrigger("Reset");
+    }
 }

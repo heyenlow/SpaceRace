@@ -147,6 +147,7 @@ public class Game : MonoBehaviour
         StopAllCoroutines();
         resetAllLocationsAlive();
 
+
         //needs to reset the reader to the first move
         StringGameReader.MoveCount = 0;
         HighlightManager.unHighlightEverything();
@@ -300,7 +301,7 @@ public class Game : MonoBehaviour
         BuildLevel(c);
     }
 
-    private void EndOfGameAnimation(Coordinate c)
+    private void runEndOfGameAnimation(Coordinate c)
     {
         Debug.Log("Blasting Off Rocket at " + Coordinate.coordToString(c));
         var location = GameObject.Find(Coordinate.coordToString(c)).GetComponent<Location>();
@@ -378,7 +379,7 @@ public class Game : MonoBehaviour
                             winner = curPlayer;
                             //wait to move then set buidler inactive
                             curPlayer.setBuilderAtLocationInactive(t.BuilderLocation);
-                            EndOfGameAnimation(t.MoveLocation);
+                            runEndOfGameAnimation(t.MoveLocation);
 
                             while (countDownActive)
                             {

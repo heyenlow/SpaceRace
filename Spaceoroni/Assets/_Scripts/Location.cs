@@ -24,7 +24,7 @@ public class Location : MonoBehaviour
         this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("FX/Flare");
     }
 
-    public void setLocationAlive() { deadLocation = false; }
+    public void setLocationAlive() { deadLocation = false; GetComponentInChildren<EndOfGameAnimation>().resetAnim(); }
 
     public IEnumerator blastOffAnimatin()
     {
