@@ -33,6 +33,8 @@ public class Game : MonoBehaviour
     private TextMeshProUGUI TurnIndicator;
     [SerializeField]
     private AudioSource panNoise;
+    [SerializeField]
+    private CountDown countDown;
 
     [SerializeField]
     private TextMeshProUGUI WinText;
@@ -313,6 +315,7 @@ public class Game : MonoBehaviour
     }
 
     bool built = true;
+    public static bool countDownActive = false;
 
     public IEnumerator PlayGameToEnd()
     {
@@ -366,14 +369,27 @@ public class Game : MonoBehaviour
 
                         if (t.isWin)
                         {
+                            countDown.gameObject.SetActive(true);
+                            countDownActive = true;
+                            StartCoroutine(countDown.startCountdown());
+
+
                             built = true;
                             winner = curPlayer;
                             //wait to move then set buidler inactive
                             curPlayer.setBuilderAtLocationInactive(t.BuilderLocation);
                             EndOfGameAnimation(t.MoveLocation);
 
-                            yield return new WaitForSeconds(2);
-                            BlastOffRocket(t.MoveLocation);
+                            while (countDownActive)
+                            {
+                                yield return new WaitForEndOfFrame();
+                            }
+                            if (!countDownActive)
+                            {
+                                yield return new WaitForSeconds(0.4f);
+                                BlastOffRocket(t.MoveLocation);
+                            countDown.gameObject.SetActive(false);
+                            }
                         }
                         else
                         {
