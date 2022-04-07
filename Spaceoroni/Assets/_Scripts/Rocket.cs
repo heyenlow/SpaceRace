@@ -31,6 +31,11 @@ public class Rocket : MonoBehaviour
         movingRocket = this.gameObject;
     }
 
+    public void runEndOfGameAnimation()
+    {
+        GetComponentInChildren<EndOfGameAnimation>().elonBlastOff();
+    }
+
     public void resetLocation()
     {
         movingRocket = null;

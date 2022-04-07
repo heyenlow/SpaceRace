@@ -9,6 +9,12 @@ public class Location : MonoBehaviour
     public static Location LocationBlinking = null;
     private bool deadLocation = false;
 
+    public void runEndOfGameAnimation()
+    {
+        var rocket = this.GetComponentInChildren<Rocket>();
+        rocket.runEndOfGameAnimation();
+    }
+
     public void blastOffRocket()
     {
         var rocket = this.GetComponentInChildren<Rocket>();

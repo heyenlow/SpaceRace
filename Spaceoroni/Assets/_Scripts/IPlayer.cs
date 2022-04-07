@@ -93,7 +93,7 @@ public abstract class IPlayer : MonoBehaviour
         {
             Builder1.gameObject.SetActive(false);
         }
-        else if (Coordinate.Equals(Builder1.getLocation(), c))
+        else if (Coordinate.Equals(Builder2.getLocation(), c))
         {
             Builder2.gameObject.SetActive(false);
         }

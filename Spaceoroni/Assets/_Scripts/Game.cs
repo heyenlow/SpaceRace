@@ -298,6 +298,13 @@ public class Game : MonoBehaviour
         BuildLevel(c);
     }
 
+    private void EndOfGameAnimation(Coordinate c)
+    {
+        Debug.Log("Blasting Off Rocket at " + Coordinate.coordToString(c));
+        var location = GameObject.Find(Coordinate.coordToString(c)).GetComponent<Location>();
+        location.runEndOfGameAnimation();
+    }
+
     private void BlastOffRocket(Coordinate c)
     {
         Debug.Log("Blasting Off Rocket at " + Coordinate.coordToString(c));
@@ -355,23 +362,25 @@ public class Game : MonoBehaviour
                         // update the board with the current player's move
                         Debug.Log("Processing Turn: " + t.ToString());
     
-                        while (Game.PAUSED) { yield return new WaitForEndOfFrame(); }
+                        while (PAUSED) { yield return new WaitForEndOfFrame(); }
 
-                        built = false;
-                        processTurnString(t, curPlayer, this);
-                    
                         if (t.isWin)
                         {
                             built = true;
                             winner = curPlayer;
                             //wait to move then set buidler inactive
-                            yield return new WaitForSeconds(0.6f);
-                            curPlayer.setBuilderAtLocationInactive(t.MoveLocation);
-                            
+                            curPlayer.setBuilderAtLocationInactive(t.BuilderLocation);
+                            EndOfGameAnimation(t.MoveLocation);
+
                             yield return new WaitForSeconds(2);
                             BlastOffRocket(t.MoveLocation);
                         }
-                    }
+                        else
+                        {
+                            built = false;
+                            processTurnString(t, curPlayer, this);
+                        }
+                }
                     else { winner = othPlayer; }
 
                 if(winner != null){
