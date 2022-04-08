@@ -56,6 +56,7 @@ public class Level : MonoBehaviour
             Game.recieveLocationClick(Coordinate.stringToCoord(this.transform.parent.parent.name));
             Rocket.blinkingRocket = null;
             BlinkingLevel = null;
+            Location.LocationBlinking = null;
             GetComponentInParent<Location>().removeHighlight();
             foreach (Level l in GetComponentInParent<Rocket>().getRocketsLevels()) l.removeHighlight();
             removeHighlight();

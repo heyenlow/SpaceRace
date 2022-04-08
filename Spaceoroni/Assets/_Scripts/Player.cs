@@ -126,8 +126,11 @@ public class Player : IPlayer
                     Game.clickLocation = null;
 
                     HighlightManager.unhighlightAllPossibleMoveLocations(allMoves);
-
-                    if (g.canBuild(currentTurn.BuilderLocation))
+                    if (g.isWin(currentTurn.MoveLocation))
+                    {
+                        
+                    }
+                    else if (g.canBuild(currentTurn.BuilderLocation))
                     {
                         moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
                         while (BuildersAreMoving()) yield return new WaitForEndOfFrame();

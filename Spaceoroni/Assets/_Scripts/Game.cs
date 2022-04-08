@@ -33,6 +33,8 @@ public class Game : MonoBehaviour
     private TextMeshProUGUI TurnIndicator;
     [SerializeField]
     private AudioSource panNoise;
+    [SerializeField]
+    private CountDown countDown;
 
     [SerializeField]
     private TextMeshProUGUI WinText;
@@ -144,6 +146,7 @@ public class Game : MonoBehaviour
         cancelTurn = true;
         StopAllCoroutines();
         resetAllLocationsAlive();
+
 
         //needs to reset the reader to the first move
         StringGameReader.MoveCount = 0;
@@ -298,6 +301,13 @@ public class Game : MonoBehaviour
         BuildLevel(c);
     }
 
+    private void runEndOfGameAnimation(Coordinate c)
+    {
+        Debug.Log("Blasting Off Rocket at " + Coordinate.coordToString(c));
+        var location = GameObject.Find(Coordinate.coordToString(c)).GetComponent<Location>();
+        location.runEndOfGameAnimation();
+    }
+
     private void BlastOffRocket(Coordinate c)
     {
         Debug.Log("Blasting Off Rocket at " + Coordinate.coordToString(c));
@@ -306,6 +316,7 @@ public class Game : MonoBehaviour
     }
 
     bool built = true;
+    public static bool countDownActive = false;
 
     public IEnumerator PlayGameToEnd()
     {
@@ -355,23 +366,38 @@ public class Game : MonoBehaviour
                         // update the board with the current player's move
                         Debug.Log("Processing Turn: " + t.ToString());
     
-                        while (Game.PAUSED) { yield return new WaitForEndOfFrame(); }
+                        while (PAUSED) { yield return new WaitForEndOfFrame(); }
 
-                        built = false;
-                        processTurnString(t, curPlayer, this);
-                    
                         if (t.isWin)
                         {
+                            countDown.gameObject.SetActive(true);
+                            countDownActive = true;
+                            StartCoroutine(countDown.startCountdown());
+
+
                             built = true;
                             winner = curPlayer;
                             //wait to move then set buidler inactive
-                            yield return new WaitForSeconds(0.6f);
-                            curPlayer.setBuilderAtLocationInactive(t.MoveLocation);
-                            
-                            yield return new WaitForSeconds(2);
-                            BlastOffRocket(t.MoveLocation);
+                            curPlayer.setBuilderAtLocationInactive(t.BuilderLocation);
+                            runEndOfGameAnimation(t.MoveLocation);
+
+                            while (countDownActive)
+                            {
+                                yield return new WaitForEndOfFrame();
+                            }
+                            if (!countDownActive)
+                            {
+                                yield return new WaitForSeconds(0.4f);
+                                BlastOffRocket(t.MoveLocation);
+                            countDown.gameObject.SetActive(false);
+                            }
                         }
-                    }
+                        else
+                        {
+                            built = false;
+                            processTurnString(t, curPlayer, this);
+                        }
+                }
                     else { winner = othPlayer; }
 
                 if(winner != null){
