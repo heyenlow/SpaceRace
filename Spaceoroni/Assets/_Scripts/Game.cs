@@ -622,6 +622,7 @@ public class Game : MonoBehaviour
 
     public long computeHash()
     {
+        if (ZobristTable == null) initTable();
         char[,] board = TranslateState();
         long h = 0;
         for (int i = 0; i < 5; i++)

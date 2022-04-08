@@ -18,6 +18,8 @@ public class SimPlayer : SimIPlayer
     public SimPlayer(IPlayer other)
     {
         Builder1 = new SimBuilder(Coordinate.stringToCoord(other.getBuilderLocations().Substring(0, 2)));
+        Builder2 = new SimBuilder(Coordinate.stringToCoord(other.getBuilderLocations().Substring(2, 2)));
+        ID = other.ID;
     }
 
     public SimPlayer(SimIPlayer other)
@@ -25,6 +27,7 @@ public class SimPlayer : SimIPlayer
         Builder1 = new SimBuilder(other.Builder1);
         Builder2 = new SimBuilder(other.Builder2);
         state = other.state;
+        ID = other.ID;
     }
 
     public override string beginTurn(SimGame g, out bool isWin)

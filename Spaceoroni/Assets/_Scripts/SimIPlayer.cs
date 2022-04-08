@@ -19,10 +19,13 @@ public abstract class SimIPlayer : MonoBehaviour
     public States state = States.Undetermined;
     private bool _disposed;
 
+
+
     public abstract Coordinate SelectBuilder();
     public abstract Coordinate chooseMove(ref Coordinate builder, Game g);
     public abstract Coordinate chooseBuild(ref Coordinate builder, ref Coordinate oldLocatiion, Game g);
     public abstract string beginTurn(SimGame g, out bool isWin);
+
     /// <summary>
     /// Returns a string showing the current coordinates of this player's builders
     /// </summary>
@@ -31,6 +34,7 @@ public abstract class SimIPlayer : MonoBehaviour
     {
         return (Builder1.getLocation() + Builder2.getLocation());
     }
+
     //used to place builders at the beginning of the game
     public virtual void PlaceBuilder(int i, Coordinate c)
     {
@@ -54,26 +58,6 @@ public abstract class SimIPlayer : MonoBehaviour
         {
             Builder2.move(to);
         }
-    }
-
-
-    public T DeepCopy<T>()
-        where T : IPlayer
-    {
-        // DEPRECATED FEATURE
-        // SERIALIZATION NOT USABLE FOR UNITY
-        T temp;
-        using (MemoryStream ms = new MemoryStream())
-        {
-            var binaryFormatter = new BinaryFormatter();
-            binaryFormatter.Serialize(ms, this);
-            ms.Position = 0;
-            temp = (T)binaryFormatter.Deserialize(ms);
-        }
-        Builder1.move(Builder1.Location);
-        Builder2.move(Builder2.Location);
-
-        return temp;
     }
 
     public virtual void Dispose()

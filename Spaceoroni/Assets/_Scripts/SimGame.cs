@@ -12,7 +12,7 @@ public class SimGame : MonoBehaviour
     public int moveNum = 0;
     public int timeToTurn = 2;
     public long Hash;
-    static char[,,] ZobristTable = null;
+    public static long[,,] ZobristTable = null;
 
     public SimPlayer CurrentPlayer => (moveNum % 2 == 0) ? Player1 : Player2;
     public SimPlayer Rival => (moveNum % 2 == 0) ? Player2 : Player1;
@@ -39,6 +39,10 @@ public class SimGame : MonoBehaviour
         {
             System.Array.Copy(Game.ZobristTable, Game.ZobristTable.GetLowerBound(0), ZobristTable, ZobristTable.GetLowerBound(0), 525);
         }
+        else
+        {
+            throw new System.NullReferenceException("SimGame(SimGame g) was passed a null zobrist table.");
+        }
         Board = g.TranslateState();
     }
 
@@ -52,9 +56,14 @@ public class SimGame : MonoBehaviour
         Player1 = new SimPlayer(g.Player1);
         Player2 = new SimPlayer(g.Player2);
         // if the table has already been initialized, pls don't create a new random zobrist table
-        if (ZobristTable != null)
+        if (Game.ZobristTable != null)
         {
+            ZobristTable = new long[5, 5, 21]; // 5x5x21 = 525
             System.Array.Copy(Game.ZobristTable, Game.ZobristTable.GetLowerBound(0), ZobristTable, ZobristTable.GetLowerBound(0), 525);
+        }
+        else
+        {
+            throw new System.NullReferenceException("SimGame(Game g) was passed a null zobrist table.");            
         }
         Board = g.TranslateState();
     }
@@ -447,7 +456,7 @@ public class SimGame : MonoBehaviour
             for (int j = -1; j <= 1; ++j)
             {
                 Coordinate test = new Coordinate(c.x + i, c.y + j);
-                if (Coordinate.inBounds(test) && Board[test.x, test.y] < 4 && locationClearOfAllBuilders(test) && !Coordinate.Equals(test, c))
+                if (Coordinate.inBounds(test) && state[test.x, test.y] < 4 && locationClearOfAllBuilders(test) && !Coordinate.Equals(test, c))
                 {
                     allBuilds.Add(Coordinate.coordToString(test));
                 }
