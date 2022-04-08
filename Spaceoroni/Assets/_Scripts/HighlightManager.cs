@@ -115,6 +115,7 @@ public static class HighlightManager
     {
         //moves all the object to the pasue list
         pauseHoldObjects = new List<GameObject>(highlightedObjects);
+        if (Location.LocationBlinking != null) Location.LocationBlinking.removeHighlight();
         highlightedObjects.Clear();
         Debug.Log("Pause: numOfGameObjectsOnHold " + pauseHoldObjects.Count);
     }
@@ -122,6 +123,7 @@ public static class HighlightManager
     {
         //restores the highlighted object list
         highlightedObjects = new List<GameObject>(pauseHoldObjects);
+        if (Location.LocationBlinking != null) Location.LocationBlinking.Blink();
         pauseHoldObjects.Clear();
         Debug.Log("Resume: numOfGameObjectsReleasedFromHold " + highlightedObjects.Count);
 
