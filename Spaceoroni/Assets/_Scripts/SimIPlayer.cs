@@ -14,23 +14,21 @@ public class SimIPlayer : MonoBehaviour
         Tied,
         Undetermined
     }
-    public SimBuilder Builder1 = new SimBuilder();
-    public SimBuilder Builder2 = new SimBuilder();
+    public SimBuilder Builder1;
+    public SimBuilder Builder2;
     public States state = States.Undetermined;
     private bool _disposed;
 
-    public abstract Coordinate SelectBuilder();
-    public abstract Coordinate chooseMove(ref Coordinate builder, Game g);
-    public abstract Coordinate chooseBuild(ref Coordinate builder, ref Coordinate oldLocatiion, Game g);
-    public abstract string beginTurn(SimGame g, out bool isWin);
-    /// <summary>
-    /// Returns a string showing the current coordinates of this player's builders
-    /// </summary>
-    /// <returns></returns>
+    //public abstract Coordinate SelectBuilder();
+    //public abstract Coordinate chooseMove(ref Coordinate builder, Game g);
+    //public abstract Coordinate chooseBuild(ref Coordinate builder, ref Coordinate oldLocatiion, Game g);
+    //public abstract string beginTurn(SimGame g, out bool isWin);
+
     public string getBuilderLocations()
     {
-        return (Builder1.getLocation() + Builder2.getLocation());
+        return Builder1.getLocation() + Builder2.getLocation();
     }
+
     //used to place builders at the beginning of the game
     public virtual void PlaceBuilder(int i, Coordinate c)
     {

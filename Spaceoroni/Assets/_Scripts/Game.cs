@@ -48,7 +48,7 @@ public class Game : MonoBehaviour
     public long Hash => computeHash();
     public int timeToTurn = 2;
 
-    int[,] Board;
+    public int[,] Board;
     public int[,] state { 
         get 
         {
@@ -806,10 +806,13 @@ public class Game : MonoBehaviour
                 // Hash Values are currently this current game's state hash
 
                 // need to change it to be the hash value of a game resulting from the move taking place.  without actually making the move?
-                Game tmpState = DeepCopy(); //copy current game state
+                SimGame tmpState = new SimGame(DeepCopy()); //copy current game state
                 string turnString = Coordinate.coordToString(tmp.Builder) + Coordinate.coordToString(tmp.Move) + Coordinate.coordToString(tmp.Build); // create turn string from this transition
                 Turn currTurn = new Turn(tmp.Builder, tmp.Move, tmp.Build);
-                tmpState.processTurnString(currTurn, tmpState.CurrentPlayer, tmpState); // execute transition on copy board
+                string t = currTurn.ToString();
+
+                tmpState.processTurnString(t); // execute transition on copy board
+                
                 tmp.Hash = tmpState.computeHash(); // this transition hash equals the hash of the copy state's Hash
                 ret.Add(tmp);
             }
@@ -824,9 +827,11 @@ public class Game : MonoBehaviour
                 UCB1Tree.Transition tmp = new UCB1Tree.Transition(Coordinate.stringToCoord(CurrentPlayer.getBuilderLocations().Substring(2, 2)), Coordinate.stringToCoord(moves[i]), Coordinate.stringToCoord(builds[j]), Hash);
                 // Hash Values are currently this current game's state hash
                 // need to change it to be the hash value of a game resulting from the move taking place.  without actually making the move?
-                Game tmpState = DeepCopy();
+                SimGame tmpState = new SimGame(DeepCopy());
                 Turn currTurn = new Turn(tmp.Builder, tmp.Move, tmp.Build);
-                tmpState.processTurnString(currTurn, tmpState.CurrentPlayer, tmpState);
+                string t = currTurn.ToString();
+
+                tmpState.processTurnString(t);
                 tmp.Hash = tmpState.computeHash();
 
                 ret.Add(tmp);
