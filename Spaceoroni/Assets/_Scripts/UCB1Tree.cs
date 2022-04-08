@@ -14,7 +14,7 @@ public class UCB1Tree : MonoBehaviour
         public CoroutineWithData(MonoBehaviour owner, IEnumerator target)
         {
             this.target = target;
-            this.coroutine = owner.StartCoroutine(Run());
+            coroutine = owner.StartCoroutine(Run());
         }
 
         private IEnumerator Run()
@@ -52,7 +52,7 @@ public class UCB1Tree : MonoBehaviour
     {
         public int plays;
         public int wins;
-        public IPlayer player;
+        public SimPlayer player;
 
         public double CurrentPlayerScore() => (double)wins / plays;
 
@@ -64,7 +64,7 @@ public class UCB1Tree : MonoBehaviour
 
         private Node() { }
 
-        public Node(IPlayer player)
+        public Node(SimPlayer player)
         {
             this.player = player;
             plays = 0;
@@ -85,14 +85,14 @@ public class UCB1Tree : MonoBehaviour
         };
 
         List<Node> path = new List<Node>();
-        Game copy;
+        SimGame copy;
         List<Transition> allTransitions;
         List<Transition> transitionNoStats;
         System.Random rng = new System.Random();
 
         for (int i = 0; i < simulations; i++)
         {
-            copy = game.DeepCopy();
+            copy = new SimGame(game.DeepCopy());
             path.Clear();
             path.Add(tree[game.Hash]);
 
@@ -155,7 +155,7 @@ public class UCB1Tree : MonoBehaviour
 
             // ROLLOUT
             copy.Rollout();
-            while (!copy.simulationRunning)
+            //while (!copy.simulationRunning) is needed?
 
             // BACKPROP
             foreach (Node node in path)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,11 @@ public class SimPlayer : SimIPlayer
     public SimPlayer(int id)
     {
         ID = id;
+    }
+
+    public SimPlayer(IPlayer other)
+    {
+        Builder1 = new SimBuilder(Coordinate.stringToCoord(other.getBuilderLocations().Substring(0, 2)));
     }
 
     public SimPlayer(SimIPlayer other)
@@ -34,6 +40,11 @@ public class SimPlayer : SimIPlayer
     public override Coordinate chooseMove(ref Coordinate builder, Game g)
     {
         throw new System.NotImplementedException();
+    }
+
+    internal void PlaceBuilders()
+    {
+        throw new NotImplementedException();
     }
 
     public override Coordinate SelectBuilder()

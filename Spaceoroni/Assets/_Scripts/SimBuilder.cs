@@ -13,6 +13,11 @@ public class SimBuilder : MonoBehaviour
         coord = new Coordinate();
     }
 
+    public SimBuilder(Coordinate c)
+    {
+        coord = new Coordinate(c);
+    }
+
     public SimBuilder(SimBuilder b)
     {
         coord = new Coordinate(b.Location);

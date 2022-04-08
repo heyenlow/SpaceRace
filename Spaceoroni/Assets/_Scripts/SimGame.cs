@@ -4,181 +4,420 @@ using UnityEngine;
 
 public class SimGame : MonoBehaviour
 {
-    int[,] Board;
-    public int[,] state
-    {
-        get
-        {
-            return Board;
-        }
-        set { }
-    }
+    char[,] Board;
+    public int[,] state;
 
-    public enum PlayerState
-    {
-        Winner,
-        Loser,
-        Playing
-    };
-
-    public PlayerState playerState { get; set; }
-    public SimIPlayer Player1;
-    public SimIPlayer Player2;
+    public SimPlayer Player1;
+    public SimPlayer Player2;
     public int moveNum = 0;
     public int timeToTurn = 2;
     public long Hash;
+    static char[,,] ZobristTable = null;
 
-    public SimIPlayer CurrentPlayer => (moveNum % 2 == 0) ? Player1 : Player2;
-    public SimIPlayer Rival => (moveNum % 2 == 0) ? Player2 : Player1;
+    public SimPlayer CurrentPlayer => (moveNum % 2 == 0) ? Player1 : Player2;
+    public SimPlayer Rival => (moveNum % 2 == 0) ? Player2 : Player1;
     public static bool cancelTurn = false;
 
     void PlaceBuilders()
     {
-        PlaceBuilder(Player1, 1);
-        PlaceBuilder(Player1, 2);
+        Player1.PlaceBuilders();
         moveNum++; // increment move to flip CurrentPlayer and Rival properties.
-        PlaceBuilder(Player2, 1);
-        PlaceBuilder(Player2, 2);
+        Player2.PlaceBuilders();
         moveNum--; // decrement moveNum back to 0 so that the game begins as normal with Player1
     }
 
     public SimGame(SimGame g)
     {
-        Board = new int[5, 5];
-        System.Array.Copy(g.state, g.state.GetLowerBound(0), Board, Board.GetLowerBound(0), 25);
-        Player1 = new MCTSPlayer(g.Player1);
-        Player2 = new MCTSPlayer(g.Player2);
-
+        state = new int[5, 5];
+        Board = new char[5, 5];
+        // TODO: translate g.state to a character array, not an int array.
+        System.Array.Copy(g.state, g.state.GetLowerBound(0), state, state.GetLowerBound(0), 25);
+        Player1 = new SimPlayer(g.Player1);
+        Player2 = new SimPlayer(g.Player2);
+        // if the table has already been initialized, pls don't create a new random zobrist table
+        if (ZobristTable != null)
+        {
+            System.Array.Copy(Game.ZobristTable, Game.ZobristTable.GetLowerBound(0), ZobristTable, ZobristTable.GetLowerBound(0), 525);
+        }
+        Board = g.TranslateState();
     }
 
-    public void PlaceBuilder(IPlayer p, int i)
+    public SimGame(Game g)
     {
-        if (p is Player)
-        {
-            string s;
-            do
-            {
-                Console.Write(p.ToString() + " place Builder " + i + ": ");
-                s = Console.ReadLine().ToUpper();
-            }
-            while (getAllBuildersString().Contains(s) || !Coordinate.inBounds(Coordinate.stringToCoord(s)));
+        Board = new char[5, 5];
+        state = new int[5, 5];
+        // TODO: translate g.state to a character array, not an int array.
 
-            p.PlaceBuilder(i, Coordinate.stringToCoord(s));
-        }
-        else if (p is MMPlayer)
+        System.Array.Copy(g.state, g.state.GetLowerBound(0), state, state.GetLowerBound(0), 25);
+        Player1 = new SimPlayer(g.Player1);
+        Player2 = new SimPlayer(g.Player2);
+        // if the table has already been initialized, pls don't create a new random zobrist table
+        if (ZobristTable != null)
         {
-            MMPlayer mmp = (MMPlayer)p;
-            mmp.placeBuilders(this, i);
+            System.Array.Copy(Game.ZobristTable, Game.ZobristTable.GetLowerBound(0), ZobristTable, ZobristTable.GetLowerBound(0), 525);
         }
-        else if (p is NeatPlayer)
-        {
-            // ASSUMES NEAT PLAYER IS GOING SECOND
-            NeatPlayer np = (NeatPlayer)p;
-            np.placeBuilders(this, i);
-        }
-        else
-        {
-            MCTSPlayer pltmp = (MCTSPlayer)p;
-            pltmp.placeBuilders(this, i);
-        }
+        Board = g.TranslateState();
     }
 
 
-    public SimIPlayer PlayGameToEnd()
+    public IEnumerable<SimPlayer> PlayGameToEnd()
     {
-        SimIPlayer winner = null;
+        SimPlayer winner = null;
 
         PlaceBuilders();
 
-        // Play until we have a winner or tie?
-        for (; winner == null; moveNum++)
-        {
-            // Check if last turn lost?
-            if (Rival.state == SimIPlayer.States.Loser)
-            {
-                winner = CurrentPlayer;
-            }
-            else
-            {
-                if (hasPossibleTurns(CurrentPlayer))
-                {
 
-                    //if it is a string player we just need to wait before getting the turn and processing it
-                    if (curPlayer is StringPlayer)
-                    {
-                        yield return new WaitForSeconds(timeToTurn);
-                    }
-                    else //if it is any other player we need to start getting the turn
-                    {
-                        curPlayer.beginTurn(this);
-                    }
-
-                    Turn t = curPlayer.getNextTurn();
-                    // update the board with the current player's move
-                    Debug.Log("Processing Turn: " + t.ToString());
-
-                    processTurnString(t, curPlayer, this);
-
-                    if (t.isWin)
-                    {
-                        built = true;
-                        winner = curPlayer;
-                        //wait to move then set buidler inactive
-                        yield return new WaitForSeconds(0.6f);
-                        curPlayer.setBuilderAtLocationInactive(t.MoveLocation);
-
-                        yield return new WaitForSeconds(2);
-                        BlastOffRocket(t.MoveLocation);
-                    }
-                }
-                else { winner = othPlayer; }
-
-                if (winner != null)
-                {
-                    if (winner == Player1) { WinText.text = "You Win!"; }
-                    else { WinText.text = "Better Luck Next Time"; }
-                    goToEndOfGameScreen();
-                }
-
-                //Check if win
-                if (playerState == PlayerState.Winner)
-                {
-                    winner = curPlayer;
-                }
-            }
-        }
-
-        return winner;
+        yield return winner;
     }
 
-    internal Game DeepCopy()
+    internal SimGame DeepCopy()
     {
-        throw new System.NotImplementedException();
+        return new SimGame(this);
+
     }
 
-    private bool hasPossibleTurns(IPlayer p)
+    public List<UCB1Tree.Transition> GetLegalTransitions()
     {
-        Coordinate BuilderOneLocation = Coordinate.stringToCoord(p.getBuilderLocations().Substring(0, 2));
-        Coordinate BuilderTwoLocation = Coordinate.stringToCoord(p.getBuilderLocations().Substring(2, 2));
-
-        var builderOneMoves = getAllPossibleMoves(BuilderOneLocation);
-        foreach (var coord in builderOneMoves)
+        List<UCB1Tree.Transition> ret = new List<UCB1Tree.Transition>();
+        if (CurrentPlayer is null) throw new System.NullReferenceException();
+        // get all possible moves from each builder including new build locations....
+        // builder 1...
+        List<string> moves = getAllPossibleMoves(CurrentPlayer.Builder1.Location);
+        for (int i = 0; i < moves.Count; i++)
         {
-            if (getAllPossibleBuilds(Coordinate.stringToCoord(coord)).Count > 0) return true;
+            if (Equals(CurrentPlayer.Builder1.Location, Coordinate.stringToCoord(moves[i])))
+                Debug.Log("Break"); // TODO: error!
+            List<string> builds = getAllPossibleBuilds(Coordinate.stringToCoord(moves[i]), CurrentPlayer.Builder1.Location);
+            for (int j = 0; j < builds.Count; j++)
+            {
+                // create transition representing this possible move
+                UCB1Tree.Transition tmp = new UCB1Tree.Transition(CurrentPlayer.Builder1.Location, Coordinate.stringToCoord(moves[i]), Coordinate.stringToCoord(builds[j]), Hash);
+                // Hash Values are currently this current game's state hash
+
+                // need to change it to be the hash value of a game resulting from the move taking place.  without actually making the move?
+                SimGame tmpState = DeepCopy(); //copy current game state
+                string turnString = Coordinate.coordToString(tmp.Builder) + Coordinate.coordToString(tmp.Move) + Coordinate.coordToString(tmp.Build); // create turn string from this transition
+                tmpState.processTurnString(turnString); // execute transition on copy board
+                tmp.Hash = tmpState.computeHash(); // this transition hash equals the hash of the copy state's Hash
+
+                ret.Add(tmp);
+            }
+        }
+        // builder 2...
+        moves = getAllPossibleMoves(CurrentPlayer.Builder2.Location);
+        for (int i = 0; i < moves.Count; i++)
+        {
+            if (Equals(CurrentPlayer.Builder2.Location, moves[i]))
+                Debug.Log("Break");
+
+            List<string> builds = getAllPossibleBuilds(Coordinate.stringToCoord(moves[i]), CurrentPlayer.Builder2.Location);
+            for (int j = 0; j < builds.Count; j++)
+            {
+                UCB1Tree.Transition tmp = new UCB1Tree.Transition(CurrentPlayer.Builder2.Location, Coordinate.stringToCoord(moves[i]), Coordinate.stringToCoord(builds[j]), Hash);
+                // Hash Values are currently this current game's state hash
+                // need to change it to be the hash value of a game resulting from the move taking place.  without actually making the move?
+                SimGame tmpState = DeepCopy();
+                tmpState.processTurnString(Coordinate.coordToString(tmp.Builder) + Coordinate.coordToString(tmp.Move) + Coordinate.coordToString(tmp.Build));
+                tmp.Hash = tmpState.computeHash();
+
+                ret.Add(tmp);
+            }
+        }
+        if (ret.Count == 0)
+        {
+            CurrentPlayer.state = SimIPlayer.States.Loser; // if you can't move you're a loser.
+            Rival.state = SimIPlayer.States.Winner;
+        }
+        return ret;
+    }
+
+    /// <summary>
+    /// returns the 2D character matrix representing the current game board for both players.
+    /// </summary>
+    /// <returns></returns>
+    public char[,] TranslateState()
+    {
+        char[,] ret = new char[5, 5];
+        // takes the Game g.state int matrix and converts it to a char matrix with representations for builders on board
+        Coordinate tmp = new Coordinate();
+        for (int i = 0; i < 5; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                tmp.x = i; tmp.y = j;
+                if (locationClearOfAllBuilders(tmp))
+                {
+                    ret[i, j] = (char)(state[i, j] + 48);
+                }
+                else
+                {
+                    char piece = '0';
+                    switch (state[i, j])
+                    {
+                        case 0:
+                            if (Equals(tmp, Player1.Builder1.Location)) piece = 'A';
+                            else if (Equals(tmp, Player1.Builder2.Location)) piece = 'E';
+                            else if (Equals(tmp, Player2.Builder1.Location)) piece = 'a';
+                            else if (Equals(tmp, Player2.Builder2.Location)) piece = 'e';
+                            break;
+                        case 1:
+                            if (Equals(tmp, Player1.Builder1.Location)) piece = 'B';
+                            else if (Equals(tmp, Player1.Builder2.Location)) piece = 'F';
+                            else if (Equals(tmp, Player2.Builder1.Location)) piece = 'b';
+                            else if (Equals(tmp, Player2.Builder2.Location)) piece = 'f';
+                            break;
+                        case 2:
+                            if (Equals(tmp, Player1.Builder1.Location)) piece = 'C';
+                            else if (Equals(tmp, Player1.Builder2.Location)) piece = 'G';
+                            else if (Equals(tmp, Player2.Builder1.Location)) piece = 'c';
+                            else if (Equals(tmp, Player2.Builder2.Location)) piece = 'g';
+                            break;
+                        case 3:
+                            if (Equals(tmp, Player1.Builder1.Location)) piece = 'D';
+                            else if (Equals(tmp, Player1.Builder2.Location)) piece = 'H';
+                            else if (Equals(tmp, Player2.Builder1.Location)) piece = 'd';
+                            else if (Equals(tmp, Player2.Builder2.Location)) piece = 'h';
+                            break;
+                    }
+                    ret[i, j] = piece;
+                }
+            }
+
         }
 
-        var builderTwoMoves = getAllPossibleMoves(BuilderTwoLocation);
-        foreach (var coord in builderTwoMoves)
+        return ret;
+    }
+
+    public long computeHash()
+    {
+        char[,] Board = TranslateState();
+        long h = 0;
+        for (int i = 0; i < 5; i++)
         {
-            if (getAllPossibleBuilds(Coordinate.stringToCoord(coord)).Count > 0) return true;
+            for (int j = 0; j < 5; j++)
+            {
+                if (Board[i, j] != '-')
+                {
+                    int piece = indexOf(Board[i, j]);
+                    h ^= ZobristTable[i, j, piece];
+                }
+            }
+        }
+        return h;
+    }
+
+    /// <summary>
+    /// THIS FUNCTION IS ONLY USED AS A HELPER FOR ZOBRIST HASHING
+    /// </summary>
+    /// <param name="piece"></param>
+    /// <returns></returns>
+    static int indexOf(char piece)
+    {// this node's character array `state` uses letters to represent builders at different heights
+     // convert these letters numbers we can use for easy height calculations and such
+        switch (piece)
+        {
+            case 'A':               // minMax player builder 1 height 0
+                return 0;
+            case 'B':
+                return 1;
+            case 'C':
+                return 2;
+            case 'D':               // minmax player builder 1 height 3
+                return 3;
+            case 'E':               // minmax player builder 2 height 0
+                return 4;
+            case 'F':
+                return 5;
+            case 'G':
+                return 6;
+            case 'H':               // minmax player builder 2 height 3
+                return 7;
+            case 'a':               // opponent builder 1 height 0
+                return 8;
+            case 'b':
+                return 9;
+            case 'c':
+                return 10;
+            case 'd':               // opponent builder 1 height 3
+                return 11;
+            case 'e':               // opponent builder 2 height 0
+                return 12;
+            case 'f':
+                return 13;
+            case 'g':
+                return 14;
+            case 'h':               // opponent builder 2 height 3
+                return 15;
+            case '0':               // player - height 0
+                return 16;
+            case '1':
+                return 17;
+            case '2':
+                return 18;
+            case '3':
+                return 19;
+            case '4':               // player - height 4
+                return 20;
+            default:
+                return -1;
+        }
+    }
+
+    /// <summary>
+    ///  Method takes in a string representing a turn
+    ///  First 2 chars are the builder being selected (make sure it is valid player moving proper builder etc)
+    /// </summary>
+    /// <param name="turn"></param>
+    /// <param name="curPlayer"></param>
+    /// <param name="isOver">out variable to be used as a flag, indicating if an emergency stop is necessary to end the game.</param>
+    /// <returns>bool did the Turn get processed successfully?</returns>
+    public bool processTurnString(string turn)
+    {
+        // when a null build location is chosen, the string is "".
+        // string is also "" if nothing has happened...
+        // sooooo......
+        if (turn.Equals(string.Empty))
+        {
+            CurrentPlayer.state = SimIPlayer.States.Loser;
+            Rival.state = SimIPlayer.States.Winner;
+            return false;
+        }
+        string builderCoord = turn.Substring(0, 2);
+        Coordinate builderLoc = Coordinate.stringToCoord(builderCoord);
+        SimBuilder builder = null;
+
+        // get builder represented by first 2 characters
+        if (CurrentPlayer.getBuilderLocations().Contains(Coordinate.coordToString(builderLoc)))
+        {
+            // checks if first 2 characters of string correlate to the location of one of curPlayer's builders
+            if (CurrentPlayer.Builder1.getLocation() == Coordinate.coordToString(builderLoc))
+            {
+                // MOVE CORRESPONDING BUILDER1
+                //curPlayer.Builder1.move(builderLoc); <-- what the heck was this?
+                builder = CurrentPlayer.Builder1;
+            }
+            else if (CurrentPlayer.Builder2.getLocation() == Coordinate.coordToString(builderLoc))
+            {
+                // MOVE CORRESPONDING BUILDER2
+                //curPlayer.Builder2.move(Coordinate.stringToCoord(Coordinate.coordToString(builderLoc))); <-- what the heck was this?
+                builder = CurrentPlayer.Builder2;
+            }
+        }
+        else
+        {
+            // error, no builder found matching first location.
+            throw new System.ArgumentOutOfRangeException("NO BUILDER FOUND MATCHING FIRST LOCATION");
+        }
+        string mv = turn.Substring(2, 2);
+        Coordinate move = Coordinate.stringToCoord(mv);
+        // need to check if the proposed move is valid.
+        if (!Coordinate.inBounds(move) && !(builder.Location.x + 1 >= move.x && builder.Location.x - 1 <= move.x &&
+                                            builder.Location.y + 1 >= move.y && builder.Location.y - 1 <= move.y))
+        {
+            // if user passes a move that is out of bounds or something similar, it's a loser.
+            throw new System.ArgumentOutOfRangeException("INVALID MOVE INTERCEPTED");
+        }
+        builder.move(move);
+        // builder has been moved.
+        // did the move result in a win? out parameter isOver can help with that?
+
+        if (state[move.x, move.y] == 3)
+        {
+            CurrentPlayer.state = SimIPlayer.States.Winner;
+            Rival.state = SimIPlayer.States.Loser;
+            return true;
+        }
+        // If not over Where to build?
+        Coordinate build = Coordinate.stringToCoord(turn.Substring(4, 2));
+
+        BuildLevel(build);
+
+        // build should be completed?
+        return true;
+    }
+
+    void BuildLevel(Coordinate c)
+    {
+        if (state[c.x, c.y] + 1 >= 5) throw new System.ArgumentOutOfRangeException("BuildLevel() tried to build too high");
+        state[c.x, c.y] += 1;
+    }
+
+    //disraguards the location of the current builder. this is used when looking for possible builds since we are moving after we look for possible moves
+    public bool locationClearOfAllOtherBuilders(Coordinate c, Coordinate currBuilderLocation)
+    {
+        string s = getAllBuildersString();
+        int i = s.IndexOf(Coordinate.coordToString(currBuilderLocation));
+        s = s.Remove(i, 2);
+        return !s.Contains(Coordinate.coordToString(c));
+    }
+
+    //returns a string of all the coords someone in that position could build in
+    public List<string> getAllPossibleBuilds(Coordinate c, Coordinate buildersOldLocation)
+    {
+        List<string> allBuilds = new List<string>();
+        for (int i = -1; i <= 1; ++i)
+        {
+            for (int j = -1; j <= 1; ++j)
+            {
+                Coordinate test = new Coordinate(c.x + i, c.y + j);
+                if (Coordinate.inBounds(test) && Board[test.x, test.y] <= 3 && locationClearOfAllOtherBuilders(test, buildersOldLocation) && !(test.x == c.x && test.y == c.y))
+                {
+                    allBuilds.Add(Coordinate.coordToString(test));
+                }
+            }
         }
 
+        //Console.WriteLine("All possible builds: ");
+        //foreach (var s in allBuilds) {
+        //    Console.WriteLine(s);
+        //}
+        if (allBuilds.Count < 1) allBuilds.Add(Coordinate.coordToString(buildersOldLocation));
+        if (allBuilds.TrueForAll((pos) => { Coordinate w = Coordinate.stringToCoord(pos); return state[w.x, w.y] + 1 <= 4; }))
+        {
+            // do nothing
+        }
+        else
+        {
+            // build detected out of bounds... investigate?
+            Debug.Log("Investigate....");
+        }
+        return allBuilds;
+    }
+
+    System.Tuple<string, string> getAllBuilderLocations()
+    {
+        return new System.Tuple<string, string>(Player1.getBuilderLocations(), Player2.getBuilderLocations());
+    }
+
+    /// <summary>
+    /// Returns true if the current gamestate is a terminal (game-over) gamestate. Returns false if there are still possible moves to perform.
+    /// </summary>
+    /// <returns></returns>
+    public bool IsGameOver()
+    {
+        // DEBUG
+        if (CurrentPlayer.state != SimIPlayer.States.Undetermined)
+        {
+            return true;
+        }
+        else if (Rival.state != SimIPlayer.States.Undetermined)
+        {
+            return true;
+        }
         return false;
     }
 
-    internal List<UCB1Tree.Transition> GetLegalTransitions()
+    // PULLS 4 BUILDER LOCATIONS and returns string ie. A2B3C4D3
+    string getAllBuildersString()
     {
-        throw new System.NotImplementedException();
+        var b = getAllBuilderLocations();
+        return b.Item1 + b.Item2;
+    }
+
+    //makes sure there are no builders in that location
+    public bool locationClearOfAllBuilders(Coordinate c)
+    {
+        return !getAllBuildersString().Contains(Coordinate.coordToString(c));
     }
 
     public List<string> getAllPossibleMoves(Coordinate c)
@@ -190,7 +429,7 @@ public class SimGame : MonoBehaviour
             {
                 Coordinate test = new Coordinate(c.x + i, c.y + j);
                 //isValidMove Function candidate
-                if (Coordinate.inBounds(test) && Board[test.x, test.y] <= (Board[c.x, c.y] + 1) && Board[test.x, test.y] < 4 && locationClearOfAllBuilders(test))
+                if (Coordinate.inBounds(test) && state[test.x, test.y] <= (state[c.x, c.y] + 1) && state[test.x, test.y] < 4 && locationClearOfAllBuilders(test))
                 {
                     allMoves.Add(Coordinate.coordToString(test));
                 }
@@ -216,5 +455,109 @@ public class SimGame : MonoBehaviour
         }
 
         return allBuilds;
+    }
+
+    /// <summary>
+    /// Execute the given move on the internal game state and update its hash with the given value. It is parameterized over the client-defined transition type.
+    /// </summary>
+    /// <param name="t"></param>
+    public void Transition(UCB1Tree.Transition t)
+    {
+        var tmpBuilder = new Coordinate(t.Builder);
+        bool isWin = false;
+        if (!Equals(CurrentPlayer.Builder1.Location, t.Builder) && !Equals(CurrentPlayer.Builder2.Location, t.Builder)) throw new System.ArgumentOutOfRangeException();
+        string turn = Coordinate.coordToString(t.Builder) + Coordinate.coordToString(t.Move) + Coordinate.coordToString(t.Build);
+        if (!processTurnString(turn))
+        {
+            throw new System.NullReferenceException();
+        }
+        else
+        {
+            moveNum++;
+            t.Builder = tmpBuilder;
+            if (isWin)
+            {
+                CurrentPlayer.state = SimIPlayer.States.Winner;
+                Rival.state = SimIPlayer.States.Loser;
+            }
+        }
+    }
+
+    /// <summary>
+    /// attempts to finish playing a game based on a copy that was made from DeepCopy()
+    /// </summary>
+    public void Rollout()
+    {
+        SimIPlayer winner = null;
+        System.Random rnd = new System.Random();
+        for (; winner == null; moveNum++)
+        {
+            if (CurrentPlayer is null) throw new System.NullReferenceException();
+            // string turn BUILDERMOVEBUILD string
+            var turn = string.Empty;
+
+            var allPossibleMoves = GetLegalTransitions();
+            if (allPossibleMoves.Count == 0)
+            {
+                winner = Rival;
+                CurrentPlayer.state = SimIPlayer.States.Loser;
+                Rival.state = SimIPlayer.States.Winner;
+                break;
+            }
+            var randomMove = allPossibleMoves[rnd.Next(0, allPossibleMoves.Count)];
+            turn = Coordinate.coordToString(randomMove.Builder) + Coordinate.coordToString(randomMove.Move) + Coordinate.coordToString(randomMove.Build);
+
+            bool won = isWin(randomMove.Move);
+            if (won)
+            {
+                CurrentPlayer.state = SimIPlayer.States.Winner;
+                Rival.state = SimIPlayer.States.Loser;
+                winner = CurrentPlayer;
+                break;
+            }
+
+            processTurnString(turn);
+
+            if (CurrentPlayer.state == SimIPlayer.States.Winner)
+            {
+                Rival.state = SimIPlayer.States.Loser;
+                winner = CurrentPlayer;
+            }
+            else if (CurrentPlayer.state == SimIPlayer.States.Loser)
+            {
+                Rival.state = SimIPlayer.States.Winner;
+                winner = Rival;
+            }
+
+        }
+    }
+
+    public bool isWin(Coordinate c)
+    {
+        if (ReferenceEquals(c, null))
+        {
+            return true; // if this function is passed a null move, it means a win did occur.  however the object that called this function is the loser....
+        } // conflicting comments :x
+        if (c.x == -1 && c.y == -1) return false; //if null move gets passed for any reason, it's not a winning move.
+        return Board[c.x, c.y] == 3;
+    }
+
+    /// <summary>
+    /// Returns whether the input player is victorious in the current gamestate. It is parameterized over the client-defined player type.
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
+    public bool IsWinner(SimIPlayer player)
+    {
+        SimIPlayer winner;
+        if (Player1.state == SimIPlayer.States.Winner) winner = Player1;
+        else if (Player2.state == SimIPlayer.States.Winner) winner = Player2;
+        else if (Player1.state == SimIPlayer.States.Loser) winner = Player2;
+        else if (Player2.state == SimIPlayer.States.Loser) winner = Player1;
+        else winner = null;
+
+        if (winner != null && player.ID == winner.ID) return true;
+
+        return false;
     }
 }

@@ -28,7 +28,7 @@ public class Game : MonoBehaviour
     [SerializeField]
     private GameObject JoinMenu;
 
-    static long[,,] ZobristTable = null;
+    public static long[,,] ZobristTable = null;
 
     [SerializeField]
     private TextMeshProUGUI WinText;
@@ -887,7 +887,6 @@ public class Game : MonoBehaviour
 
     public void Transition(UCB1Tree.Transition t)
     {
-        bool isWin = false;
         processTurnString(new Turn(t.Builder, t.Move, t.Build), CurrentPlayer, this);
 
         moveNum++;
