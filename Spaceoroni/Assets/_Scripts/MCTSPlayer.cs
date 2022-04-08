@@ -4,13 +4,16 @@ using UnityEngine;
 
     public class MCTSPlayer : IPlayer
     {
+
+        public new SimBuilder Builder1;
+        public new SimBuilder Builder2;
         protected Turn currentTurn;
         public MCTSPlayer() { }
 
         public MCTSPlayer(IPlayer p)
         {
-            Builder1 = new Builder(Coordinate.stringToCoord(p.getBuilderLocations().Substring(0, 2)));
-            Builder2 = new Builder(Coordinate.stringToCoord(p.getBuilderLocations().Substring(2, 2)));
+            Builder1 = new SimBuilder(Coordinate.stringToCoord(p.getBuilderLocations().Substring(0, 2)));
+            Builder2 = new SimBuilder(Coordinate.stringToCoord(p.getBuilderLocations().Substring(2, 2)));
             state = p.state;
             ID = p.ID;
         }

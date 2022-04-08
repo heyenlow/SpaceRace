@@ -1,3 +1,4 @@
+using Assets._Scripts.MCTS;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ public class SimGame : MonoBehaviour
         }
         set { }
     }
+    public long Hash;
 
     public enum PlayerState
     {
@@ -23,26 +25,32 @@ public class SimGame : MonoBehaviour
     };
 
     int[,] Board;
-    long Hash;
-    MCTSPlayer player1, player2;
-    public SimGame() { }
+    IPlayer Player1, Player2;
+
+    public SimGame(){}
+
+    public SimGame(SimGame simGame) 
+    {
+        Hash = computeHash();
+    }
+
     public SimGame(Game g)
     {
         this.Board = g.Board;
-        player1 = new MCTSPlayer (g.Player1);
-        player2 = new MCTSPlayer(g.Player2);
+        Player1 = new MCTSPlayer (g.Player1);
+        Player2 = new MCTSPlayer(g.Player2);
         Hash = g.Hash;
     }
 
     public PlayerState playerState { get; set; }
-    public SimIPlayer Player1;
-    public SimIPlayer Player2;
     public int moveNum = 0;
     public int timeToTurn = 2;
 
-    public SimIPlayer CurrentPlayer => (moveNum % 2 == 0) ? Player1 : Player2;
-    public SimIPlayer Rival => (moveNum % 2 == 0) ? Player2 : Player1;
+    public IPlayer CurrentPlayer => (moveNum % 2 == 0) ? Player1 : Player2;
+    public IPlayer Rival => (moveNum % 2 == 0) ? Player2 : Player1;
     public static bool cancelTurn = false;
+    public MCTSPlayer curPlayer;
+    public bool simulationRunning;
 
     public bool processTurnString(string turn)
     {
@@ -51,29 +59,30 @@ public class SimGame : MonoBehaviour
         // sooooo......
         if (turn.Equals(string.Empty))
         {
-            CurrentPlayer.state = SimIPlayer.States.Loser;
-            Rival.state = SimIPlayer.States.Winner;
+            CurrentPlayer.state = IPlayer.States.Loser;
+            Rival.state = IPlayer.States.Winner;
             return false;
         }
         string builderCoord = turn.Substring(0, 2);
         Coordinate builderLoc = Coordinate.stringToCoord(builderCoord);
         SimBuilder builder = null;
+        curPlayer = new MCTSPlayer(CurrentPlayer);
 
         // get builder represented by first 2 characters
-        if (CurrentPlayer.getBuilderLocations().Contains(Coordinate.coordToString(builderLoc)))
+        if (curPlayer.getBuilderLocations().Contains(Coordinate.coordToString(builderLoc)))
         {
             // checks if first 2 characters of string correlate to the location of one of curPlayer's builders
-            if (CurrentPlayer.Builder1.getLocation() == Coordinate.coordToString(builderLoc))
+            if (curPlayer.Builder1.getLocation().ToString() == Coordinate.coordToString(builderLoc))
             {
                 // MOVE CORRESPONDING BUILDER1
                 //curPlayer.Builder1.move(builderLoc); <-- what the heck was this?
-                builder = CurrentPlayer.Builder1;
+                builder = curPlayer.Builder1;
             }
-            else if (CurrentPlayer.Builder2.getLocation() == Coordinate.coordToString(builderLoc))
+            else if (curPlayer.Builder2.getLocation().ToString() == Coordinate.coordToString(builderLoc))
             {
                 // MOVE CORRESPONDING BUILDER2
                 //curPlayer.Builder2.move(Coordinate.stringToCoord(Coordinate.coordToString(builderLoc))); <-- what the heck was this?
-                builder = CurrentPlayer.Builder2;
+                builder = curPlayer.Builder2;
             }
         }
         else
@@ -96,8 +105,8 @@ public class SimGame : MonoBehaviour
 
         if (state[move.x, move.y] == 3)
         {
-            CurrentPlayer.state = SimIPlayer.States.Winner;
-            Rival.state = SimIPlayer.States.Loser;
+            CurrentPlayer.state = MCTSPlayer.States.Winner;
+            Rival.state = MCTSPlayer.States.Loser;
             return true;
         }
         // If not over Where to build?
@@ -247,6 +256,199 @@ public class SimGame : MonoBehaviour
             default:
                 return -1;
         }
+    }
+
+    public SimGame DeepCopy()
+    {
+        SimGame copy = new SimGame();
+        copy.Board = this.Board;
+        copy.Player1 = new MCTSPlayer(this.Player1);
+        copy.Player2 = new MCTSPlayer(this.Player2);
+        copy.Hash = this.Hash;
+
+
+        return copy;
+    }
+
+    public List<UCB1Tree.Transition> GetLegalTransitions()
+    {
+        List<UCB1Tree.Transition> ret = new List<UCB1Tree.Transition>();
+        // get all possible moves from each builder including new build locations....
+        // builder 1...
+        List<string> moves = getAllPossibleMoves(Coordinate.stringToCoord(CurrentPlayer.getBuilderLocations().Substring(0, 2)));
+
+        for (int i = 0; i < moves.Count; i++)
+        {
+            List<string> builds = getAllPossibleBuilds(Coordinate.stringToCoord(moves[i]));
+            for (int j = 0; j < builds.Count; j++)
+            {
+
+                // create transition representing this possible move
+                UCB1Tree.Transition tmp = new UCB1Tree.Transition(Coordinate.stringToCoord(CurrentPlayer.getBuilderLocations().Substring(0, 2)), Coordinate.stringToCoord(moves[i]), Coordinate.stringToCoord(builds[j]), Hash);
+                // Hash Values are currently this current game's state hash
+
+                // need to change it to be the hash value of a game resulting from the move taking place.  without actually making the move?
+                SimGame tmpState = new SimGame(this.DeepCopy()); //copy current game state
+                string turnString = Coordinate.coordToString(tmp.Builder) + Coordinate.coordToString(tmp.Move) + Coordinate.coordToString(tmp.Build); // create turn string from this transition
+                Turn currTurn = new Turn(tmp.Builder, tmp.Move, tmp.Build);
+                string t = currTurn.ToString();
+
+                tmpState.processTurnString(t); // execute transition on copy board
+
+                tmp.Hash = tmpState.computeHash(); // this transition hash equals the hash of the copy state's Hash
+                ret.Add(tmp);
+            }
+        }
+        // builder 2...
+        moves = getAllPossibleMoves(Coordinate.stringToCoord(CurrentPlayer.getBuilderLocations().Substring(2, 2)));
+        for (int i = 0; i < moves.Count; i++)
+        {
+            List<string> builds = getAllPossibleBuilds(Coordinate.stringToCoord(moves[i]));
+            for (int j = 0; j < builds.Count; j++)
+            {
+                UCB1Tree.Transition tmp = new UCB1Tree.Transition(Coordinate.stringToCoord(CurrentPlayer.getBuilderLocations().Substring(2, 2)), Coordinate.stringToCoord(moves[i]), Coordinate.stringToCoord(builds[j]), Hash);
+                // Hash Values are currently this current game's state hash
+                // need to change it to be the hash value of a game resulting from the move taking place.  without actually making the move?
+                SimGame tmpState = new SimGame(DeepCopy());
+                Turn currTurn = new Turn(tmp.Builder, tmp.Move, tmp.Build);
+                string t = currTurn.ToString();
+
+                tmpState.processTurnString(t);
+                tmp.Hash = tmpState.computeHash();
+
+                ret.Add(tmp);
+            }
+        }
+        if (ret.Count == 0)
+        {
+            CurrentPlayer.state = IPlayer.States.Loser; // if you can't move you're a loser.
+            Rival.state = IPlayer.States.Winner;
+        }
+        return ret;
+    }
+
+    public void Rollout()
+    {
+        IPlayer winner = null;
+
+        System.Random rnd = RandomFactory.Create();
+        simulationRunning = false;
+        for (; winner == null; moveNum++)
+        {
+            var allPossibleMoves = GetLegalTransitions();
+            if (allPossibleMoves.Count == 0)
+            {
+                winner = Rival;
+                CurrentPlayer.state = IPlayer.States.Loser;
+                Rival.state = IPlayer.States.Winner;
+                break;
+            }
+            var randomMove = allPossibleMoves[rnd.Next(0, allPossibleMoves.Count)];
+            Turn currTurn = new Turn(randomMove.Builder, randomMove.Move, randomMove.Build);
+
+            bool won = isWin(randomMove.Move);
+            if (won)
+            {
+                CurrentPlayer.state = IPlayer.States.Winner;
+                Rival.state = IPlayer.States.Loser;
+                winner = CurrentPlayer;
+                break;
+            }
+
+            processTurnString(currTurn.ToString());
+
+            if (CurrentPlayer.state == IPlayer.States.Winner)
+            {
+                Rival.state = IPlayer.States.Loser;
+                winner = CurrentPlayer;
+            }
+            else if (CurrentPlayer.state == IPlayer.States.Loser)
+            {
+                Rival.state = IPlayer.States.Winner;
+                winner = Rival;
+            }
+
+        }
+
+    }
+
+
+    public List<string> getAllPossibleMoves(Coordinate c)
+    {
+        List<string> allMoves = new List<string>();
+        for (int i = -1; i <= 1; ++i)
+        {
+            for (int j = -1; j <= 1; ++j)
+            {
+                Coordinate test = new Coordinate(c.x + i, c.y + j);
+                //isValidMove Function candidate
+                if (Coordinate.inBounds(test) && Board[test.x, test.y] <= (Board[c.x, c.y] + 1) && Board[test.x, test.y] < 4 && locationClearOfAllBuilders(test))
+                {
+                    allMoves.Add(Coordinate.coordToString(test));
+                }
+            }
+        }
+
+        return allMoves;
+    }
+
+    //returns a string of all the coords someone in that position could build in
+    public List<string> getAllPossibleBuilds(Coordinate c)
+    {
+        List<string> allBuilds = new List<string>();
+        for (int i = -1; i <= 1; ++i)
+        {
+            for (int j = -1; j <= 1; ++j)
+            {
+                Coordinate test = new Coordinate(c.x + i, c.y + j);
+                if (Coordinate.inBounds(test) && Board[test.x, test.y] < 4 && locationClearOfAllBuilders(test) && !Coordinate.Equals(test, c))
+                {
+                    allBuilds.Add(Coordinate.coordToString(test));
+                }
+            }
+        }
+
+        return allBuilds;
+    }
+
+    public void Transition(UCB1Tree.Transition t)
+    {
+        bool isWin = false;
+        processTurnString(new Turn(t.Builder, t.Move, t.Build).ToString());
+
+        moveNum++;
+    }
+
+    public bool isWin(Coordinate c)
+    {
+        return Board[c.x, c.y] == 3;
+    }
+
+    public bool IsGameOver()
+    {
+        if (CurrentPlayer.state != IPlayer.States.Undetermined)
+        {
+            return true;
+        }
+        else if (Rival.state != IPlayer.States.Undetermined)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public bool IsWinner(IPlayer player)
+    {
+        IPlayer winner;
+        if (Player1.state == IPlayer.States.Winner) winner = Player1;
+        else if (Player2.state == IPlayer.States.Winner) winner = Player2;
+        else if (Player1.state == IPlayer.States.Loser) winner = Player2;
+        else if (Player2.state == IPlayer.States.Loser) winner = Player1;
+        else winner = null;
+
+        if (winner != null) return true;
+
+        return false;
     }
 
 }

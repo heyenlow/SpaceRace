@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SimPlayer : SimIPlayer
 {
+
     public SimPlayer()
     {
         // nothing happens here...
@@ -20,6 +21,7 @@ public class SimPlayer : SimIPlayer
         Builder2 = new SimBuilder(other.Builder2);
         state = other.state;
     }
+
     //public Coordinate SelectBuilder()
     //{
     //    //which builder do you want to move

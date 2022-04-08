@@ -774,20 +774,6 @@ public class Game : MonoBehaviour
         }
     }
 
-    public bool IsWinner(IPlayer player)
-    {
-        IPlayer winner;
-        if (Player1.state == IPlayer.States.Winner) winner = Player1;
-        else if (Player2.state == IPlayer.States.Winner) winner = Player2;
-        else if (Player1.state == IPlayer.States.Loser) winner = Player2;
-        else if (Player2.state == IPlayer.States.Loser) winner = Player1;
-        else winner = null;
-
-        if (winner != null) return true;
-
-        return false;
-    }
-
     public List<UCB1Tree.Transition> GetLegalTransitions()
     {
         List<UCB1Tree.Transition> ret = new List<UCB1Tree.Transition>();
@@ -898,16 +884,5 @@ public class Game : MonoBehaviour
         moveNum++;
     }
 
-    public bool IsGameOver()
-    {
-        if (CurrentPlayer.state != IPlayer.States.Undetermined)
-        {
-            return true;
-        }
-        else if (Rival.state != IPlayer.States.Undetermined)
-        {
-            return true;
-        }
-        return false;
-    }
+
 }
