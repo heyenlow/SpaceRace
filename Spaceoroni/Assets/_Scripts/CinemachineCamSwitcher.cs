@@ -27,10 +27,6 @@ public class CinemachineCamSwitcher : MonoBehaviour
 
 
     [SerializeField]
-    private CinemachineVirtualCamera TruckFollowVCam;
-    [SerializeField]
-    private CinemachineVirtualCamera TruckDoorVCam;
-    [SerializeField]
     private CinemachineVirtualCamera ElonTextVCam;
     [SerializeField]
     private Elon ElonAnimator;
@@ -107,8 +103,6 @@ public class CinemachineCamSwitcher : MonoBehaviour
         foreach (var c in IntroSceneCams) { c.Priority = 1; }
         //reset all cameras priorities to 1;
             BoardCameraHigh.Priority = 1;
-            TruckFollowVCam.Priority = 1;
-            TruckDoorVCam.Priority = 1;
             SolarSystemCam.Priority = 1;
             BoardCameraOther.Priority = 1;
             CenterEarthCamera.Priority = 1;
@@ -217,22 +211,6 @@ public class CinemachineCamSwitcher : MonoBehaviour
             if (introRunning) yield return new WaitForSeconds(2.5f);
         }
         if (introRunning) StartCoroutine(MoveToElonText());
-    }
-
-    private IEnumerator MoveToFollowTruck()
-    {
-        if (introRunning) ResetAllPriorities();
-        if (introRunning) TruckFollowVCam.Priority = 2;
-        if (introRunning) yield return new WaitForSeconds(3f);
-        //if (introRunning) Truck.Move();
-    }
-
-    private IEnumerator MoveToTruckDoor()
-    {
-        if (introRunning) ResetAllPriorities();
-        if (introRunning) TruckDoorVCam.Priority = 2;
-        if (introRunning) yield return new WaitForSeconds(6);
-        if (introRunning) yield return StartCoroutine(MoveToElonText());
     }
 
     public IEnumerator MoveToElonText()

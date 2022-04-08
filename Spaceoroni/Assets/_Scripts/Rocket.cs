@@ -12,7 +12,6 @@ public class Rocket : MonoBehaviour
     private void Start()
     {
         homeLocation = this.transform.position;
-        StartCoroutine(runEndOfGameAnimation());
     }
     void Update()
     {
