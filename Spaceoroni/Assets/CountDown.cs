@@ -8,8 +8,15 @@ public class CountDown : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI num;
 
+
+    int fontStartSize = 40;
     bool fontIncrease = false;
     int number = 2;
+
+    private void Start()
+    {
+        StartCoroutine(startCountdown());
+    }
     void Update()
     {
         if(fontIncrease) num.fontSize += 5;
@@ -17,7 +24,7 @@ public class CountDown : MonoBehaviour
 
     private void decrement()
     {
-        num.fontSize = 60;
+        num.fontSize = fontStartSize;
         num.text = number.ToString();
         number--;
     }
@@ -40,7 +47,7 @@ public class CountDown : MonoBehaviour
         yield return new WaitForSeconds(0.4f);
         
         num.text = "";
-        num.fontSize = 60;
+        num.fontSize = fontStartSize;
         number = 2;
 
         Game.countDownActive = false;
