@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SimGame : MonoBehaviour
+public class SimGame //: MonoBehaviour
 {
     char[,] Board;
     public int[,] state;
