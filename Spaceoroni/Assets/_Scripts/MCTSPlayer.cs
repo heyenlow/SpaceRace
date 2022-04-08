@@ -100,7 +100,7 @@ using UnityEngine;
             {
                 yield return null;
             }
-            Game tmpState = g.DeepCopy();
+            SimGame tmpState = new SimGame(g);
 
             //UCB1Tree.CoroutineWithData cd = new UCB1Tree.CoroutineWithData(this, tree.Search(tmpState, 500));
 

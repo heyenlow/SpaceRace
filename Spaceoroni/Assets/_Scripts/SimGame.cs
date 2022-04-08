@@ -22,13 +22,14 @@ public class SimGame : MonoBehaviour
     };
 
     public PlayerState playerState { get; set; }
-    public IPlayer Player1;
-    public IPlayer Player2;
+    public SimIPlayer Player1;
+    public SimIPlayer Player2;
     public int moveNum = 0;
     public int timeToTurn = 2;
+    public long Hash;
 
-    public IPlayer CurrentPlayer => (moveNum % 2 == 0) ? Player1 : Player2;
-    public IPlayer Rival => (moveNum % 2 == 0) ? Player2 : Player1;
+    public SimIPlayer CurrentPlayer => (moveNum % 2 == 0) ? Player1 : Player2;
+    public SimIPlayer Rival => (moveNum % 2 == 0) ? Player2 : Player1;
     public static bool cancelTurn = false;
 
     void PlaceBuilders()
@@ -85,28 +86,21 @@ public class SimGame : MonoBehaviour
 
     public SimIPlayer PlayGameToEnd()
     {
-        SimIPlayer curPlayer;
-        SimIPlayer othPlayer;
         SimIPlayer winner = null;
 
         PlaceBuilders();
 
         // Play until we have a winner or tie?
-        for (int moveNum = 0; winner == null; moveNum++)
+        for (; winner == null; moveNum++)
         {
-            // Determine who's turn it is.
-            curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
-            othPlayer = (moveNum % 2 == 0) ? Player2 : Player1;
-
-
-            //Check if last turn lost
-            if (playerState == PlayerState.Loser)
+            // Check if last turn lost?
+            if (Rival.state == SimIPlayer.States.Loser)
             {
-                winner = curPlayer;
+                winner = CurrentPlayer;
             }
             else
             {
-                if (hasPossibleTurns(curPlayer))
+                if (hasPossibleTurns(CurrentPlayer))
                 {
 
                     //if it is a string player we just need to wait before getting the turn and processing it
@@ -157,6 +151,10 @@ public class SimGame : MonoBehaviour
         return winner;
     }
 
+    internal Game DeepCopy()
+    {
+        throw new System.NotImplementedException();
+    }
 
     private bool hasPossibleTurns(IPlayer p)
     {
@@ -176,6 +174,11 @@ public class SimGame : MonoBehaviour
         }
 
         return false;
+    }
+
+    internal List<UCB1Tree.Transition> GetLegalTransitions()
+    {
+        throw new System.NotImplementedException();
     }
 
     public List<string> getAllPossibleMoves(Coordinate c)

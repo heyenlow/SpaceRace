@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public class SimIPlayer : MonoBehaviour
+public abstract class SimIPlayer : MonoBehaviour
 {
     public int ID;
     public enum States
@@ -60,6 +60,8 @@ public class SimIPlayer : MonoBehaviour
     public T DeepCopy<T>()
         where T : IPlayer
     {
+        // DEPRECATED FEATURE
+        // SERIALIZATION NOT USABLE FOR UNITY
         T temp;
         using (MemoryStream ms = new MemoryStream())
         {

@@ -76,7 +76,7 @@ public class UCB1Tree : MonoBehaviour
 
     private static double UCB1(double childWins, double childPlays, double parentPlays) => (childWins / childPlays) + Math.Sqrt(2f * Math.Log(parentPlays) / childPlays);
 
-    public IEnumerator Search(Game game, int simulations, Turn currentTurn, List<Turn> turns)
+    public IEnumerator Search(SimGame game, int simulations, Turn currentTurn, List<Turn> turns)
     {
 
         Dictionary<long, Node> tree = new Dictionary<long, Node>
