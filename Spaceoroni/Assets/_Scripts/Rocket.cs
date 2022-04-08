@@ -12,6 +12,7 @@ public class Rocket : MonoBehaviour
     private void Start()
     {
         homeLocation = this.transform.position;
+        StartCoroutine(runEndOfGameAnimation());
     }
     void Update()
     {
@@ -31,9 +32,11 @@ public class Rocket : MonoBehaviour
         movingRocket = this.gameObject;
     }
 
-    public void runEndOfGameAnimation()
+    public IEnumerator runEndOfGameAnimation()
     {
         GetComponentInChildren<EndOfGameAnimation>().elonBlastOff();
+        yield return new WaitForSeconds(5);
+        GetComponentInChildren<EndOfGameAnimation>().resetAnim();
     }
 
     public void resetLocation()

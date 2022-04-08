@@ -27,5 +27,7 @@ public class EndOfGameAnimation : MonoBehaviour
     public void resetAnim()
     {
         anim.SetTrigger("Reset");
+        elon.SetActive(false);
+        jeff.SetActive(false);
     }
 }

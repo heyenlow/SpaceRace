@@ -12,7 +12,7 @@ public class Location : MonoBehaviour
     public void runEndOfGameAnimation()
     {
         var rocket = this.GetComponentInChildren<Rocket>();
-        rocket.runEndOfGameAnimation();
+        StartCoroutine(rocket.runEndOfGameAnimation());
     }
 
     public void blastOffRocket()
@@ -24,7 +24,7 @@ public class Location : MonoBehaviour
         this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("FX/Flare");
     }
 
-    public void setLocationAlive() { deadLocation = false; GetComponentInChildren<EndOfGameAnimation>().resetAnim(); }
+    public void setLocationAlive() { deadLocation = false; }// GetComponentInChildren<EndOfGameAnimation>().resetAnim(); }
 
     public IEnumerator blastOffAnimatin()
     {
