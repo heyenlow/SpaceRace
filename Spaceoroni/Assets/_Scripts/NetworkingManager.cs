@@ -89,9 +89,9 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         }
        if(playersWaiting == 2)
         {
-            gameManager.restartAfterMultiplayer = true;
             notWaiting();
-            Debug.Log("asd;lkjf");
+            playersWaiting--;
+            gameManager.restartAfterMultiplayer = true;
             gameManager.RestartGame();
             WaitingToPlayAgain.SetActive(false);
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
@@ -181,6 +181,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
             if (playersWaiting > 0)
             {
                 playersWaiting--;
+                Debug.Log(playersWaiting);
             }
         }
         else
@@ -189,6 +190,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
             if(playersWaiting > 0)
             {
                 playersWaiting--;
+                Debug.Log(playersWaiting);
             }
         }
 
