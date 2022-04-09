@@ -346,10 +346,10 @@ public class Game : MonoBehaviour
                         if (t.isWin)
                         {
                             built = true;
-                            winner = curPlayer;
+                            winner = CurrentPlayer;
                             //wait to move then set buidler inactive
                             yield return new WaitForSeconds(0.6f);
-                            curPlayer.setBuilderAtLocationInactive(t.MoveLocation);
+                            CurrentPlayer.setBuilderAtLocationInactive(t.MoveLocation);
                             
                             yield return new WaitForSeconds(2);
                             BlastOffRocket(t.MoveLocation);
@@ -366,7 +366,7 @@ public class Game : MonoBehaviour
                 //Check if win
                 if (playerState == PlayerState.Winner)
                 {
-                    winner = curPlayer;
+                    winner = CurrentPlayer;
                 }
             }
         }

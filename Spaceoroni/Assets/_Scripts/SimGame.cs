@@ -94,7 +94,8 @@ public class SimGame //: MonoBehaviour
                 var tmpState = new SimGame(DeepCopy());
                 string turnString = Coordinate.coordToString(tmp.Builder) + Coordinate.coordToString(tmp.Move) + Coordinate.coordToString(tmp.Build); // create turn string from this transition
                 tmpState.processTurnString(turnString); // execute transition on copy board
-
+                
+                tmpState.computeHash(); // hopefully update hash
                 tmp.Hash = tmpState.Hash; // this hash is the hash of the copy's current state
 
                 ret.Add(tmp);
