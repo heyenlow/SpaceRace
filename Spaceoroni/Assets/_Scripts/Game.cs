@@ -141,23 +141,31 @@ public class Game : MonoBehaviour
         
     }
 
+    public bool restartAfterMultiplayer = false;
     public void RestartGame()
     {
-        cancelTurn = true;
-        StopAllCoroutines();
-        resetAllLocationsAlive();
+        if (GameSettings.gameType == GameSettings.GameType.Multiplayer && !restartAfterMultiplayer)
+        {
+            
+        }
+        else 
+        {
+            restartAfterMultiplayer = false;
+            cancelTurn = true;
+            StopAllCoroutines();
+            resetAllLocationsAlive();
 
+            //needs to reset the reader to the first move
+            StringGameReader.MoveCount = 0;
+            HighlightManager.unHighlightEverything();
+            HighlightManager.highlightedObjects.Clear();
+            if (Player1 != null && Player2 != null) clearPlayersTurnsAndSendBuildersHome();
+            curPlayer = null;
+            rival = null;
+            clickLocation = null;
 
-        //needs to reset the reader to the first move
-        StringGameReader.MoveCount = 0;
-        HighlightManager.unHighlightEverything();
-        HighlightManager.highlightedObjects.Clear();
-        if (Player1 != null && Player2 != null) clearPlayersTurnsAndSendBuildersHome();
-        curPlayer = null;
-        rival = null;
-        clickLocation = null;
-
-        StartGame();
+            StartGame();
+        }
     }
 
     private void clearPlayersTurnsAndSendBuildersHome()

@@ -89,7 +89,10 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         }
        if(playersWaiting == 2)
         {
+            gameManager.restartAfterMultiplayer = true;
             notWaiting();
+            Debug.Log("asd;lkjf");
+            gameManager.RestartGame();
             WaitingToPlayAgain.SetActive(false);
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
         }
@@ -157,11 +160,6 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
             }
 
             PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
-
-            if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("waiting"))
-            {
-                Debug.Log(PhotonNetwork.LocalPlayer.CustomProperties["waiting"]);
-            }
 
             if(PhotonNetwork.LocalPlayer.CustomProperties["waiting"].Equals(true))
             {
