@@ -307,45 +307,41 @@ public class Game : MonoBehaviour
         built = true;
 
         // Play until we have a winner or tie?
-        for (int moveNum = 0; winner == null; moveNum++)
+        for (; winner == null; moveNum++)
         {
 
             yield return StartCoroutine(waitForBuildersToMove());
             yield return StartCoroutine(waitForBuildersToBuild());
 
-            // Determine who's turn it is.
-            curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
-            othPlayer = (moveNum % 2 == 0) ? Player2 : Player1;
-
             
             //Check if last turn lost
             if (playerState == PlayerState.Loser)
             {
-                winner = curPlayer;
+                winner = CurrentPlayer;
             }
             else
             {
-                    if (hasPossibleTurns(curPlayer))
+                    if (hasPossibleTurns(CurrentPlayer))
                     {
                         // string turn BUILDERMOVEBUILD string
                         PhotonView photonView = PhotonView.Get(this);
 
                         //if it is a string player we just need to wait before getting the turn and processing it
-                        if (curPlayer is StringPlayer)
+                        if (CurrentPlayer is StringPlayer)
                         {
                             yield return new WaitForSeconds(timeToTurn);
                         }
                         else //if it is any other player we need to start getting the turn
                         {
-                            yield return StartCoroutine(curPlayer.beginTurn(this));
+                            yield return StartCoroutine(CurrentPlayer.beginTurn(this));
                         }
 
-                        Turn t = curPlayer.getNextTurn();
+                        Turn t = CurrentPlayer.getNextTurn();
                         // update the board with the current player's move
                         Debug.Log("Processing Turn: " + t.ToString());
                         
                         built = false;
-                        processTurnString(t, curPlayer, this);
+                        processTurnString(t, CurrentPlayer, this);
                         
                         if (t.isWin)
                         {
@@ -359,7 +355,7 @@ public class Game : MonoBehaviour
                             BlastOffRocket(t.MoveLocation);
                         }
                     }
-                    else { winner = othPlayer; }
+                    else { winner = Rival; }
 
                 if(winner != null){
                     if (winner == Player1) { WinText.text = "You Win!"; }

@@ -48,7 +48,9 @@ public class SimGame //: MonoBehaviour
         System.Array.Copy(g.state, g.state.GetLowerBound(0), state, state.GetLowerBound(0), 25);
 
         Player1 = new SimPlayer(g.Player1);
+        Player1.ID = 0;
         Player2 = new SimPlayer(g.Player2);
+        Player2.ID = 1;
         
         moveNum = g.moveNum;
     }
