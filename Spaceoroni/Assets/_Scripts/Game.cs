@@ -711,11 +711,11 @@ public class Game : MonoBehaviour
             {
                 for (int k = 0; k < 21; k++)
                 {
-                    System.Random rng = new System.Random();
                     byte[] bytes = new byte[8];
-                    rng.NextBytes(bytes);
+                    rnd.NextBytes(bytes);
                     long uint64 = System.BitConverter.ToInt64(bytes, 0);
                     ZobristTable[i, j, k] = uint64;
+                    rnd.Next();
                 }
 
             }

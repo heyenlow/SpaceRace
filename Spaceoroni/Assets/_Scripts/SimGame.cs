@@ -89,10 +89,11 @@ public class SimGame //: MonoBehaviour
                 // Hash Values are currently this current game's state hash
 
                 // need to change it to be the hash value of a game resulting from the move taking place.  without actually making the move?
-                SimGame tmpState = DeepCopy(); //copy current game state
+                var tmpState = new SimGame(DeepCopy());
                 string turnString = Coordinate.coordToString(tmp.Builder) + Coordinate.coordToString(tmp.Move) + Coordinate.coordToString(tmp.Build); // create turn string from this transition
                 tmpState.processTurnString(turnString); // execute transition on copy board
-                tmp.Hash = tmpState.computeHash(); // this transition hash equals the hash of the copy state's Hash
+
+                tmp.Hash = tmpState.Hash; // this hash is the hash of the copy's current state
 
                 ret.Add(tmp);
             }
