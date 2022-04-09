@@ -17,7 +17,10 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     bool isConnecting;
     string gameVersion = "1";
 
-    private List<Listing> _listings = new List<Listing>(); 
+    private List<Listing> _listings = new List<Listing>();
+
+    private ExitGames.Client.Photon.Hashtable customProperty = new ExitGames.Client.Photon.Hashtable();
+    private bool waiting = false;
 
     #endregion
 
@@ -47,6 +50,9 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     private GameObject PlayerDisconnect;
     [SerializeField]
     private GameObject PostGamePanel;
+    [SerializeField]
+    private GameObject WaitingToPlayAgain;
+
 
     [SerializeField]
     private Game gameManager;
@@ -127,6 +133,40 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
             Debug.Log("Not Connected");
         }
        
+    }
+
+    public void isWaiting()
+    {
+        if (PhotonNetwork.IsConnected)
+        {
+            WaitingToPlayAgain.SetActive(true);
+            waiting = true;
+            customProperty["waiting"] = waiting;
+
+            PhotonNetwork.LocalPlayer.CustomProperties = customProperty;
+            if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("waiting"))
+            {
+                Debug.Log(PhotonNetwork.LocalPlayer.CustomProperties["waiting"]);
+            }
+
+            if(PhotonNetwork.LocalPlayer.CustomProperties["waiting"].Equals(true))
+            {
+                Debug.Log("This value is true and the function worked properly!");
+            }
+
+
+        }
+    }
+
+    public void notWaiting()
+    {
+        waiting = false;
+        customProperty["waiting"] = waiting;
+
+        if(PhotonNetwork.LocalPlayer.CustomProperties["waiting"].Equals(false))
+        {
+            Debug.Log("This value is false and the function worked properly!");
+        }
     }
 
     public static void LeaveRoom()
