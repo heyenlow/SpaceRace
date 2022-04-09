@@ -89,9 +89,9 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         }
        if(playersWaiting == 2)
         {
+            notWaiting();
             WaitingToPlayAgain.SetActive(false);
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
-            notWaiting();
         }
     }
 
@@ -180,19 +180,23 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         {
             hash.Remove("waiting");
             hash.Add("waiting", waiting);
+            if (playersWaiting > 0)
+            {
+                playersWaiting--;
+            }
         }
         else
         {
             hash.Add("waiting", waiting);
+            if(playersWaiting > 0)
+            {
+                playersWaiting--;
+            }
         }
 
         if (PhotonNetwork.LocalPlayer.CustomProperties["waiting"].Equals(false))
         {
             Debug.Log("This value is false and the function worked properly!");
-        }
-        if(playersWaiting > 0)
-        {
-            playersWaiting--;
         }
     }
 
