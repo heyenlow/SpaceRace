@@ -78,7 +78,7 @@ public class UCB1Tree : MonoBehaviour
 
     public IEnumerator Search(SimGame game, int simulations, Turn currentTurn, List<Turn> turns)
     {
-
+        if (Game.ZobristTable == null) throw new System.NullReferenceException("MCTS Search has an uninitialized zobrist table");
         Dictionary<long, Node> tree = new Dictionary<long, Node>
         {
             { game.Hash, new Node(game.CurrentPlayer) }
@@ -98,12 +98,10 @@ public class UCB1Tree : MonoBehaviour
 
             while (!copy.IsGameOver())
             {
-                Debug.Log("Enters while loop");
                 allTransitions = copy.GetLegalTransitions();
 
                 if (allTransitions.Count == 0)
                 {
-                    Debug.Log("trans == 0");
                     break;
                 }
                 
@@ -113,7 +111,7 @@ public class UCB1Tree : MonoBehaviour
                     if (!tree.ContainsKey(t.Hash))
                         transitionNoStats.Add(t);
 
-                    Debug.Log(transitionNoStats);
+                    Debug.Log(Coordinate.coordToString(t.Builder) + Coordinate.coordToString(t.Move) + Coordinate.coordToString(t.Build));
                 }
 
                 // SELECTION
@@ -141,7 +139,7 @@ public class UCB1Tree : MonoBehaviour
                 // EXPANSION
                 else
                 {
-                    Debug.Log("Expansdion");
+                    Debug.Log("Expansion");
                     Transition t = transitionNoStats.RandomItem(rng);
                     copy.Transition(t);
                     Node node = new Node(copy.CurrentPlayer);

@@ -93,7 +93,6 @@ using UnityEngine;
 
         public override IEnumerator beginTurn(Game g)
         {
-            UCB1Tree tree = new UCB1Tree();
             // this is the current player
             // opp is rival
             if (state != States.Undetermined)
@@ -103,6 +102,7 @@ using UnityEngine;
             SimGame tmpState = new SimGame(g);
 
             //UCB1Tree.CoroutineWithData cd = new UCB1Tree.CoroutineWithData(this, tree.Search(tmpState, 500));
+            UCB1Tree tree = new UCB1Tree();
 
 
             yield return StartCoroutine(tree.Search(tmpState, 500, currentTurn, turns));

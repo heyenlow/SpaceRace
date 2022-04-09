@@ -11,8 +11,7 @@ public class SimGame //: MonoBehaviour
     public SimPlayer Player2;
     public int moveNum = 0;
     public int timeToTurn = 2;
-    public long Hash;
-    public static long[,,] ZobristTable = null;
+    public long Hash => computeHash();
 
     public SimPlayer CurrentPlayer => (moveNum % 2 == 0) ? Player1 : Player2;
     public SimPlayer Rival => (moveNum % 2 == 0) ? Player2 : Player1;
@@ -28,44 +27,30 @@ public class SimGame //: MonoBehaviour
 
     public SimGame(SimGame g)
     {
-        state = new int[5, 5];
         Board = new char[5, 5];
-        // TODO: translate g.state to a character array, not an int array.
+        Board = g.TranslateState();
+        
+        state = new int[5, 5];
         System.Array.Copy(g.state, g.state.GetLowerBound(0), state, state.GetLowerBound(0), 25);
+        
         Player1 = new SimPlayer(g.Player1);
         Player2 = new SimPlayer(g.Player2);
-        // if the table has already been initialized, pls don't create a new random zobrist table
-        if (ZobristTable != null)
-        {
-            System.Array.Copy(Game.ZobristTable, Game.ZobristTable.GetLowerBound(0), ZobristTable, ZobristTable.GetLowerBound(0), 525);
-        }
-        else
-        {
-            throw new System.NullReferenceException("SimGame(SimGame g) was passed a null zobrist table.");
-        }
-        Board = g.TranslateState();
+        
+        moveNum = g.moveNum;
     }
 
     public SimGame(Game g)
     {
         Board = new char[5, 5];
+        Board = g.TranslateState();
+        
         state = new int[5, 5];
-        // TODO: translate g.state to a character array, not an int array.
-
         System.Array.Copy(g.state, g.state.GetLowerBound(0), state, state.GetLowerBound(0), 25);
+
         Player1 = new SimPlayer(g.Player1);
         Player2 = new SimPlayer(g.Player2);
-        // if the table has already been initialized, pls don't create a new random zobrist table
-        if (Game.ZobristTable != null)
-        {
-            ZobristTable = new long[5, 5, 21]; // 5x5x21 = 525
-            System.Array.Copy(Game.ZobristTable, Game.ZobristTable.GetLowerBound(0), ZobristTable, ZobristTable.GetLowerBound(0), 525);
-        }
-        else
-        {
-            throw new System.NullReferenceException("SimGame(Game g) was passed a null zobrist table.");            
-        }
-        Board = g.TranslateState();
+        
+        moveNum = g.moveNum;
     }
 
 
@@ -146,6 +131,7 @@ public class SimGame //: MonoBehaviour
     /// <returns></returns>
     public char[,] TranslateState()
     {
+        // TODO: this function isn't returning the right array
         char[,] ret = new char[5, 5];
         // takes the Game g.state int matrix and converts it to a char matrix with representations for builders on board
         Coordinate tmp = new Coordinate();
@@ -160,35 +146,33 @@ public class SimGame //: MonoBehaviour
                 }
                 else
                 {
-                    char piece = '0';
                     switch (state[i, j])
                     {
                         case 0:
-                            if (Equals(tmp, Player1.Builder1.Location)) piece = 'A';
-                            else if (Equals(tmp, Player1.Builder2.Location)) piece = 'E';
-                            else if (Equals(tmp, Player2.Builder1.Location)) piece = 'a';
-                            else if (Equals(tmp, Player2.Builder2.Location)) piece = 'e';
+                            if (Coordinate.Equals(tmp, Player1.Builder1.Location)) ret[i, j] = 'A';
+                            else if (Coordinate.Equals(tmp, Player1.Builder2.Location)) ret[i, j] = 'E';
+                            else if (Coordinate.Equals(tmp, Player2.Builder1.Location)) ret[i, j] = 'a';
+                            else if (Coordinate.Equals(tmp, Player2.Builder2.Location)) ret[i, j] = 'e';
                             break;
                         case 1:
-                            if (Equals(tmp, Player1.Builder1.Location)) piece = 'B';
-                            else if (Equals(tmp, Player1.Builder2.Location)) piece = 'F';
-                            else if (Equals(tmp, Player2.Builder1.Location)) piece = 'b';
-                            else if (Equals(tmp, Player2.Builder2.Location)) piece = 'f';
+                            if (Coordinate.Equals(tmp, Player1.Builder1.Location)) ret[i, j] = 'B';
+                            else if (Coordinate.Equals(tmp, Player1.Builder2.Location)) ret[i, j] = 'F';
+                            else if (Coordinate.Equals(tmp, Player2.Builder1.Location)) ret[i, j] = 'b';
+                            else if (Coordinate.Equals(tmp, Player2.Builder2.Location)) ret[i, j] = 'f';
                             break;
                         case 2:
-                            if (Equals(tmp, Player1.Builder1.Location)) piece = 'C';
-                            else if (Equals(tmp, Player1.Builder2.Location)) piece = 'G';
-                            else if (Equals(tmp, Player2.Builder1.Location)) piece = 'c';
-                            else if (Equals(tmp, Player2.Builder2.Location)) piece = 'g';
+                            if (Coordinate.Equals(tmp, Player1.Builder1.Location)) ret[i, j] = 'C';
+                            else if (Coordinate.Equals(tmp, Player1.Builder2.Location)) ret[i, j] = 'G';
+                            else if (Coordinate.Equals(tmp, Player2.Builder1.Location)) ret[i, j] = 'c';
+                            else if (Coordinate.Equals(tmp, Player2.Builder2.Location)) ret[i, j] = 'g';
                             break;
                         case 3:
-                            if (Equals(tmp, Player1.Builder1.Location)) piece = 'D';
-                            else if (Equals(tmp, Player1.Builder2.Location)) piece = 'H';
-                            else if (Equals(tmp, Player2.Builder1.Location)) piece = 'd';
-                            else if (Equals(tmp, Player2.Builder2.Location)) piece = 'h';
+                            if (Coordinate.Equals(tmp, Player1.Builder1.Location)) ret[i, j] = 'D';
+                            else if (Coordinate.Equals(tmp, Player1.Builder2.Location)) ret[i, j] = 'H';
+                            else if (Coordinate.Equals(tmp, Player2.Builder1.Location)) ret[i, j] = 'd';
+                            else if (Coordinate.Equals(tmp, Player2.Builder2.Location)) ret[i, j] = 'h';
                             break;
                     }
-                    ret[i, j] = piece;
                 }
             }
 
@@ -199,7 +183,8 @@ public class SimGame //: MonoBehaviour
 
     public long computeHash()
     {
-        char[,] Board = TranslateState();
+        if (Game.ZobristTable == null) return (long)0;
+        Board = TranslateState();
         long h = 0;
         for (int i = 0; i < 5; i++)
         {
@@ -208,7 +193,7 @@ public class SimGame //: MonoBehaviour
                 if (Board[i, j] != '-')
                 {
                     int piece = indexOf(Board[i, j]);
-                    h ^= ZobristTable[i, j, piece];
+                    h ^= Game.ZobristTable[i, j, piece];
                 }
             }
         }
