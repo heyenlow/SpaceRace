@@ -50,7 +50,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     private GameObject PostGamePanel;
     [SerializeField]
     private GameObject WaitingToPlayAgain;
-
+    [SerializeField]
+    private GameObject PostGamePanel_PlayAgain;
 
     [SerializeField]
     private Game gameManager;
@@ -286,7 +287,14 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     {
         Debug.LogFormat("OnPlayerLeftRoom() ", otherPlayer);
         RoomListingsContent.DestroyChildren();
-        PlayerDisconnect.SetActive(true);
+        if (PostGamePanel.activeSelf)
+        {
+            PostGamePanel_PlayAgain.SetActive(false);
+        }
+        else
+        {
+            PlayerDisconnect.SetActive(true);
+        }
         HighlightManager.unHighlightEverything();
 
         if(playersWaiting > 0)
