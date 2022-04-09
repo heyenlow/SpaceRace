@@ -18,7 +18,6 @@ public class Location : MonoBehaviour
     public void blastOffRocket()
     {
         var rocket = this.GetComponentInChildren<Rocket>();
-        StartCoroutine(blastOffAnimatin());
         rocket.blastOffRocket();
         deadLocation = true;
         this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("FX/Flare");
@@ -26,13 +25,6 @@ public class Location : MonoBehaviour
 
     public void setLocationAlive() { deadLocation = false; }// GetComponentInChildren<EndOfGameAnimation>().resetAnim(); }
 
-    public IEnumerator blastOffAnimatin()
-    {
-        this.transform.GetChild(1).gameObject.SetActive(true);
-        yield return new WaitForSeconds(5);
-        this.transform.GetChild(1).gameObject.SetActive(false);
-        yield return null;
-    }
 
     private void OnMouseOver()
     {

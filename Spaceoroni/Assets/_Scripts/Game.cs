@@ -355,62 +355,73 @@ public class Game : MonoBehaviour
             }
             else
             {
-                    if (hasPossibleTurns(curPlayer))
+                if (hasPossibleTurns(curPlayer))
+                {
+                    // string turn BUILDERMOVEBUILD string
+                    PhotonView photonView = PhotonView.Get(this);
+
+                    //if it is a string player we just need to wait before getting the turn and processing it
+                    if (curPlayer is StringPlayer)
                     {
-                        // string turn BUILDERMOVEBUILD string
-                        PhotonView photonView = PhotonView.Get(this);
+                        yield return new WaitForSeconds(timeToTurn);
+                    }
+                    else //if it is any other player we need to start getting the turn
+                    {
+                        yield return StartCoroutine(curPlayer.beginTurn(this));
+                    }
 
-                        //if it is a string player we just need to wait before getting the turn and processing it
-                        if (curPlayer is StringPlayer)
-                        {
-                            yield return new WaitForSeconds(timeToTurn);
-                        }
-                        else //if it is any other player we need to start getting the turn
-                        {
-                            yield return StartCoroutine(curPlayer.beginTurn(this));
-                        }
-
-                        Turn t = curPlayer.getNextTurn();
-                        // update the board with the current player's move
-                        Debug.Log("Processing Turn: " + t.ToString());
+                    Turn t = curPlayer.getNextTurn();
+                    // update the board with the current player's move
+                    Debug.Log("Processing Turn: " + t.ToString());
     
-                        while (PAUSED) { yield return new WaitForEndOfFrame(); }
+                    while (PAUSED) { yield return new WaitForEndOfFrame(); }
 
-                        if (t.isWin)
+                    if (t.isWin)
+                    {
+                        countDown.gameObject.SetActive(true);
+                        countDownActive = true;
+                        StartCoroutine(countDown.startCountdown());
+
+
+                        built = true;
+                        winner = curPlayer;
+                        //wait to move then set buidler inactive
+                        curPlayer.setBuilderAtLocationInactive(t.BuilderLocation);
+                        runEndOfGameAnimation(t.MoveLocation);
+
+                        while (countDownActive)
                         {
-                            countDown.gameObject.SetActive(true);
-                            countDownActive = true;
-                            StartCoroutine(countDown.startCountdown());
-
-
-                            built = true;
-                            winner = curPlayer;
-                            //wait to move then set buidler inactive
-                            curPlayer.setBuilderAtLocationInactive(t.BuilderLocation);
-                            runEndOfGameAnimation(t.MoveLocation);
-
-                            while (countDownActive)
-                            {
-                                yield return new WaitForEndOfFrame();
-                            }
-                            if (!countDownActive)
-                            {
-                                yield return new WaitForSeconds(0.4f);
-                                BlastOffRocket(t.MoveLocation);
+                            yield return new WaitForEndOfFrame();
+                        }
+                        if (!countDownActive)
+                        {
+                            yield return new WaitForSeconds(0.4f);
+                            BlastOffRocket(t.MoveLocation);
                             countDown.gameObject.SetActive(false);
-                            }
                         }
-                        else
-                        {
-                            built = false;
-                            processTurnString(t, curPlayer, this);
-                        }
+                    }
+                    else
+                    {
+                        built = false;
+                        processTurnString(t, curPlayer, this);
+                    }
                 }
-                    else { winner = othPlayer; }
+                else { winner = othPlayer; }
 
-                if(winner != null){
-                    if (winner == Player1) { WinText.text = "You Win!"; }
-                    else { WinText.text = "Better Luck Next Time"; }
+                if (winner != null){
+                    if (GameSettings.gameType == GameSettings.GameType.Multiplayer)
+                    {
+                        if (winner == Player1 && GameSettings.netMode == GameSettings.NetworkMode.Host) { WinText.text = "You Win!"; }
+                        else if (winner == Player2 && GameSettings.netMode == GameSettings.NetworkMode.Host) { WinText.text = "Better Luck Next Time"; }
+                        else if (winner == Player2 && GameSettings.netMode == GameSettings.NetworkMode.Join) { WinText.text = "You Win!"; }
+                        else if (winner == Player1 && GameSettings.netMode == GameSettings.NetworkMode.Join) { WinText.text = "Better Luck Next Time"; }
+                    }
+                    else
+                    {
+                        if (winner == Player1) { WinText.text = "You Win!"; }
+                        else { WinText.text = "Better Luck Next Time"; }
+                    }
+                    yield return new WaitForSeconds(1.5f);
                     goToEndOfGameScreen();
                 }
 
