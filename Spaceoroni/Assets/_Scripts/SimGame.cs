@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SimGame //: MonoBehaviour
 {
-    char[,] Board;
+    public char[,] Board => TranslateState();
     public int[,] state;
 
     public SimPlayer Player1;
@@ -27,9 +27,6 @@ public class SimGame //: MonoBehaviour
 
     public SimGame(SimGame g)
     {
-        Board = new char[5, 5];
-        Board = g.TranslateState();
-        
         state = new int[5, 5];
         System.Array.Copy(g.state, g.state.GetLowerBound(0), state, state.GetLowerBound(0), 25);
         
@@ -41,9 +38,6 @@ public class SimGame //: MonoBehaviour
 
     public SimGame(Game g)
     {
-        Board = new char[5, 5];
-        Board = g.TranslateState();
-        
         state = new int[5, 5];
         System.Array.Copy(g.state, g.state.GetLowerBound(0), state, state.GetLowerBound(0), 25);
 
@@ -188,7 +182,6 @@ public class SimGame //: MonoBehaviour
     public long computeHash()
     {
         if (Game.ZobristTable == null) return (long)0;
-        Board = TranslateState();
         long h = 0;
         for (int i = 0; i < 5; i++)
         {
@@ -358,7 +351,7 @@ public class SimGame //: MonoBehaviour
             for (int j = -1; j <= 1; ++j)
             {
                 Coordinate test = new Coordinate(c.x + i, c.y + j);
-                if (Coordinate.inBounds(test) && Board[test.x, test.y] <= 3 && locationClearOfAllOtherBuilders(test, buildersOldLocation) && !(test.x == c.x && test.y == c.y))
+                if (Coordinate.inBounds(test) && state[test.x, test.y] <= 3 && locationClearOfAllOtherBuilders(test, buildersOldLocation) && !(test.x == c.x && test.y == c.y))
                 {
                     allBuilds.Add(Coordinate.coordToString(test));
                 }
