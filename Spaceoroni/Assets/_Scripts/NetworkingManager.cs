@@ -17,8 +17,9 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     bool isConnecting;
     string gameVersion = "1";
 
-    private List<Listing> _listings = new List<Listing>(); 
+    private List<Listing> _listings = new List<Listing>();
 
+    private int playersWaiting = 0;
     #endregion
 
     [SerializeField]
@@ -47,6 +48,9 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     private GameObject PlayerDisconnect;
     [SerializeField]
     private GameObject PostGamePanel;
+    [SerializeField]
+    private GameObject WaitingToPlayAgain;
+
 
     [SerializeField]
     private Game gameManager;
@@ -82,6 +86,15 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
                     WaitingForPlayer.SetActive(true);
                 }
             }
+        }
+       if(playersWaiting == 2)
+        {
+            notWaiting();
+            playersWaiting--;
+            gameManager.restartAfterMultiplayer = true;
+            gameManager.RestartGame();
+            WaitingToPlayAgain.SetActive(false);
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToGameBoard();
         }
     }
 
@@ -129,6 +142,64 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
        
     }
 
+    public void isWaiting()
+    {
+        if (PhotonNetwork.InRoom)
+        {
+            WaitingToPlayAgain.SetActive(true);
+            bool waiting = true;
+            var hash = PhotonNetwork.LocalPlayer.CustomProperties;
+            if(hash.ContainsKey("waiting"))
+            {
+                hash.Remove("waiting");
+                hash.Add("waiting", waiting);
+            }
+            else
+            {
+                hash.Add("waiting", waiting);
+            }
+
+            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+
+            if(PhotonNetwork.LocalPlayer.CustomProperties["waiting"].Equals(true))
+            {
+                Debug.Log("This value is true and the function worked properly!");
+            }
+
+
+        }
+    }
+
+    public void notWaiting()
+    {
+        bool waiting = false;
+        var hash = PhotonNetwork.LocalPlayer.CustomProperties;
+        if (hash.ContainsKey("waiting"))
+        {
+            hash.Remove("waiting");
+            hash.Add("waiting", waiting);
+            if (playersWaiting > 0)
+            {
+                playersWaiting--;
+                Debug.Log(playersWaiting);
+            }
+        }
+        else
+        {
+            hash.Add("waiting", waiting);
+            if(playersWaiting > 0)
+            {
+                playersWaiting--;
+                Debug.Log(playersWaiting);
+            }
+        }
+
+        if (PhotonNetwork.LocalPlayer.CustomProperties["waiting"].Equals(false))
+        {
+            Debug.Log("This value is false and the function worked properly!");
+        }
+    }
+
     public static void LeaveRoom()
     {
         PhotonNetwork.LeaveRoom(true);
@@ -158,7 +229,10 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     {
         Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
         isConnecting = false;
-
+        if(playersWaiting > 0)
+        {
+            playersWaiting--;
+        }
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
@@ -181,6 +255,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
             gameManager.StartGame();
         }
 
+        notWaiting();
+
     }
 
     public override void OnLeftRoom()
@@ -192,6 +268,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     public override void OnCreatedRoom()
     {
         Debug.Log("You Created a Room");
+        notWaiting();
     }
 
     public override void OnPlayerEnteredRoom(Photon.Realtime.Player other)
@@ -209,10 +286,12 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     {
         Debug.LogFormat("OnPlayerLeftRoom() ", otherPlayer);
         RoomListingsContent.DestroyChildren();
-        if (!PostGamePanel.activeSelf)
+        PlayerDisconnect.SetActive(true);
+        HighlightManager.unHighlightEverything();
+
+        if(playersWaiting > 0)
         {
-            PlayerDisconnect.SetActive(true);
-            HighlightManager.unHighlightEverything();
+            playersWaiting--;
         }
     }
 
@@ -253,6 +332,29 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         Debug.Log("You joined a PUN lobby! ");
+    }
+
+    public override void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    {
+        base.OnPlayerPropertiesUpdate(targetPlayer, changedProps);
+        if(changedProps.ContainsKey("waiting"))
+        {
+            if (changedProps["waiting"].Equals(true))
+            {
+                playersWaiting++;
+                Debug.Log("Players Waiting: " + playersWaiting);
+            }
+            else if(changedProps["waiting"].Equals(false) && playersWaiting > 0)
+            {
+                playersWaiting--;
+                Debug.Log("Players Waiting: " + playersWaiting);
+            }
+        }
+        else
+        {
+            Debug.Log("changed props did not contain waiting");
+        }
+
     }
 
     #endregion

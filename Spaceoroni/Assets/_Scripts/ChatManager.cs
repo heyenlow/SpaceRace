@@ -12,7 +12,7 @@ public class ChatManager : MonoBehaviour
     private PhotonView _photon;
     private List<string> messages = new List<string>();
     private float _buildDelay = 0f;
-    private int _maximumMessages = 14;
+    private int _maximumMessages = 8;
 
 
  
@@ -86,6 +86,12 @@ public class ChatManager : MonoBehaviour
                 BuildChatContents();
                 _buildDelay = Time.time + 0.25f;
             }
+
+            if(Input.GetKeyUp(KeyCode.Return))
+            {
+                SubmitChat();
+            }
+
         }
         else if(messages.Count>0)
         {
