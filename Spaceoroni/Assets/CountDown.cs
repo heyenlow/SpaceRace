@@ -33,12 +33,12 @@ public class CountDown : MonoBehaviour
     {
         num.text = "3";
         fontIncrease = true;
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.3f);
 
 
         while (number > 0){
             decrement();
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(1.3f);
         }
         fontIncrease = false;
 

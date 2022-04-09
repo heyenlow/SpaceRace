@@ -9,6 +9,8 @@ public class Rocket : MonoBehaviour
     public int Speed = 15;
     private Vector3 newLocation;
     public static Rocket blinkingRocket = null;
+    [SerializeField]
+    private GameObject Flame;
     private void Start()
     {
         homeLocation = this.transform.position;
@@ -26,9 +28,18 @@ public class Rocket : MonoBehaviour
     public void blastOffRocket()
     {
         if(!VolumeListener.MUTE) GetComponent<AudioSource>().Play();
+        StartCoroutine(blastOffFlame());
         Vector3 heightDiff = new Vector3(0, 100, 0);
         newLocation = this.gameObject.transform.position + heightDiff;
         movingRocket = this.gameObject;
+    }
+
+    public IEnumerator blastOffFlame()
+    {
+        Flame.SetActive(true);
+        yield return new WaitForSeconds(5);
+        Flame.SetActive(false);
+        yield return null;
     }
 
     public IEnumerator runEndOfGameAnimation()

@@ -397,7 +397,7 @@ public class Game : MonoBehaviour
                             {
                                 yield return new WaitForSeconds(0.4f);
                                 BlastOffRocket(t.MoveLocation);
-                            countDown.gameObject.SetActive(false);
+                                countDown.gameObject.SetActive(false);
                             }
                         }
                         else
@@ -408,9 +408,10 @@ public class Game : MonoBehaviour
                 }
                     else { winner = othPlayer; }
 
-                if(winner != null){
+                if (winner != null){
                     if (winner == Player1) { WinText.text = "You Win!"; }
                     else { WinText.text = "Better Luck Next Time"; }
+                    yield return new WaitForSeconds(1.5f);
                     goToEndOfGameScreen();
                 }
 
