@@ -101,6 +101,7 @@ public class UCB1Tree //: MonoBehaviour
             {
                 bool running = true;
                 CoroutineWithData co_data = new CoroutineWithData(game, copy.GetLegalTransitions());
+                LegalTransitions = co_data.result;
                 //CoroutineWithData co_data = new CoroutineWithData(game, copy.GetLegalTransitions(LegalTransitions));
                 //LegalTransitions = co_data.result;
 
