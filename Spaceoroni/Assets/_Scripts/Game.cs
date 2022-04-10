@@ -38,6 +38,7 @@ public class Game : MonoBehaviour
 
     [SerializeField]
     private TextMeshProUGUI WinText;
+    Color blueColor; 
 
 
     public enum PlayerState
@@ -74,7 +75,7 @@ public class Game : MonoBehaviour
     private bool isDebug = false;
     private void Start()
     {
-
+        blueColor = TurnIndicator.color;
         if (isDebug)
         {
             GameSettings.gameType = GameSettings.GameType.Watch;
@@ -446,7 +447,7 @@ public class Game : MonoBehaviour
         if (GameSettings.netMode == GameSettings.NetworkMode.Local)
         {
             if (curPlayer == Player1) { TurnIndicator.text = "Player 1's Turn"; TurnIndicator.color = Color.white; }
-            else if (curPlayer == Player2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = new Color(0, 75, 255); }
+            else if (curPlayer == Player2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = blueColor; }
         }
     }
     private void setTurnIndicator(int PlayerInt)
@@ -454,7 +455,7 @@ public class Game : MonoBehaviour
         if (GameSettings.netMode == GameSettings.NetworkMode.Local)
         {
             if (PlayerInt == 1) { TurnIndicator.text = "Player 1's Turn"; TurnIndicator.color = Color.white; }
-            else if (PlayerInt == 2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = new Color(0, 75, 255); }
+            else if (PlayerInt == 2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = blueColor; }
         }
     }
     private bool hasPossibleTurns(IPlayer p)
