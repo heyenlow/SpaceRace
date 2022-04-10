@@ -30,11 +30,12 @@ public class Game : MonoBehaviour
 
     public static long[,,] ZobristTable = null;
 
-    public void StartLegalTransitionSearch(IEnumerator data, List<UCB1Tree.Transition> ret)
+    public void StartLegalTransitionSearch(IEnumerator data, out List<UCB1Tree.Transition> ret)
     {
         UCB1Tree.CoroutineWithData co_data = new UCB1Tree.CoroutineWithData(this, data);
-
+        ret = co_data.result;
     }
+
 
     public void StartChildCoroutine(IEnumerator data)
     {

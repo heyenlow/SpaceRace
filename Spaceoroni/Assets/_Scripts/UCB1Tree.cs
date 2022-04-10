@@ -74,7 +74,7 @@ public class UCB1Tree //: MonoBehaviour
 
     private static double UCB1(double childWins, double childPlays, double parentPlays) => (childWins / childPlays) + Math.Sqrt(2f * Math.Log(parentPlays) / childPlays);
 
-    public IEnumerator Search(Game game, int simulations, Turn currentTurn, List<Turn> turns)
+    public IEnumerator Search(Game game, int simulations, List<Turn> turns, Turn currentTurn = null)
     {
         if (Game.ZobristTable == null) throw new System.NullReferenceException("MCTS Search has an uninitialized zobrist table");
         SimGame g = new SimGame(game);
@@ -170,11 +170,9 @@ public class UCB1Tree //: MonoBehaviour
         }
 
         // Simulations are over. Pick the best move, then return it.
-        allTransitions = new List<UCB1Tree.Transition>();
         
         CoroutineWithData game_data = new CoroutineWithData(game, g.GetLegalTransitions());
         allTransitions = game_data.result;
-        game.StartLegalTransitionSearch(g.GetLegalTransitions(), allTransitions);
 
         double worstScoreFound = double.MaxValue;
         double score;

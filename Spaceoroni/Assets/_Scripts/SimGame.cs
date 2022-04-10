@@ -493,7 +493,7 @@ public class SimGame //: MonoBehaviour
 
             var allPossibleMoves = new List<UCB1Tree.Transition>();
             
-            game.StartLegalTransitionSearch(GetLegalTransitions(), allPossibleMoves);
+            game.StartLegalTransitionSearch(GetLegalTransitions(), out allPossibleMoves);
 
             if (allPossibleMoves.Count == 0)
             {
