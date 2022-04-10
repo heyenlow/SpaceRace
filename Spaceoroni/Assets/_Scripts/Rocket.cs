@@ -83,7 +83,7 @@ public class Rocket : MonoBehaviour
         yield return new WaitForSeconds(1.8f);
         level1Animation.SetActive(false);
         level2Animation.SetActive(false);
-        //level3Animation.SetActive(false);
+        level3Animation.SetActive(false);
 
         transform.GetChild(level - 1).gameObject.SetActive(true);
         Debug.Log(transform.GetChild(level - 1).name);
@@ -100,7 +100,7 @@ public class Rocket : MonoBehaviour
                 level2Animation.SetActive(true);
                 break;
             case 3:
-               // level3Animation.SetActive(true);
+                level3Animation.SetActive(true);
                 break;
         }
     }
