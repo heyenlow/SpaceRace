@@ -129,7 +129,7 @@ public class UCB1Tree //: MonoBehaviour
                     int indexOfBestTransition = 0;
                     for (int j = 0; j < LegalTransitions.Count; j++)
                     {
-                        ucb1Score = tree[LegalTransitions[i].Hash].ParentUCBScore(parentPlays);
+                        ucb1Score = tree[LegalTransitions[j].Hash].ParentUCBScore(parentPlays);
                         if (ucb1Score > bestScore)
                         {
                             bestScore = ucb1Score;
