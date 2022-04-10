@@ -72,16 +72,19 @@ public class UCB1Tree //: MonoBehaviour
 
     public UCB1Tree() { }
 
+    Dictionary<long, Node> tree;
+
     private static double UCB1(double childWins, double childPlays, double parentPlays) => (childWins / childPlays) + Math.Sqrt(2f * Math.Log(parentPlays) / childPlays);
 
     public IEnumerator Search(Game game, int simulations, List<Turn> turns, Turn currentTurn = null)
     {
         if (Game.ZobristTable == null) throw new System.NullReferenceException("MCTS Search has an uninitialized zobrist table");
         SimGame g = new SimGame(game);
-        Dictionary<long, Node> tree = new Dictionary<long, Node>
+        if (tree == null) tree = new Dictionary<long, Node>
         {
             { g.Hash, new Node(g.CurrentPlayer) }
         };
+        else if (!tree.ContainsKey(g.Hash)) tree.Add(g.Hash, new Node(g.CurrentPlayer));
 
         List<Node> path = new List<Node>();
         SimGame copy;
@@ -194,7 +197,7 @@ public class UCB1Tree //: MonoBehaviour
 
         //yield return tran;
 
-        currentTurn = new Turn(tran.Builder, tran.Build, tran.Move);
+        currentTurn = new Turn(tran.Builder, tran.Move, tran.Build);
 
         turns.Add(currentTurn);
     }

@@ -117,8 +117,8 @@ public class MCTSPlayer : IPlayer
         {
             yield return null;
         }
-            
 
+        currentTurn = new Turn();
         //UCB1Tree.CoroutineWithData cd = new UCB1Tree.CoroutineWithData(this, tree.Search(tmpState, 500));
         UCB1Tree tree = new UCB1Tree();
 
@@ -129,18 +129,6 @@ public class MCTSPlayer : IPlayer
 
         Debug.Log("MCTS move is made");
         currentTurn = turns[turns.Count - 1];
-        if (Builder1.getLocation().Equals(currentTurn.BuilderLocation))
-        {
-            Builder1.move(currentTurn.MoveLocation, g);
-        }
-        else if (Builder2.getLocation().Equals(currentTurn.BuilderLocation))
-        {
-            Builder2.move(currentTurn.MoveLocation, g);
-        }
-        else
-        {
-            throw new System.NullReferenceException("WHAT WAS PASSED TO ME WAS NOT EXPECTED!!!!");
-        }
         //yield return cd.coroutine;
 
         //UCB1Tree.Transition t = cd.result;
