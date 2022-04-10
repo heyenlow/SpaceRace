@@ -100,8 +100,8 @@ public class UCB1Tree //: MonoBehaviour
             while (!copy.IsGameOver())
             {
                 bool running = true;
-                CoroutineWithData co_data = new CoroutineWithData(game, copy.GetLegalTransitions());
-                LegalTransitions = co_data.result;
+                CoroutineWithData copy_data = new CoroutineWithData(game, copy.GetLegalTransitions());
+                LegalTransitions = copy_data.result;
                 //CoroutineWithData co_data = new CoroutineWithData(game, copy.GetLegalTransitions(LegalTransitions));
                 //LegalTransitions = co_data.result;
 
@@ -171,6 +171,9 @@ public class UCB1Tree //: MonoBehaviour
 
         // Simulations are over. Pick the best move, then return it.
         allTransitions = new List<UCB1Tree.Transition>();
+        
+        CoroutineWithData game_data = new CoroutineWithData(game, g.GetLegalTransitions());
+        allTransitions = game_data.result;
         game.StartLegalTransitionSearch(g.GetLegalTransitions(), allTransitions);
 
         double worstScoreFound = double.MaxValue;
