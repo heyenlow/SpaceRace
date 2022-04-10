@@ -9,10 +9,10 @@ public class Location : MonoBehaviour
     public static Location LocationBlinking = null;
     private bool deadLocation = false;
 
-    public void runEndOfGameAnimation()
+    public void runEndOfGameAnimation(bool elon)
     {
         var rocket = this.GetComponentInChildren<Rocket>();
-        StartCoroutine(rocket.runEndOfGameAnimation());
+        StartCoroutine(rocket.runEndOfGameAnimation(elon));
     }
 
     public void blastOffRocket()
@@ -91,6 +91,11 @@ public class Location : MonoBehaviour
         this.gameObject.GetComponent<Renderer>().material.shader = Shader.Find("Shader Graphs/Blink");
         var rocket = GetComponentInChildren<Rocket>();
         rocket.Blink();
+    }
+
+    public void buildLevel(int level)
+    {
+        StartCoroutine(GetComponentInChildren<Rocket>().buildLevel(level));
     }
 
 }

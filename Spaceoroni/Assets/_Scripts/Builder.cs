@@ -12,6 +12,8 @@ public class Builder : MonoBehaviour
     private Animator anim;
     public bool currentlyMoving = false;
     public static Builder BlinkingBuilder = null;
+    [SerializeField]
+    private AudioSource Running;
 
     void Start()
     {
@@ -62,6 +64,7 @@ public class Builder : MonoBehaviour
         {
             createDust(); //Create Dust when object moves 
             anim.SetBool("Run", true);
+            Running.Play();
         }
         else if (g.heightAtCoordinate(coordinateOfSquare) > 2 || g.heightAtCoordinate(coord) > 2)
         {
@@ -71,6 +74,7 @@ public class Builder : MonoBehaviour
         {
             createDust(); //Create Dust when object moves 
             anim.SetBool("Run", true);
+            Running.Play();
         }
         StartCoroutine(moveToNextPoint(newLocation));
     }
@@ -90,7 +94,7 @@ public class Builder : MonoBehaviour
 
                 anim.SetBool("Run", false);
                 anim.SetBool("Jump", false);
-
+                Running.Stop();
                 dust.Stop();
             }
             yield return null;
@@ -112,7 +116,7 @@ public class Builder : MonoBehaviour
 
                 anim.SetBool("Run", false);
                 anim.SetBool("Jump", false);
-
+                Running.Stop();
                 dust.Stop();
             }
             yield return null;

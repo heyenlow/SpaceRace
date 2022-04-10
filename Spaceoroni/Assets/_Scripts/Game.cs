@@ -34,10 +34,13 @@ public class Game : MonoBehaviour
     [SerializeField]
     private AudioSource panNoise;
     [SerializeField]
+    private AudioSource Build;
+    [SerializeField]
     private CountDown countDown;
 
     [SerializeField]
     private TextMeshProUGUI WinText;
+    Color blueColor; 
 
 
     public enum PlayerState
@@ -74,7 +77,7 @@ public class Game : MonoBehaviour
     private bool isDebug = false;
     private void Start()
     {
-
+        blueColor = TurnIndicator.color;
         if (isDebug)
         {
             GameSettings.gameType = GameSettings.GameType.Watch;
@@ -144,7 +147,7 @@ public class Game : MonoBehaviour
     public bool restartAfterMultiplayer = false;
     public void RestartGame()
     {
-        if (GameSettings.gameType == GameSettings.GameType.Multiplayer && !restartAfterMultiplayer)
+        if (GameSettings.gameType == GameSettings.GameType.Multiplayer && GameSettings.netMode != GameSettings.NetworkMode.Local && !restartAfterMultiplayer)
         {
             
         }
@@ -309,11 +312,11 @@ public class Game : MonoBehaviour
         BuildLevel(c);
     }
 
-    private void runEndOfGameAnimation(Coordinate c)
+    private void runEndOfGameAnimation(Coordinate c, bool elon)
     {
         Debug.Log("Blasting Off Rocket at " + Coordinate.coordToString(c));
         var location = GameObject.Find(Coordinate.coordToString(c)).GetComponent<Location>();
-        location.runEndOfGameAnimation();
+        location.runEndOfGameAnimation(elon);
     }
 
     private void BlastOffRocket(Coordinate c)
@@ -323,7 +326,7 @@ public class Game : MonoBehaviour
         location.blastOffRocket();
     }
 
-    bool built = true;
+    public static bool built = true;
     public static bool countDownActive = false;
 
     public IEnumerator PlayGameToEnd()
@@ -342,6 +345,8 @@ public class Game : MonoBehaviour
 
             yield return StartCoroutine(waitForBuildersToMove());
             yield return StartCoroutine(waitForBuildersToBuild());
+            while (PAUSED) { yield return new WaitForEndOfFrame(); }
+
             // Determine who's turn it is.
             curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
             othPlayer = (moveNum % 2 == 0) ? Player2 : Player1;
@@ -380,6 +385,7 @@ public class Game : MonoBehaviour
                     {
                         countDown.gameObject.SetActive(true);
                         countDownActive = true;
+                        TurnIndicator.text = "";
                         StartCoroutine(countDown.startCountdown());
 
 
@@ -387,7 +393,7 @@ public class Game : MonoBehaviour
                         winner = curPlayer;
                         //wait to move then set buidler inactive
                         curPlayer.setBuilderAtLocationInactive(t.BuilderLocation);
-                        runEndOfGameAnimation(t.MoveLocation);
+                        runEndOfGameAnimation(t.MoveLocation, winner == Player1);
 
                         while (countDownActive)
                         {
@@ -445,7 +451,7 @@ public class Game : MonoBehaviour
         if (GameSettings.netMode == GameSettings.NetworkMode.Local)
         {
             if (curPlayer == Player1) { TurnIndicator.text = "Player 1's Turn"; TurnIndicator.color = Color.white; }
-            else if (curPlayer == Player2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = new Color(0, 75, 255); }
+            else if (curPlayer == Player2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = blueColor; }
         }
     }
     private void setTurnIndicator(int PlayerInt)
@@ -453,7 +459,7 @@ public class Game : MonoBehaviour
         if (GameSettings.netMode == GameSettings.NetworkMode.Local)
         {
             if (PlayerInt == 1) { TurnIndicator.text = "Player 1's Turn"; TurnIndicator.color = Color.white; }
-            else if (PlayerInt == 2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = new Color(0, 75, 255); }
+            else if (PlayerInt == 2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = blueColor; }
         }
     }
     private bool hasPossibleTurns(IPlayer p)
@@ -602,9 +608,9 @@ public class Game : MonoBehaviour
         if (isAtThree()) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().moveToHigh(); }
         else { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().moveToLow(); }
 
-        if (Board[c.x,c.y] < 4) level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
-        else { BlastOffRocket(c); }
-        built = true;
+        if (Board[c.x, c.y] < 4) level.GetComponent<Location>().buildLevel(Board[c.x, c.y]); // level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
+        else { BlastOffRocket(c); built = true; }
+        Build.Play();
     }
     public int getBoardHeightAtCoord(Coordinate c)
     {
