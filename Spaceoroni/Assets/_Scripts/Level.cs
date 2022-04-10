@@ -6,6 +6,9 @@ public class Level : MonoBehaviour
 {
     private Vector3 homeLocation;
     public static Level BlinkingLevel;
+    [SerializeField]
+    private GameObject animation;
+
     private void Start()
     {
         homeLocation = this.transform.position;
@@ -97,6 +100,15 @@ public class Level : MonoBehaviour
         {
             rend.material.shader = Shader.Find("Universal Render Pipeline/Lit");
         }
+    }
+
+    public IEnumerator buildLevel()
+    {
+        animation.SetActive(true);
+        this.gameObject.SetActive(false);
+        yield return new WaitForSeconds(2);
+        this.gameObject.SetActive(false);
+        animation.SetActive(true);
     }
 
 }

@@ -93,4 +93,9 @@ public class Location : MonoBehaviour
         rocket.Blink();
     }
 
+    public void buildLevel(int level)
+    {
+        StartCoroutine(GetComponentInChildren<Rocket>().buildLevel(level));
+    }
+
 }

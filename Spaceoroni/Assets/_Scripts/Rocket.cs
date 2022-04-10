@@ -11,6 +11,13 @@ public class Rocket : MonoBehaviour
     public static Rocket blinkingRocket = null;
     [SerializeField]
     private GameObject Flame;
+
+    [SerializeField]
+    private GameObject level1Animation;
+    [SerializeField]
+    private GameObject level2Animation;
+    [SerializeField]
+    private GameObject level3Animation;
     private void Start()
     {
         homeLocation = this.transform.position;
@@ -67,5 +74,34 @@ public class Rocket : MonoBehaviour
     public Level[] getRocketsLevels()
     {
         return GetComponentsInChildren<Level>();
+    }
+
+    public IEnumerator buildLevel(int level)
+    {
+        Debug.Log("runnign: " + level);
+        runBuildAnimation(level);
+        yield return new WaitForSeconds(1.8f);
+        level1Animation.SetActive(false);
+        level2Animation.SetActive(false);
+        //level3Animation.SetActive(false);
+
+        transform.GetChild(level - 1).gameObject.SetActive(true);
+        Debug.Log(transform.GetChild(level - 1).name);
+    }
+
+    private void runBuildAnimation(int level)
+    {
+        switch (level)
+        {
+            case 1:
+                level1Animation.SetActive(true);
+                break;
+            case 2:
+                level2Animation.SetActive(true);
+                break;
+            case 3:
+               // level3Animation.SetActive(true);
+                break;
+        }
     }
 }

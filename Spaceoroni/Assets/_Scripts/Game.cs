@@ -602,7 +602,7 @@ public class Game : MonoBehaviour
         if (isAtThree()) { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().moveToHigh(); }
         else { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().moveToLow(); }
 
-        if (Board[c.x,c.y] < 4) level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
+        if (Board[c.x, c.y] < 4) level.GetComponent<Location>().buildLevel(Board[c.x, c.y]); // level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
         else { BlastOffRocket(c); }
         built = true;
     }
