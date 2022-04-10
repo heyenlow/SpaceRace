@@ -4,26 +4,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UCB1Tree : MonoBehaviour
+public class UCB1Tree //: MonoBehaviour
 {
     public class CoroutineWithData
     {
         public Coroutine coroutine { get; private set; }
-        public Transition result;
+        public List<Transition> result;
         private IEnumerator target;
         public CoroutineWithData(MonoBehaviour owner, IEnumerator target)
         {
             this.target = target;
             coroutine = owner.StartCoroutine(Run());
+            result = new List<Transition>(target.Current as IEnumerable<Transition>);
         }
 
         private IEnumerator Run()
         {
-            while (target.MoveNext())
-            {
-                result = (Transition)target.Current;
-                yield return result;
-            }
+            yield return target.MoveNext();
+
         }
     }
 
@@ -76,12 +74,13 @@ public class UCB1Tree : MonoBehaviour
 
     private static double UCB1(double childWins, double childPlays, double parentPlays) => (childWins / childPlays) + Math.Sqrt(2f * Math.Log(parentPlays) / childPlays);
 
-    public IEnumerator Search(SimGame game, int simulations, Turn currentTurn, List<Turn> turns)
+    public IEnumerator Search(Game game, int simulations, Turn currentTurn, List<Turn> turns)
     {
         if (Game.ZobristTable == null) throw new System.NullReferenceException("MCTS Search has an uninitialized zobrist table");
+        SimGame g = new SimGame(game);
         Dictionary<long, Node> tree = new Dictionary<long, Node>
         {
-            { game.Hash, new Node(game.CurrentPlayer) }
+            { g.Hash, new Node(g.CurrentPlayer) }
         };
 
         List<Node> path = new List<Node>();
@@ -92,21 +91,26 @@ public class UCB1Tree : MonoBehaviour
 
         for (int i = 0; i < simulations; i++)
         {
-            copy = new SimGame(game.DeepCopy());
+            copy = new SimGame(g.DeepCopy());
             path.Clear();
-            path.Add(tree[game.Hash]);
+            path.Add(tree[g.Hash]);
+
+            List<Transition> LegalTransitions = new List<Transition>();
 
             while (!copy.IsGameOver())
             {
-                allTransitions = copy.GetLegalTransitions();
+                bool running = true;
+                CoroutineWithData co_data = new CoroutineWithData(game, copy.GetLegalTransitions());
+                //CoroutineWithData co_data = new CoroutineWithData(game, copy.GetLegalTransitions(LegalTransitions));
+                //LegalTransitions = co_data.result;
 
-                if (allTransitions.Count == 0)
+                if (LegalTransitions.Count == 0)
                 {
                     break;
                 }
                 
                 transitionNoStats = new List<Transition>();
-                foreach (Transition t in allTransitions)
+                foreach (Transition t in LegalTransitions)
                 {
                     if (!tree.ContainsKey(t.Hash))
                         transitionNoStats.Add(t);
@@ -122,16 +126,16 @@ public class UCB1Tree : MonoBehaviour
                     int parentPlays = path[path.Count - 1].plays;
                     double ucb1Score;
                     int indexOfBestTransition = 0;
-                    for (int j = 0; j < allTransitions.Count; j++)
+                    for (int j = 0; j < LegalTransitions.Count; j++)
                     {
-                        ucb1Score = tree[allTransitions[i].Hash].ParentUCBScore(parentPlays);
+                        ucb1Score = tree[LegalTransitions[i].Hash].ParentUCBScore(parentPlays);
                         if (ucb1Score > bestScore)
                         {
                             bestScore = ucb1Score;
                             indexOfBestTransition = j;
                         }
                     }
-                    Transition bestTransition = allTransitions[indexOfBestTransition];
+                    Transition bestTransition = LegalTransitions[indexOfBestTransition];
                     copy.Transition(bestTransition);
                     path.Add(tree[bestTransition.Hash]);
                 }
@@ -152,7 +156,7 @@ public class UCB1Tree : MonoBehaviour
             }
 
             // ROLLOUT
-            copy.Rollout();
+            copy.Rollout(game);
             //while (!copy.simulationRunning) is needed?
 
             // BACKPROP
@@ -165,7 +169,9 @@ public class UCB1Tree : MonoBehaviour
         }
 
         // Simulations are over. Pick the best move, then return it.
-        allTransitions = game.GetLegalTransitions();
+        allTransitions = new List<UCB1Tree.Transition>();
+        game.StartLegalTransitionSearch(g.GetLegalTransitions(), allTransitions);
+
         double worstScoreFound = double.MaxValue;
         double score;
         int bestIndex = 0;

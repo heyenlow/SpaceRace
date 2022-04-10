@@ -30,6 +30,18 @@ public class Game : MonoBehaviour
 
     public static long[,,] ZobristTable = null;
 
+    public void StartLegalTransitionSearch(IEnumerator data, List<UCB1Tree.Transition> ret)
+    {
+        UCB1Tree.CoroutineWithData co_data = new UCB1Tree.CoroutineWithData(this, data);
+
+    }
+
+    public void StartChildCoroutine(IEnumerator data)
+    {
+        StartCoroutine(data);
+    }
+
+
     [SerializeField]
     private TextMeshProUGUI WinText;
     public bool simulationRunning;

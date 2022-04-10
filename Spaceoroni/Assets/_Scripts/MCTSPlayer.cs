@@ -99,13 +99,13 @@ using UnityEngine;
             {
                 yield return null;
             }
-            SimGame tmpState = new SimGame(g);
+            
 
             //UCB1Tree.CoroutineWithData cd = new UCB1Tree.CoroutineWithData(this, tree.Search(tmpState, 500));
             UCB1Tree tree = new UCB1Tree();
 
 
-            yield return StartCoroutine(tree.Search(tmpState, 500, currentTurn, turns));
+            g.StartChildCoroutine(tree.Search(g, 250, currentTurn, turns));
 
             //yield return cd.coroutine;
 

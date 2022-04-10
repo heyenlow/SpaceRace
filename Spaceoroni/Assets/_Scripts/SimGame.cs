@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SimGame //: MonoBehaviour
 {
+
     public char[,] Board => TranslateState();
     public int[,] state;
 
@@ -66,7 +67,7 @@ public class SimGame //: MonoBehaviour
 
     }
 
-    public List<UCB1Tree.Transition> GetLegalTransitions()
+    public IEnumerator GetLegalTransitions()
     {
         List<UCB1Tree.Transition> ret = new List<UCB1Tree.Transition>();
         if (CurrentPlayer is null) throw new System.NullReferenceException();
@@ -120,7 +121,8 @@ public class SimGame //: MonoBehaviour
             CurrentPlayer.state = SimIPlayer.States.Loser; // if you can't move you're a loser.
             Rival.state = SimIPlayer.States.Winner;
         }
-        return ret;
+        yield return ret;
+
     }
 
     /// <summary>
@@ -182,6 +184,7 @@ public class SimGame //: MonoBehaviour
     public long computeHash()
     {
         if (Game.ZobristTable == null) return (long)0;
+        var Board = TranslateState();
         long h = 0;
         for (int i = 0; i < 5; i++)
         {
@@ -477,7 +480,7 @@ public class SimGame //: MonoBehaviour
     /// <summary>
     /// attempts to finish playing a game based on a copy that was made from DeepCopy()
     /// </summary>
-    public void Rollout()
+    public IEnumerator Rollout(Game game)
     {
         SimIPlayer winner = null;
         System.Random rnd = new System.Random();
@@ -487,7 +490,11 @@ public class SimGame //: MonoBehaviour
             // string turn BUILDERMOVEBUILD string
             var turn = string.Empty;
 
-            var allPossibleMoves = GetLegalTransitions();
+
+            var allPossibleMoves = new List<UCB1Tree.Transition>();
+            
+            game.StartLegalTransitionSearch(GetLegalTransitions(), allPossibleMoves);
+
             if (allPossibleMoves.Count == 0)
             {
                 winner = Rival;
@@ -521,6 +528,8 @@ public class SimGame //: MonoBehaviour
             }
 
         }
+
+        yield return true;
     }
 
     public bool isWin(Coordinate c)
