@@ -144,7 +144,7 @@ public class Game : MonoBehaviour
     public bool restartAfterMultiplayer = false;
     public void RestartGame()
     {
-        if (GameSettings.gameType == GameSettings.GameType.Multiplayer && !restartAfterMultiplayer)
+        if (GameSettings.gameType == GameSettings.GameType.Multiplayer && GameSettings.netMode != GameSettings.NetworkMode.Local && !restartAfterMultiplayer)
         {
             
         }
@@ -380,6 +380,7 @@ public class Game : MonoBehaviour
                     {
                         countDown.gameObject.SetActive(true);
                         countDownActive = true;
+                        TurnIndicator.text = "";
                         StartCoroutine(countDown.startCountdown());
 
 
