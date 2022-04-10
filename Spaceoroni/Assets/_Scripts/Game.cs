@@ -309,11 +309,11 @@ public class Game : MonoBehaviour
         BuildLevel(c);
     }
 
-    private void runEndOfGameAnimation(Coordinate c)
+    private void runEndOfGameAnimation(Coordinate c, bool elon)
     {
         Debug.Log("Blasting Off Rocket at " + Coordinate.coordToString(c));
         var location = GameObject.Find(Coordinate.coordToString(c)).GetComponent<Location>();
-        location.runEndOfGameAnimation();
+        location.runEndOfGameAnimation(elon);
     }
 
     private void BlastOffRocket(Coordinate c)
@@ -323,7 +323,7 @@ public class Game : MonoBehaviour
         location.blastOffRocket();
     }
 
-    bool built = true;
+    public static bool built = true;
     public static bool countDownActive = false;
 
     public IEnumerator PlayGameToEnd()
@@ -387,7 +387,7 @@ public class Game : MonoBehaviour
                         winner = curPlayer;
                         //wait to move then set buidler inactive
                         curPlayer.setBuilderAtLocationInactive(t.BuilderLocation);
-                        runEndOfGameAnimation(t.MoveLocation);
+                        runEndOfGameAnimation(t.MoveLocation, winner == Player1);
 
                         while (countDownActive)
                         {
@@ -603,8 +603,7 @@ public class Game : MonoBehaviour
         else { GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().moveToLow(); }
 
         if (Board[c.x, c.y] < 4) level.GetComponent<Location>().buildLevel(Board[c.x, c.y]); // level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
-        else { BlastOffRocket(c); }
-        built = true;
+        else { BlastOffRocket(c); built = true; }
     }
     public int getBoardHeightAtCoord(Coordinate c)
     {

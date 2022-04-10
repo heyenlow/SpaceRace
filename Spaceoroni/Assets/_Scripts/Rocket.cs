@@ -49,9 +49,10 @@ public class Rocket : MonoBehaviour
         yield return null;
     }
 
-    public IEnumerator runEndOfGameAnimation()
+    public IEnumerator runEndOfGameAnimation(bool elon)
     {
-        GetComponentInChildren<EndOfGameAnimation>().elonBlastOff();
+        if(elon)GetComponentInChildren<EndOfGameAnimation>().elonBlastOff();
+        else GetComponentInChildren<EndOfGameAnimation>().jeffBlastOff();
         yield return new WaitForSeconds(5);
         GetComponentInChildren<EndOfGameAnimation>().resetAnim();
     }
@@ -78,7 +79,6 @@ public class Rocket : MonoBehaviour
 
     public IEnumerator buildLevel(int level)
     {
-        Debug.Log("runnign: " + level);
         runBuildAnimation(level);
         yield return new WaitForSeconds(1.8f);
         level1Animation.SetActive(false);
@@ -86,7 +86,7 @@ public class Rocket : MonoBehaviour
         level3Animation.SetActive(false);
 
         transform.GetChild(level - 1).gameObject.SetActive(true);
-        Debug.Log(transform.GetChild(level - 1).name);
+        Game.built = true;
     }
 
     private void runBuildAnimation(int level)
