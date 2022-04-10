@@ -34,6 +34,8 @@ public class Game : MonoBehaviour
     [SerializeField]
     private AudioSource panNoise;
     [SerializeField]
+    private AudioSource Build;
+    [SerializeField]
     private CountDown countDown;
 
     [SerializeField]
@@ -606,6 +608,7 @@ public class Game : MonoBehaviour
 
         if (Board[c.x, c.y] < 4) level.GetComponent<Location>().buildLevel(Board[c.x, c.y]); // level.transform.GetChild(0).GetChild(Board[c.x, c.y] - 1).gameObject.SetActive(true);
         else { BlastOffRocket(c); built = true; }
+        Build.Play();
     }
     public int getBoardHeightAtCoord(Coordinate c)
     {

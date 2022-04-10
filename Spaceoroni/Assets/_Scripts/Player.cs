@@ -10,6 +10,7 @@ using Cinemachine;
 
 public class Player : IPlayer
 {
+
     protected Turn currentTurn;
 
     public bool clickedBuilder(Coordinate click)

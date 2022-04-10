@@ -12,6 +12,8 @@ public class Builder : MonoBehaviour
     private Animator anim;
     public bool currentlyMoving = false;
     public static Builder BlinkingBuilder = null;
+    [SerializeField]
+    private AudioSource Running;
 
     void Start()
     {
@@ -72,6 +74,7 @@ public class Builder : MonoBehaviour
             createDust(); //Create Dust when object moves 
             anim.SetBool("Run", true);
         }
+        Running.Play();
         StartCoroutine(moveToNextPoint(newLocation));
     }
 
