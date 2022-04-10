@@ -530,6 +530,11 @@ public class Game : MonoBehaviour
         return newHeightToMoveTo;
     }
 
+    public int levelAtCoord(Coordinate c)
+    {
+        return Board[c.x, c.y];
+    }
+
     private IEnumerator PlaceBuilders()
     {
         setTurnIndicator(1);

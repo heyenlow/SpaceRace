@@ -30,10 +30,19 @@ public class Builder : MonoBehaviour
     public void moveBuilderToNewSquare(GameObject GamePiece, GameObject Square, Game g)
     {
         Coordinate coordinateOfSquare = Coordinate.stringToCoord(Square.name);
-        //this next line will need to be adjusted for the height of each level object
-        Vector3 heightDiff = new Vector3(0, (g.heightAtCoordinate(coordinateOfSquare)), 0);
-        var newLocation = Square.transform.position + heightDiff;
+        int levelAtCoord = g.levelAtCoord(coordinateOfSquare);
+        Vector3 newLocation;
 
+        if (levelAtCoord == 1 || levelAtCoord == 2)
+        {
+            newLocation = Square.transform.GetChild(0).transform.GetChild(levelAtCoord - 1).transform.position;
+        }
+        else
+        {
+            //this next line will need to be adjusted for the height of each level object
+            Vector3 heightDiff = new Vector3(0, (g.heightAtCoordinate(coordinateOfSquare)), 0);
+            newLocation = Square.transform.position + heightDiff;
+        }
         var x_diff = (Square.transform.position.x - GamePiece.transform.position.x);
         var y_diff = (Square.transform.position.y - GamePiece.transform.position.y);
         var z_diff = (Square.transform.position.z - GamePiece.transform.position.z);
