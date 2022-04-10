@@ -116,7 +116,7 @@ public class Builder : MonoBehaviour
 
                 anim.SetBool("Run", false);
                 anim.SetBool("Jump", false);
-
+                Running.Stop();
                 dust.Stop();
             }
             yield return null;

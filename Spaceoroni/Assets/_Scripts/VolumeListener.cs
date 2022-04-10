@@ -42,8 +42,13 @@ public class VolumeListener : MonoBehaviour
 
     public void Mute()
     {
-        BackGroundMusic.mute = true;
         MUTE = true;
+
+        var soundObjects = GameObject.FindGameObjectsWithTag("Audio");
+        foreach (var sound in soundObjects)
+        {
+            sound.GetComponent<mute>().MMute();
+        }
         //set the mute button hidden
         MuteGameMenu.SetActive(false);
         MuteMainMenu.SetActive(false);
@@ -55,7 +60,11 @@ public class VolumeListener : MonoBehaviour
 
     public void Unmute(bool inGame)
     {
-        BackGroundMusic.mute = false;
+        var soundObjects = GameObject.FindGameObjectsWithTag("Audio");
+        foreach (var sound in soundObjects)
+        {
+            sound.GetComponent<mute>().unMMute();
+        }
         MUTE = false;
         //set the unmute button hidden
         UnmuteGameMenu.SetActive(false);

@@ -12,6 +12,7 @@ TagManager:
   - MusicVolumeSlider
   - TurnText
   - IntroVCam
+  - Audio
   layers:
   - Default
   - TransparentFX
