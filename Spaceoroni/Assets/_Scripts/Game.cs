@@ -345,6 +345,8 @@ public class Game : MonoBehaviour
 
             yield return StartCoroutine(waitForBuildersToMove());
             yield return StartCoroutine(waitForBuildersToBuild());
+            while (PAUSED) { yield return new WaitForEndOfFrame(); }
+
             // Determine who's turn it is.
             curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
             othPlayer = (moveNum % 2 == 0) ? Player2 : Player1;
