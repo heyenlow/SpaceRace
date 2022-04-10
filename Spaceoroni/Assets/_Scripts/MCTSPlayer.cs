@@ -125,7 +125,7 @@ public class MCTSPlayer : IPlayer
         // start child coroutine with data
         // match syntax from previous use, but this time with a Turn object.
         // to be called on g.StartMCTSTurn()
-        g.StartChildCoroutine(tree.Search(g, 250, turns, currentTurn));
+        g.StartChildCoroutine(tree.Search(g, 200, turns, currentTurn));
 
         Debug.Log("MCTS move is made");
         currentTurn = turns[turns.Count - 1];

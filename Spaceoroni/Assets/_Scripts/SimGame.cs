@@ -492,8 +492,9 @@ public class SimGame //: MonoBehaviour
 
 
             var allPossibleMoves = new List<UCB1Tree.Transition>();
-            
-            game.StartLegalTransitionSearch(GetLegalTransitions(), out allPossibleMoves);
+
+            UCB1Tree.CoroutineWithData co_data = new UCB1Tree.CoroutineWithData(game, GetLegalTransitions());
+            allPossibleMoves = co_data.result;
 
             if (allPossibleMoves.Count == 0)
             {
@@ -526,7 +527,6 @@ public class SimGame //: MonoBehaviour
                 Rival.state = SimIPlayer.States.Winner;
                 winner = Rival;
             }
-
         }
 
         yield return true;
@@ -556,7 +556,10 @@ public class SimGame //: MonoBehaviour
         else if (Player2.state == SimIPlayer.States.Loser) winner = Player1;
         else winner = null;
 
-        if (winner != null && player.ID == winner.ID) return true;
+        if (winner != null && player.ID == winner.ID)
+        {
+            return true;
+        }
 
         return false;
     }
