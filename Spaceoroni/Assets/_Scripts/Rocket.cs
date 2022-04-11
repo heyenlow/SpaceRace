@@ -53,7 +53,7 @@ public class Rocket : MonoBehaviour
     {
         if(elon)GetComponentInChildren<EndOfGameAnimation>().elonBlastOff();
         else GetComponentInChildren<EndOfGameAnimation>().jeffBlastOff();
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(7);
         GetComponentInChildren<EndOfGameAnimation>().resetAnim();
     }
 

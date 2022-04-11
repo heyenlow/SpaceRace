@@ -29,6 +29,7 @@ public class CountDown : MonoBehaviour
     public IEnumerator startCountdown()
     {
         countdownAudio.Play();
+        yield return new WaitForSeconds(1);
         num.text = "3";
         fontIncrease = true;
         yield return new WaitForSeconds(1.3f);
