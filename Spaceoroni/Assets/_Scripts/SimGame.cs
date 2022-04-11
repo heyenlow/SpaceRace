@@ -122,7 +122,6 @@ public class SimGame //: MonoBehaviour
             Rival.state = SimIPlayer.States.Winner;
         }
         yield return ret;
-
     }
 
     /// <summary>
@@ -528,8 +527,11 @@ public class SimGame //: MonoBehaviour
                 winner = Rival;
             }
         }
-
-        yield return true;
+        if (winner is null)
+        {
+            Debug.Log("This shouldn't be happening.");
+        }
+        yield return winner;
     }
 
     public bool isWin(Coordinate c)

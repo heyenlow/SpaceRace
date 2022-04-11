@@ -25,6 +25,24 @@ public class UCB1Tree //: MonoBehaviour
         }
     }
 
+    public class CoroutinePermanence
+    {
+        public Coroutine coroutine { get; private set; }
+        public SimPlayer result;
+        private IEnumerator target;
+        public CoroutinePermanence(MonoBehaviour owner, IEnumerator target)
+        {
+            this.target = target;
+            coroutine = owner.StartCoroutine(Run());
+            result = new SimPlayer(target.Current as SimPlayer);
+        }
+
+        private IEnumerator Run()
+        {
+            yield return target.MoveNext();
+        }
+    }
+
     public class Transition
     {
         public Coordinate Builder;
@@ -94,6 +112,7 @@ public class UCB1Tree //: MonoBehaviour
 
         for (int i = 0; i < simulations; i++)
         {
+            Debug.Log("Simulation " + i + " STARTED.");
             copy = new SimGame(g.DeepCopy());
             path.Clear();
             path.Add(tree[g.Hash]);
@@ -160,7 +179,7 @@ public class UCB1Tree //: MonoBehaviour
             }
 
             // ROLLOUT
-            copy.Rollout(game);
+            CoroutinePermanence co_perm = new CoroutinePermanence(game, copy.Rollout(game));
             //while (!copy.simulationRunning) is needed?
 
             // BACKPROP
@@ -170,6 +189,7 @@ public class UCB1Tree //: MonoBehaviour
                 if (copy.IsWinner(node.player))
                     node.wins++;
             }
+            Debug.Log("Simulation " + i + "FINISHED.");
         }
 
         // Simulations are over. Pick the best move, then return it.
