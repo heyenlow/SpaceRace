@@ -255,10 +255,23 @@ public class Game : MonoBehaviour
             case GameSettings.GameType.Singleplayer:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
                 Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
-                Player2.loadNEATPlayer("coevolution_champion");
+                setAIDifficulty();
                 break;
             case GameSettings.GameType.Multiplayer:
                 setupMultiplayerSettings();
+                break;
+        }
+    }
+
+    private void setAIDifficulty()
+    {
+        switch (GameSettings.difficulty)
+        {
+            case GameSettings.AIDifficulty.Easy:
+                Player2.loadNEATPlayer("coevolution_champion");
+                break;
+            case GameSettings.AIDifficulty.Hard:
+                Player2.loadNEATPlayer("uipevolution_champion");
                 break;
         }
     }
