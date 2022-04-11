@@ -178,8 +178,8 @@ public class Game : MonoBehaviour
     }
     public void QuitGame()
     {
-        Player1.ClearTurnText();
-        Player2.ClearTurnText();
+        if (Player1 != null) Player1.ClearTurnText();
+        if (Player2 != null) Player2.ClearTurnText();
         TurnIndicator.text = "";
         Location.LocationBlinking = null;
         Rocket.blinkingRocket = null;

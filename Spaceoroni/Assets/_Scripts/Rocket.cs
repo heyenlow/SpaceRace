@@ -85,7 +85,7 @@ public class Rocket : MonoBehaviour
         level2Animation.SetActive(false);
         level3Animation.SetActive(false);
 
-        transform.GetChild(level - 1).gameObject.SetActive(true);
+        if(!Game.cancelTurn) transform.GetChild(level - 1).gameObject.SetActive(true);
         Game.built = true;
     }
 

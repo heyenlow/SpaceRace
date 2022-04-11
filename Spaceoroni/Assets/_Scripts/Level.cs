@@ -102,13 +102,4 @@ public class Level : MonoBehaviour
         }
     }
 
-    public IEnumerator buildLevel()
-    {
-        animation.SetActive(true);
-        this.gameObject.SetActive(false);
-        yield return new WaitForSeconds(2);
-        this.gameObject.SetActive(false);
-        animation.SetActive(true);
-    }
-
 }
