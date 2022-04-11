@@ -53,6 +53,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject PostGamePanel;
     [SerializeField]
+    private GameObject PostGamePanel_PlayerDisconnected;
+    [SerializeField]
     private GameObject WaitingToPlayAgain;
     [SerializeField]
     private GameObject PostGamePanel_PlayAgain;
@@ -318,6 +320,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
         if (PostGamePanel.activeSelf)
         {
             PostGamePanel_PlayAgain.SetActive(false);
+            PostGamePanel_PlayerDisconnected.SetActive(true);
         }
         else
         {
