@@ -138,13 +138,13 @@ public class UCB1Tree //: MonoBehaviour
                     if (!tree.ContainsKey(t.Hash))
                         transitionNoStats.Add(t);
 
-                    Debug.Log(Coordinate.coordToString(t.Builder) + Coordinate.coordToString(t.Move) + Coordinate.coordToString(t.Build));
+                    //Debug.Log(Coordinate.coordToString(t.Builder) + Coordinate.coordToString(t.Move) + Coordinate.coordToString(t.Build));
                 }
 
                 // SELECTION
                 if (transitionNoStats.Count == 0)
                 {
-                    Debug.Log("Count ==0 ");
+                    //Debug.Log("Count ==0 ");
                     double bestScore = float.MinValue;
                     int parentPlays = path[path.Count - 1].plays;
                     double ucb1Score;
@@ -166,7 +166,7 @@ public class UCB1Tree //: MonoBehaviour
                 // EXPANSION
                 else
                 {
-                    Debug.Log("Expansion");
+                    //Debug.Log("Expansion");
                     Transition t = transitionNoStats.RandomItem(rng);
                     copy.Transition(t);
                     Node node = new Node(copy.CurrentPlayer);
@@ -189,7 +189,7 @@ public class UCB1Tree //: MonoBehaviour
                 if (copy.IsWinner(node.player))
                     node.wins++;
             }
-            Debug.Log("Simulation " + i + "FINISHED.");
+            Debug.Log("Simulation " + i + " FINISHED.");
         }
 
         // Simulations are over. Pick the best move, then return it.

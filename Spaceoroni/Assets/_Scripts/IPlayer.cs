@@ -87,7 +87,7 @@ public abstract class IPlayer : MonoBehaviour
     public void resetPlayer()
     {
         setAllBuildersActive();
-        turns.Clear();
+        if (turns != default) turns.Clear();
         Builder1.returnHome();
         Builder2.returnHome();
     }
