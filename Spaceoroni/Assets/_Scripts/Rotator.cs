@@ -10,6 +10,7 @@ public class Rotator : MonoBehaviour
         x,
         y,
         z,
+        zReverse,
         earth
     };
     
@@ -62,6 +63,9 @@ public class Rotator : MonoBehaviour
                 break;
             case Axis.z:
                 this.transform.RotateAround(CenterObject.transform.position, new Vector3(0f, 0f, Speed), Speed);
+                break;
+            case Axis.zReverse:
+                this.transform.RotateAround(CenterObject.transform.position, new Vector3(0f, 0f, -1 * Speed), Speed);
                 break;
             case Axis.earth:
                 this.transform.Rotate(Speed, 0f, -1 * Speed);
