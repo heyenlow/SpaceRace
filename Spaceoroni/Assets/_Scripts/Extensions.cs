@@ -14,8 +14,8 @@ namespace Assets._Scripts.MCTS
         /// <typeparam name="T">The type of elements in the List.</typeparam>
         /// <param name="list">The calling List.</param>
         /// <param name="random">An instance of the Random class.</param>
-        internal static T RandomItem<T>(this List<T> list, Random random)
-            => list[random.Next(0, list.Count)];
+        internal static T RandomItem<T>(this List<T> list, Unity.Mathematics.Random random)
+            => list[random.NextInt(0, list.Count)];
     }
 
     static class RandomFactory
