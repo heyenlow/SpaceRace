@@ -242,7 +242,7 @@ public class NeatPlayer : IPlayer
        // Debug.Log(Coordinate.coordToString(currentTurn.BuilderLocation));
         // return highest scoring move to go to next.
         currentTurn.MoveLocation = move;
-        moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), move, g);
+        if(!g.isWin(currentTurn.MoveLocation)) moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), move, g);
         //Debug.Log(Coordinate.coordToString(currentTurn.BuilderLocation));
         currentTurn.BuilderLocation = temp;
         yield return null;
