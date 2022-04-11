@@ -29,13 +29,17 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject WaitingForPlayer;
     [SerializeField]
+    private GameObject MultiplayerMenu;
+    [SerializeField]
     private GameObject Connecting;
+    [SerializeField]
+    private GameObject UnableToConnect;
     [SerializeField]
     private GameObject Join;
     [SerializeField]
-    private GameObject HostMenu;
-    [SerializeField]
     private GameObject Host;
+    [SerializeField]
+    private GameObject HostMenu;
     [SerializeField]
     private GameObject hostRoomName;
     [SerializeField]
@@ -52,17 +56,21 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     private GameObject WaitingToPlayAgain;
     [SerializeField]
     private GameObject PostGamePanel_PlayAgain;
+    [SerializeField]
+    private GameObject ConnectionFailed;
 
+    [SerializeField]
+    private PanelFader PanelFader;
     [SerializeField]
     private Game gameManager;
 
 
     private string netinfo = "";
+    private bool leftRoom = false;
 
     public const byte RAISE_TURN = 1;
     public const byte RAISE_INITIAL_BUILDERS = 2;
     public const byte RAISE_INITIAL_BUILDER = 3;
-    
 
     #region Monobehaviour CallBacks
     private void Awake()
@@ -104,7 +112,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
 
     public void OnClick_Multiplayer()
     {
-        if (!PhotonNetwork.IsConnected)
+        if (!PhotonNetwork.IsConnected && Application.internetReachability != NetworkReachability.NotReachable)
         {
             isConnecting = PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = gameVersion;
@@ -112,13 +120,19 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
             Join.SetActive(false);
             Host.SetActive(false);
         }
-        else
+        else if(PhotonNetwork.IsConnected)
         {
             Connecting.SetActive(false);
             Join.SetActive(true);
             Host.SetActive(true);
         }
-
+        else if(!PhotonNetwork.IsConnected && Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            Connecting.SetActive(false);
+            Join.SetActive(false);
+            Host.SetActive(false);
+            UnableToConnect.SetActive(true);
+        }
     }
 
     public void HostGame()
@@ -134,7 +148,6 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
             Debug.Log("CreateRoom called with name:" + name);
             PhotonNetwork.CreateRoom(name, options);
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineCamSwitcher>().MoveToCenterEarth();
-
         }
         else
         {
@@ -219,6 +232,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
             Debug.Log("Connected to master");
 
             Connecting.SetActive(false);
+            UnableToConnect.SetActive(false);
             Join.SetActive(true);
             Host.SetActive(true);
         }
@@ -228,22 +242,34 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
 
         public override void OnDisconnected(DisconnectCause cause)
     {
-        Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
+        Debug.LogWarningFormat("OnDisconnected() was called by PUN because: " + cause);
         isConnecting = false;
+        if (leftRoom)
+        {
+            gameManager.QuitGame();
+            ConnectionFailed.SetActive(true);
+            PanelFader.FadePanel(ConnectionFailed);
+            leftRoom = false;
+        }
+        else if(Connecting)
+        {
+            Connecting.SetActive(false);
+            UnableToConnect.SetActive(true);
+        }
+        else
+        {
+            ConnectionFailed.SetActive(true);
+            PanelFader.FadePanel(ConnectionFailed);
+        }
+
         if(playersWaiting > 0)
         {
             playersWaiting--;
         }
     }
 
-    public override void OnJoinRandomFailed(short returnCode, string message)
-    {
-        Debug.Log("Join Random Room failed.");   
-    }
-
     public override void OnJoinedRoom()
     {
-        
         Debug.Log("OnJoinedRoom() called by PUN. Now this client is in a room.");
         Debug.Log(PhotonNetwork.CurrentRoom.PlayerCount);
 
@@ -264,6 +290,8 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     {
         RoomListingsContent.DestroyChildren();
         Chat.SetActive(false);
+        leftRoom = true;
+        Debug.Log("This Client has left a PUN room.");
     }
 
     public override void OnCreatedRoom()
