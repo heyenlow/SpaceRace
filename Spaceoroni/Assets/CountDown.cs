@@ -7,7 +7,8 @@ public class CountDown : MonoBehaviour
 {
     [SerializeField]
     private TextMeshProUGUI num;
-
+    [SerializeField]
+    AudioSource countdownAudio;
 
     int fontStartSize = 40;
     bool fontIncrease = false;
@@ -31,6 +32,7 @@ public class CountDown : MonoBehaviour
 
     public IEnumerator startCountdown()
     {
+        countdownAudio.Play();
         num.text = "3";
         fontIncrease = true;
         yield return new WaitForSeconds(1.3f);
@@ -49,6 +51,7 @@ public class CountDown : MonoBehaviour
         num.text = "";
         num.fontSize = fontStartSize;
         number = 2;
+        countdownAudio.Stop();
 
         Game.countDownActive = false;
     }
