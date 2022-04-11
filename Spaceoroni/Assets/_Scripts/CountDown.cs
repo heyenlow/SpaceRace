@@ -14,10 +14,6 @@ public class CountDown : MonoBehaviour
     bool fontIncrease = false;
     int number = 2;
 
-    private void Start()
-    {
-        StartCoroutine(startCountdown());
-    }
     void Update()
     {
         if(fontIncrease) num.fontSize += 5;
@@ -51,7 +47,6 @@ public class CountDown : MonoBehaviour
         num.text = "";
         num.fontSize = fontStartSize;
         number = 2;
-        countdownAudio.Stop();
 
         Game.countDownActive = false;
     }
