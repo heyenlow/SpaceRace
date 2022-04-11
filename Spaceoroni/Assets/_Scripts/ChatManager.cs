@@ -14,8 +14,11 @@ public class ChatManager : MonoBehaviour
     private float _buildDelay = 0f;
     private int _maximumMessages = 8;
 
+    [SerializeField]
+    private PanelFader PanelFader;
+    [SerializeField]
+    private GameObject ChatPanel;
 
- 
     void Start()
     {
         _photon = GetComponent<PhotonView>();
@@ -26,6 +29,7 @@ public class ChatManager : MonoBehaviour
     void RPC_AddNewMessage(string msg)
     {
         messages.Add(msg);
+        ChatPanel.GetComponent<CanvasGroup>().alpha = 1;
     }
 
     public void SendChat(string msg)
@@ -90,6 +94,7 @@ public class ChatManager : MonoBehaviour
             if(Input.GetKeyUp(KeyCode.Return))
             {
                 SubmitChat();
+                PanelFader.FadePanel(ChatPanel);
             }
 
         }
