@@ -36,6 +36,8 @@ public class Game : MonoBehaviour
     [SerializeField]
     private AudioSource Build;
     [SerializeField]
+    private AudioSource Birds;
+    [SerializeField]
     private CountDown countDown;
 
     [SerializeField]
@@ -115,6 +117,8 @@ public class Game : MonoBehaviour
         playerState = PlayerState.Playing;
         setupGameSettings();
         Debug.Log("Starting " + GameSettings.gameType +  " Game" + Player1 + Player2);
+
+        Birds.Play();
         StartCoroutine(PlayGameToEnd());
     }
     public void ResetGame()
@@ -178,6 +182,8 @@ public class Game : MonoBehaviour
     }
     public void QuitGame()
     {
+        Birds.Stop();
+
         if (Player1 != null) Player1.ClearTurnText();
         if (Player2 != null) Player2.ClearTurnText();
         TurnIndicator.text = "";
@@ -396,6 +402,7 @@ public class Game : MonoBehaviour
 
                     if (t.isWin)
                     {
+                        Birds.Stop();
                         countDown.gameObject.SetActive(true);
                         countDownActive = true;
                         TurnIndicator.text = "";
