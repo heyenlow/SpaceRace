@@ -39,6 +39,12 @@ public class CinemachineCamSwitcher : MonoBehaviour
     [SerializeField]
     private AudioSource panNoise;
 
+    public bool textFocused = false;
+    public void setTextFocused(bool inFocus)
+    {
+        textFocused = inFocus;
+    }
+
     //private MoveTruck Truck;
 
     private List<CinemachineVirtualCamera> IntroSceneCams;
@@ -67,7 +73,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown("space") && introRunning)
+        if (Input.GetKeyDown("space") && introRunning )
         {
             panNoise.Play();
             turnText.text = "";
@@ -78,7 +84,7 @@ public class CinemachineCamSwitcher : MonoBehaviour
             SpaceCamera.Priority = 2;
         }
 
-        if (Input.GetKeyDown("space") && CameraGameBoardPosition != GameCameraLocations.none)
+        if (Input.GetKeyDown("space") && CameraGameBoardPosition != GameCameraLocations.none && !textFocused)
         {
             switch (CameraGameBoardPosition)
             {
