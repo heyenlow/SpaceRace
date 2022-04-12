@@ -47,7 +47,7 @@ public class Player : IPlayer
 
             if (moveLocation != null)
             {
-                moveBuidler(builder, moveLocation, g);
+                moveBuilder(builder, moveLocation, g);
 
                 HighlightManager.highlightedObjects.Clear();
             }
@@ -133,7 +133,7 @@ public class Player : IPlayer
                     }
                     else if (g.canBuild(currentTurn.BuilderLocation))
                     {
-                        moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
+                        moveBuilder(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
                         while (BuildersAreMoving()) yield return new WaitForEndOfFrame();
                     }
                     else

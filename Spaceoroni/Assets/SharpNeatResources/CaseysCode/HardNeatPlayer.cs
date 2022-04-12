@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
 
-class HardNeatPlayer : IPlayer
+public class HardNeatPlayer : IPlayer
 {
     public class Transition
     {
@@ -34,7 +34,18 @@ class HardNeatPlayer : IPlayer
     public class CoroutineWithData
     {
         public Coroutine coroutine { get; private set; }
-        public List<
+        public List<Transition> result;
+        private IEnumerator target;
+        public CoroutineWithData(MonoBehaviour owner, IEnumerator target)
+        {
+            this.target = target;
+            coroutine = owner.StartCoroutine(Run());
+            result = new List<Transition>(target.Current as IEnumerable<Transition>);
+        }
+        private IEnumerator Run()
+        {
+            yield return target.MoveNext();
+        }
     }
 
     SantoriniCoevolutionExperiment _experiment = new SantoriniCoevolutionExperiment();
@@ -128,7 +139,7 @@ class HardNeatPlayer : IPlayer
             {
                 tmp.x = rnd.Next(0, 4);
                 tmp.y = rnd.Next(0, 4);
-                moveBuidler(builder, tmp, g);
+                moveBuilder(builder, tmp, g);
             }
             else if (builder == 2)
             {
@@ -173,7 +184,7 @@ class HardNeatPlayer : IPlayer
 
                     if (found1)
                     {
-                        moveBuidler(builderID, tmp, g);
+                        moveBuilder(builderID, tmp, g);
                         return;
                     }
                 }
@@ -181,7 +192,7 @@ class HardNeatPlayer : IPlayer
         else
         {
             // place builder at x y
-            moveBuidler(builderID, tmp, g);
+            moveBuilder(builderID, tmp, g);
             return;
         }
     }

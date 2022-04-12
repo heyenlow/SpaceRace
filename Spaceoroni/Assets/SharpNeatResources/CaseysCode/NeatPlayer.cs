@@ -126,7 +126,7 @@ public class NeatPlayer : IPlayer
             {
                 tmp.x = rnd.Next(0, 4);
                 tmp.y = rnd.Next(0, 4);
-                moveBuidler(builder, tmp, g);
+                moveBuilder(builder, tmp, g);
             }
             else if (builder == 2)
             {
@@ -171,7 +171,7 @@ public class NeatPlayer : IPlayer
 
                     if (found1)
                     {
-                        moveBuidler(builderID, tmp, g);
+                        moveBuilder(builderID, tmp, g);
                         return;
                     }
                 }
@@ -179,7 +179,7 @@ public class NeatPlayer : IPlayer
         else
         {
             // place builder at x y
-            moveBuidler(builderID, tmp, g);
+            moveBuilder(builderID, tmp, g);
             return;
         }
     }
@@ -240,7 +240,7 @@ public class NeatPlayer : IPlayer
        // Debug.Log(Coordinate.coordToString(currentTurn.BuilderLocation));
         // return highest scoring move to go to next.
         currentTurn.MoveLocation = move;
-        if(!g.isWin(currentTurn.MoveLocation)) moveBuidler(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), move, g);
+        if(!g.isWin(currentTurn.MoveLocation)) moveBuilder(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), move, g);
         //Debug.Log(Coordinate.coordToString(currentTurn.BuilderLocation));
         currentTurn.BuilderLocation = temp;
         yield return null;
