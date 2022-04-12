@@ -402,6 +402,7 @@ public class Game : MonoBehaviour
 
                     if (t.isWin)
                     {
+                        PauseButton.SetActive(false);
                         Birds.Stop();
                         countDown.gameObject.SetActive(true);
                         countDownActive = true;
