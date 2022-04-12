@@ -30,7 +30,7 @@ public class HardNeatPlayer : IPlayer
             Hash = hash;
         }
 
-        public override string ToString() => $"{Coordinate.coordToString(Builder)} + {Coordinate.coordToString(Move)} + {Coordinate.coordToString(Build)}";
+        public override string ToString() => $"{Coordinate.coordToString(Builder)}" + $"{Coordinate.coordToString(Move)}" + $"{Coordinate.coordToString(Build)}";
     }
 
     public class CoroutineWithData
@@ -123,7 +123,7 @@ public class HardNeatPlayer : IPlayer
         }
     }
 
-    public IEnumerator PlaceBuilder(int builder, int player, Game g)
+    public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
         System.Random seed = new System.Random();
         System.Random rnd1 = new System.Random(seed.Next(0, (int)(int.MaxValue / 2)));
