@@ -310,11 +310,7 @@ public class Game : MonoBehaviour
 
     public void processTurnString(Turn turn, IPlayer CurrentPlayer, Game g)
     {
-        //players already move the builders and so does neatplayer
-        if (!(CurrentPlayer is Player) && !(CurrentPlayer is NeatPlayer)) CurrentPlayer.moveBuilder(CurrentPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
-
-        // if (!(CurrentPlayer is Player)) yield return new WaitForSeconds(timeToTurn/2);
         if (CurrentPlayer is Player)
         {
             // If not over Where to build?

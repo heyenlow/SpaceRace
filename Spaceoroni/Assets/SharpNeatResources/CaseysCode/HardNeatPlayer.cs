@@ -227,6 +227,7 @@ public class HardNeatPlayer : IPlayer
             }
         }
         currentTurn = new Turn(legalMoves[indexOfBestMoveFound].ToString());
+
         while (BuildersAreMoving()) yield return new WaitForEndOfFrame();
 
         if (g.isWin(currentTurn.MoveLocation))
@@ -236,6 +237,11 @@ public class HardNeatPlayer : IPlayer
             turns.Add(currentTurn);
             yield return null;
         }
+        else
+        {
+            moveBuilder(getBuilderInt(new Coordinate(currentTurn.BuilderLocation.x, currentTurn.BuilderLocation.y)), currentTurn.MoveLocation, g);
+        }
+        turns.Add(currentTurn);
         yield return null;
 
     }
