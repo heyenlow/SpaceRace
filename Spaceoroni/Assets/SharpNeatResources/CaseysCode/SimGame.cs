@@ -295,8 +295,8 @@ public class SimGame //: MonoBehaviour
 
         if (state[move.x, move.y] == 3)
         {
-            CurrentPlayer.state = SimPlayer.States.Winner;
-            Rival.state = SimPlayer.States.Loser;
+            CurrentPlayer.state = IPlayer.States.Winner;
+            Rival.state = IPlayer.States.Loser;
             return true;
         }
         // If not over Where to build?
@@ -368,11 +368,11 @@ public class SimGame //: MonoBehaviour
     public bool IsGameOver()
     {
         // DEBUG
-        if (CurrentPlayer.state != SimPlayer.States.Undetermined)
+        if (CurrentPlayer.state != IPlayer.States.Undetermined)
         {
             return true;
         }
-        else if (Rival.state != SimPlayer.States.Undetermined)
+        else if (Rival.state != IPlayer.States.Undetermined)
         {
             return true;
         }
@@ -449,8 +449,8 @@ public class SimGame //: MonoBehaviour
             t.Builder = tmpBuilder;
             if (isWin)
             {
-                CurrentPlayer.state = SimPlayer.States.Winner;
-                Rival.state = SimPlayer.States.Loser;
+                CurrentPlayer.state = IPlayer.States.Winner;
+                Rival.state = IPlayer.States.Loser;
             }
         }
     }
@@ -477,8 +477,8 @@ public class SimGame //: MonoBehaviour
             if (allPossibleMoves.Count == 0)
             {
                 winner = Rival;
-                CurrentPlayer.state = SimPlayer.States.Loser;
-                Rival.state = SimPlayer.States.Winner;
+                CurrentPlayer.state = IPlayer.States.Loser;
+                Rival.state = IPlayer.States.Winner;
                 break;
             }
             var randomMove = allPossibleMoves[rnd.Next(0, allPossibleMoves.Count)];
@@ -487,22 +487,22 @@ public class SimGame //: MonoBehaviour
             bool won = isWin(randomMove.Move);
             if (won)
             {
-                CurrentPlayer.state = SimPlayer.States.Winner;
-                Rival.state = SimPlayer.States.Loser;
+                CurrentPlayer.state = IPlayer.States.Winner;
+                Rival.state = IPlayer.States.Loser;
                 winner = CurrentPlayer;
                 break;
             }
 
             processTurnString(turn);
 
-            if (CurrentPlayer.state == SimPlayer.States.Winner)
+            if (CurrentPlayer.state == IPlayer.States.Winner)
             {
-                Rival.state = SimPlayer.States.Loser;
+                Rival.state = IPlayer.States.Loser;
                 winner = CurrentPlayer;
             }
-            else if (CurrentPlayer.state == SimPlayer.States.Loser)
+            else if (CurrentPlayer.state == IPlayer.States.Loser)
             {
-                Rival.state = SimPlayer.States.Winner;
+                Rival.state = IPlayer.States.Winner;
                 winner = Rival;
             }
         }
@@ -531,10 +531,10 @@ public class SimGame //: MonoBehaviour
     public bool IsWinner(SimPlayer player)
     {
         SimPlayer winner;
-        if (Player1.state == SimPlayer.States.Winner) winner = Player1;
-        else if (Player2.state == SimPlayer.States.Winner) winner = Player2;
-        else if (Player1.state == SimPlayer.States.Loser) winner = Player2;
-        else if (Player2.state == SimPlayer.States.Loser) winner = Player1;
+        if (Player1.state == IPlayer.States.Winner) winner = Player1;
+        else if (Player2.state == IPlayer.States.Winner) winner = Player2;
+        else if (Player1.state == IPlayer.States.Loser) winner = Player2;
+        else if (Player2.state == IPlayer.States.Loser) winner = Player1;
         else winner = null;
 
         if (winner != null && player.ID == winner.ID)

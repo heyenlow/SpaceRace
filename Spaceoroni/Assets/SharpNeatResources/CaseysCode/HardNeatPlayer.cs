@@ -18,6 +18,8 @@ public class HardNeatPlayer : IPlayer
 
         public Coordinate Build;
 
+        public double Value;
+
         public long Hash;
 
         public Transition(Coordinate builder, Coordinate move, Coordinate build, long hash)
@@ -106,7 +108,7 @@ public class HardNeatPlayer : IPlayer
         //Brain.ResetState();
         var tmpBoard = TranslateState(g);
         // map character array representing board state to inputs 0-24
-        inputSignalArray[0] = ReferenceEquals(g.curPlayer, g.Player1) ? 0 : 1;    // player 2 is represented by a {1}, and player 1 is represented by a {0}
+        inputSignalArray[0] = ReferenceEquals(g.CurrentPlayer, g.Player1) ? 0 : 1;    // player 2 is represented by a {1}, and player 1 is represented by a {0}
         int i, x, y;
         for (i = 1, x = 0; x < 5; x++)
         {
@@ -121,24 +123,19 @@ public class HardNeatPlayer : IPlayer
         }
     }
 
-    public override IEnumerator PlaceBuilder(int builder, int player, Game g)
+    public IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
-        //Coordinate builder1 = new Coordinate(0, 0);
-        //Coordinate builder2 = new Coordinate(1, 1);
-        //if (builder == 1) { moveBuidler(builder, builder1, g); } else { moveBuidler(builder, builder2, g); }
-        // this player is now temporarily the current player
-        g.curPlayer = this;
-        // the rival is whichever player this isn't
-        g.rival = (ReferenceEquals(g.Player2, this)) ? g.Player1 : g.Player2;
-        System.Random rnd = new System.Random();
+        System.Random seed = new System.Random();
+        System.Random rnd1 = new System.Random(seed.Next(0, (int)(int.MaxValue / 2)));
+        System.Random rnd2 = new System.Random(seed.Next((int)(int.MaxValue / 2), int.MaxValue));
         Coordinate tmp = new Coordinate();
         int x, y;
-        if (g.rival.getBuilders().Item1.coord.x == -1 && g.rival.getBuilders().Item1.coord.y == -1)
+        if (g.Rival.getBuilders().Item1.coord.x == -1 && g.Rival.getBuilders().Item1.coord.y == -1)
         {
             if (builder == 1)
             {
-                tmp.x = rnd.Next(0, 4);
-                tmp.y = rnd.Next(0, 4);
+                tmp.x = rnd2.Next() % 4;
+                tmp.y = rnd1.Next() % 4;
                 moveBuilder(builder, tmp, g);
             }
             else if (builder == 2)
@@ -150,15 +147,15 @@ public class HardNeatPlayer : IPlayer
         else
         {
             // opponent's first builder is defined, but not guaranteed the second is defined...
-            if (g.rival.getBuilders().Item2.coord.x == -1 && g.rival.getBuilders().Item2.coord.y == -1)
+            if (g.Rival.getBuilders().Item2.coord.x == -1 && g.Rival.getBuilders().Item2.coord.y == -1)
             {
                 // place a builder near the opponent's first builder.
-                findFreeSpots(g, g.rival.getBuilders().Item1.getLocation().x, g.rival.getBuilders().Item1.getLocation().y, builder);
+                findFreeSpots(g, g.Rival.getBuilders().Item1.getLocation().x, g.Rival.getBuilders().Item1.getLocation().y, builder);
             }
             else
             {
-                x = Math.Abs((g.rival.getBuilders().Item1.coord.x + g.rival.getBuilders().Item2.coord.x) / 2);
-                y = Math.Abs((g.rival.getBuilders().Item1.coord.y + g.rival.getBuilders().Item2.coord.y) / 2);
+                x = Math.Abs((g.Rival.getBuilders().Item1.coord.x + g.Rival.getBuilders().Item2.coord.x) / 2);
+                y = Math.Abs((g.Rival.getBuilders().Item1.coord.y + g.Rival.getBuilders().Item2.coord.y) / 2);
                 findFreeSpots(g, x, y, builder); // neat player places second builder close to opponent's builder averaged out
             }
         }
@@ -201,7 +198,46 @@ public class HardNeatPlayer : IPlayer
     {
         currentTurn = new Turn();
 
-        
+        CoroutineWithData co_data = new CoroutineWithData(g, g.GetLegalTransitions());
+        List<Transition> legalMoves = co_data.result;
+
+        if (legalMoves.Count == 0)
+        {
+            state = States.Loser;
+            g.Rival.state = States.Winner;
+            yield return null;
+        }
+        foreach (var t in legalMoves)
+        {
+            // load in the state (board + move)
+            setInputSignalArray(Brain.InputSignalArray, g, t.ToString());
+            // perform some magic
+            Brain.Activate();
+            // save the value.
+            t.Value = Brain.OutputSignalArray[0];
+        }
+        int indexOfBestMoveFound = 0;
+        double bestScoreFound = double.MinValue;
+        for (int i = 0; i < legalMoves.Count; i++)
+        {
+            if (legalMoves[i].Value > bestScoreFound)
+            {
+                bestScoreFound = legalMoves[i].Value;
+                indexOfBestMoveFound = i;
+            }
+        }
+        currentTurn = new Turn(legalMoves[indexOfBestMoveFound].ToString());
+        while (BuildersAreMoving()) yield return new WaitForEndOfFrame();
+
+        if (g.isWin(currentTurn.MoveLocation))
+        {
+            currentTurn.isWin = true;
+
+            turns.Add(currentTurn);
+            yield return null;
+        }
+        yield return null;
+
     }
 
     /// <summary>

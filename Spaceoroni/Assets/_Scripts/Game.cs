@@ -40,6 +40,9 @@ public class Game : MonoBehaviour
     [SerializeField]
     private CountDown countDown;
 
+    public static long[,,] ZobristTable = null;
+
+
     [SerializeField]
     private TextMeshProUGUI WinText;
     Color blueColor; 
@@ -65,7 +68,11 @@ public class Game : MonoBehaviour
         } }
     public IPlayer Player1;
     public IPlayer Player2;
-    public IPlayer curPlayer, rival;
+    public int moveNum = 0;
+    public long Hash => computeHash();
+
+    public IPlayer CurrentPlayer => (moveNum % 2 == 0) ? Player1 : Player2;
+    public IPlayer Rival => (moveNum % 2 == 0) ? Player2 : Player1;
     public static bool cancelTurn = false;
     public static bool PAUSED = false;
     public static bool PLAYERinTURN = false;
@@ -142,8 +149,6 @@ public class Game : MonoBehaviour
         //reset game variables
         Player1 = null;
         Player2 = null;
-        curPlayer = null;
-        rival = null;
         clickLocation = null;
         
     }
@@ -167,8 +172,6 @@ public class Game : MonoBehaviour
             HighlightManager.unHighlightEverything();
             HighlightManager.highlightedObjects.Clear();
             if (Player1 != null && Player2 != null) clearPlayersTurnsAndSendBuildersHome();
-            curPlayer = null;
-            rival = null;
             clickLocation = null;
 
             StartGame();
@@ -304,14 +307,14 @@ public class Game : MonoBehaviour
         Debug.Log("Player1: " + Player1 + ", Player2: " + Player2);
     }
 
-    public void processTurnString(Turn turn, IPlayer curPlayer, Game g)
+    public void processTurnString(Turn turn, IPlayer CurrentPlayer, Game g)
     {
         //players already move the builders and so does neatplayer
-        if (!(curPlayer is Player) && !(curPlayer is NeatPlayer)) curPlayer.moveBuilder(curPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
+        if (!(CurrentPlayer is Player) && !(CurrentPlayer is NeatPlayer)) CurrentPlayer.moveBuilder(CurrentPlayer.getBuilderInt(turn.BuilderLocation), turn.MoveLocation, g);
 
 
-        // if (!(curPlayer is Player)) yield return new WaitForSeconds(timeToTurn/2);
-        if (curPlayer is Player)
+        // if (!(CurrentPlayer is Player)) yield return new WaitForSeconds(timeToTurn/2);
+        if (CurrentPlayer is Player)
         {
             // If not over Where to build?
             if (!turn.isWin)
@@ -350,7 +353,7 @@ public class Game : MonoBehaviour
 
     public IEnumerator PlayGameToEnd()
     {
-        IPlayer curPlayer;
+        IPlayer CurrentPlayer;
         IPlayer othPlayer;
         IPlayer winner = null;
 
@@ -367,34 +370,34 @@ public class Game : MonoBehaviour
             while (PAUSED) { yield return new WaitForEndOfFrame(); }
 
             // Determine who's turn it is.
-            curPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
+            CurrentPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
             othPlayer = (moveNum % 2 == 0) ? Player2 : Player1;
 
-            if (GameSettings.netMode == GameSettings.NetworkMode.Local) { setTurnIndicator(curPlayer); }
+            if (GameSettings.netMode == GameSettings.NetworkMode.Local) { setTurnIndicator(CurrentPlayer); }
 
                 //Check if last turn lost
                 if (playerState == PlayerState.Loser)
             {
-                winner = curPlayer;
+                winner = CurrentPlayer;
             }
             else
             {
-                if (hasPossibleTurns(curPlayer))
+                if (hasPossibleTurns(CurrentPlayer))
                 {
                     // string turn BUILDERMOVEBUILD string
                     PhotonView photonView = PhotonView.Get(this);
 
                     //if it is a string player we just need to wait before getting the turn and processing it
-                    if (curPlayer is StringPlayer)
+                    if (CurrentPlayer is StringPlayer)
                     {
                         yield return new WaitForSeconds(timeToTurn);
                     }
                     else //if it is any other player we need to start getting the turn
                     {
-                        yield return StartCoroutine(curPlayer.beginTurn(this));
+                        yield return StartCoroutine(CurrentPlayer.beginTurn(this));
                     }
 
-                    Turn t = curPlayer.getNextTurn();
+                    Turn t = CurrentPlayer.getNextTurn();
                     // update the board with the current player's move
                     Debug.Log("Processing Turn: " + t.ToString());
     
@@ -410,9 +413,9 @@ public class Game : MonoBehaviour
 
 
                         built = true;
-                        winner = curPlayer;
+                        winner = CurrentPlayer;
                         //wait to move then set buidler inactive
-                        curPlayer.setBuilderAtLocationInactive(t.BuilderLocation);
+                        CurrentPlayer.setBuilderAtLocationInactive(t.BuilderLocation);
                         runEndOfGameAnimation(t.MoveLocation, winner == Player1);
 
                         while (countDownActive)
@@ -429,7 +432,7 @@ public class Game : MonoBehaviour
                     else
                     {
                         built = false;
-                        processTurnString(t, curPlayer, this);
+                        processTurnString(t, CurrentPlayer, this);
                     }
                 }
                 else { winner = othPlayer; }
@@ -454,7 +457,7 @@ public class Game : MonoBehaviour
                 //Check if win
                 if (playerState == PlayerState.Winner)
                 {
-                    winner = curPlayer;
+                    winner = CurrentPlayer;
                 }
             }
         }
@@ -466,12 +469,12 @@ public class Game : MonoBehaviour
     public void RESUMEGAME() { PAUSED = false; HighlightManager.resumeGameHighlights(); }
 
 
-    private void setTurnIndicator(IPlayer curPlayer)
+    private void setTurnIndicator(IPlayer CurrentPlayer)
     {
         if (GameSettings.netMode == GameSettings.NetworkMode.Local)
         {
-            if (curPlayer == Player1) { TurnIndicator.text = "Player 1's Turn"; TurnIndicator.color = Color.white; }
-            else if (curPlayer == Player2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = blueColor; }
+            if (CurrentPlayer == Player1) { TurnIndicator.text = "Player 1's Turn"; TurnIndicator.color = Color.white; }
+            else if (CurrentPlayer == Player2) { TurnIndicator.text = "Player 2's Turn"; TurnIndicator.color = blueColor; }
         }
     }
     private void setTurnIndicator(int PlayerInt)
@@ -826,13 +829,6 @@ public class Game : MonoBehaviour
         return ret;
     }
 
-    public Game DeepCopy()
-    {
-        Game copy = new Game(this);
-
-        return copy;
-    }
-
     void initTable()
     {
         if (ZobristTable != null) return;
@@ -943,7 +939,7 @@ public class Game : MonoBehaviour
                 // Hash Values are currently this current game's state hash
 
                 // need to change it to be the hash value of a game resulting from the move taking place.  without actually making the move?
-                var tmpState = new SimGame(DeepCopy());
+                var tmpState = new SimGame(this);
                 string turnString = Coordinate.coordToString(tmp.Builder) + Coordinate.coordToString(tmp.Move) + Coordinate.coordToString(tmp.Build); // create turn string from this transition
                 tmpState.processTurnString(turnString); // execute transition on copy board
 
@@ -954,10 +950,10 @@ public class Game : MonoBehaviour
             }
         }
         // builder 2...
-        moves = getAllPossibleMoves(CurrentPlayer.Builder2.Location);
+        moves = getAllPossibleMoves(CurrentPlayer.getBuilders().Item2.coord);
         for (int i = 0; i < moves.Count; i++)
         {
-            if (Equals(CurrentPlayer.Builder2.Location, moves[i]))
+            if (Equals(CurrentPlayer.getBuilders().Item2.coord, moves[i]))
                 Debug.Log("Break");
 
             List<string> builds = getAllPossibleBuilds(Coordinate.stringToCoord(moves[i]));
@@ -966,7 +962,7 @@ public class Game : MonoBehaviour
                 HardNeatPlayer.Transition tmp = new HardNeatPlayer.Transition(Coordinate.stringToCoord(CurrentPlayer.getBuilderLocations().Substring(2, 2)), Coordinate.stringToCoord(moves[i]), Coordinate.stringToCoord(builds[j]), Hash);
                 // Hash Values are currently this current game's state hash
                 // need to change it to be the hash value of a game resulting from the move taking place.  without actually making the move?
-                SimGame tmpState = new SimGame(DeepCopy());
+                SimGame tmpState = new SimGame(this);
                 tmpState.processTurnString(Coordinate.coordToString(tmp.Builder) + Coordinate.coordToString(tmp.Move) + Coordinate.coordToString(tmp.Build));
                 tmp.Hash = tmpState.computeHash();
 

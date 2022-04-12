@@ -68,8 +68,8 @@ public class NeatPlayer : IPlayer
         // change builder x, y coordinates to an int representing that square (0-24)
         inputSignalArray[0] = (Builder1.getLocation().x * 5) + Builder1.getLocation().y;
         inputSignalArray[1] = (Builder2.getLocation().x * 5) + Builder2.getLocation().y;
-        inputSignalArray[2] = (g.curPlayer == g.Player1) ? (g.Player2.getBuilders().Item1.getLocation().x * 5) + g.Player2.getBuilders().Item1.getLocation().y : (g.Player1.getBuilders().Item1.getLocation().x * 5) + g.Player1.getBuilders().Item1.getLocation().y;
-        inputSignalArray[3] = (g.curPlayer == g.Player1) ? (g.Player2.getBuilders().Item2.getLocation().x * 5) + g.Player2.getBuilders().Item2.getLocation().y : (g.Player1.getBuilders().Item2.getLocation().x * 5) + g.Player1.getBuilders().Item2.getLocation().y;
+        inputSignalArray[2] = (g.CurrentPlayer == g.Player1) ? (g.Player2.getBuilders().Item1.getLocation().x * 5) + g.Player2.getBuilders().Item1.getLocation().y : (g.Player1.getBuilders().Item1.getLocation().x * 5) + g.Player1.getBuilders().Item1.getLocation().y;
+        inputSignalArray[3] = (g.CurrentPlayer == g.Player1) ? (g.Player2.getBuilders().Item2.getLocation().x * 5) + g.Player2.getBuilders().Item2.getLocation().y : (g.Player1.getBuilders().Item2.getLocation().x * 5) + g.Player1.getBuilders().Item2.getLocation().y;
         // loop sets 25 inputs to board heights.
         for (int i = 0; i < 5; i++)
         {
@@ -110,17 +110,10 @@ public class NeatPlayer : IPlayer
 
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
-        //Coordinate builder1 = new Coordinate(0, 0);
-        //Coordinate builder2 = new Coordinate(1, 1);
-        //if (builder == 1) { moveBuidler(builder, builder1, g); } else { moveBuidler(builder, builder2, g); }
-        // this player is now temporarily the current player
-        g.curPlayer = this;
-        // the rival is whichever player this isn't
-        g.rival = (ReferenceEquals(g.Player2, this)) ? g.Player1 : g.Player2;
         System.Random rnd = new System.Random();
         Coordinate tmp = new Coordinate();
         int x, y;
-        if (g.rival.getBuilders().Item1.coord.x == -1 && g.rival.getBuilders().Item1.coord.y == -1)
+        if (g.Rival.getBuilders().Item1.coord.x == -1 && g.Rival.getBuilders().Item1.coord.y == -1)
         {
             if (builder == 1)
             {
@@ -137,15 +130,15 @@ public class NeatPlayer : IPlayer
         else
         {
             // opponent's first builder is defined, but not guaranteed the second is defined...
-            if (g.rival.getBuilders().Item2.coord.x == -1 && g.rival.getBuilders().Item2.coord.y == -1)
+            if (g.Rival.getBuilders().Item2.coord.x == -1 && g.Rival.getBuilders().Item2.coord.y == -1)
             {
                 // place a builder near the opponent's first builder.
-                findFreeSpots(g, g.rival.getBuilders().Item1.getLocation().x, g.rival.getBuilders().Item1.getLocation().y, builder);
+                findFreeSpots(g, g.Rival.getBuilders().Item1.getLocation().x, g.Rival.getBuilders().Item1.getLocation().y, builder);
             }
             else
             {
-                x = Math.Abs((g.rival.getBuilders().Item1.coord.x + g.rival.getBuilders().Item2.coord.x) / 2);
-                y = Math.Abs((g.rival.getBuilders().Item1.coord.y + g.rival.getBuilders().Item2.coord.y) / 2);
+                x = Math.Abs((g.Rival.getBuilders().Item1.coord.x + g.Rival.getBuilders().Item2.coord.x) / 2);
+                y = Math.Abs((g.Rival.getBuilders().Item1.coord.y + g.Rival.getBuilders().Item2.coord.y) / 2);
                 findFreeSpots(g, x, y, builder); // neat player places second builder close to opponent's builder averaged out
             }
         }

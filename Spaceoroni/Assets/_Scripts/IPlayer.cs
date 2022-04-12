@@ -9,6 +9,7 @@ public abstract class IPlayer : MonoBehaviour
     protected Builder Builder1;
     protected Builder Builder2;
     protected List<Turn> turns;
+    public int ID;
     protected TextMeshProUGUI turnText;
     public enum States
     {

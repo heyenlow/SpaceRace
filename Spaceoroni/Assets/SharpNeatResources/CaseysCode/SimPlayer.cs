@@ -20,6 +20,7 @@ public class SimPlayer
         SimBuilder builderToMove = Builder == 1 ? Builder1 : Builder2;
         builderToMove.move(to, g);
     }
+
     public IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
         //Coordinate builder1 = new Coordinate(0, 0);
@@ -35,6 +36,16 @@ public class SimPlayer
         if (g.Rival.getBuilders().Item1.coord.x == -1 && g.Rival.getBuilders().Item1.coord.y == -1)
         {
             if (builder == 1)
+            {
+                tmp.x = rnd2.Next() % 4;
+                tmp.y = rnd1.Next() % 4;
+                moveBuilder(builder, tmp, g);
+            }
+            else if (builder == 2)
+            {
+                // nothing should happen here because if we're placing our second builder the opponent must have already defined at least their first builder.
+                Debug.Log("This error shouldn't be happening... look in NeatPlayer.cs");
+            }
         }
         else
         {
@@ -53,6 +64,7 @@ public class SimPlayer
         }
         yield return true;
     }
+
     public SimPlayer(int id)
     {
         ID = id;
@@ -63,6 +75,7 @@ public class SimPlayer
         Builder2 = new SimBuilder(Coordinate.stringToCoord(other.getBuilderLocations().Substring(2, 2)));
         ID = other.ID;
     }
+
     public SimPlayer(SimPlayer other)
     {
         Builder1 = new SimBuilder(other.Builder1);
@@ -70,4 +83,37 @@ public class SimPlayer
         state = other.state;
         ID = other.ID;
     }
+
+    private void findFreeSpots(Game g, int x, int y, int builderID)
+    {
+        Coordinate tmp = new Coordinate { x = x, y = y };
+        bool found1 = false;
+        if (!g.locationClearOfAllBuilders(tmp))
+        {
+            for (int i = x - 1; (i <= x + 1) && !found1; i++)
+                for (int j = y - 1; j <= y + 1; j++)
+                {
+                    tmp.x = i; tmp.y = j;
+                    if (!Coordinate.inBounds(tmp))
+                        continue;
+                    if (x == i && y == j)
+                        continue;
+
+                    found1 = g.locationClearOfAllBuilders(tmp);
+
+                    if (found1)
+                    {
+                        moveBuilder(builderID, tmp, g);
+                        return;
+                    }
+                }
+        }
+        else
+        {
+            // place builder at x y
+            moveBuilder(builderID, tmp, g);
+            return;
+        }
+    }
+
 }
