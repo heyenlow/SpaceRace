@@ -5,6 +5,12 @@ using UnityEngine;
 public class PanelFader : MonoBehaviour
 {
     public float Duration = 10.0f;
+    public bool allowFade = true;
+
+    public void SetAllowFade(bool allow)
+    {
+        allowFade = allow;
+    }
 
     public void FadePanel(GameObject panel)
     {
@@ -18,7 +24,7 @@ public class PanelFader : MonoBehaviour
     {
         float counter = 0f;
 
-        while (counter < Duration)
+        while (counter < Duration && allowFade)
         {
             counter += (Time.deltaTime);
             canvG.alpha = Mathf.Lerp(start, end, counter / Duration);
