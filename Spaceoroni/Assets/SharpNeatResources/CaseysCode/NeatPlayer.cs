@@ -77,7 +77,7 @@ public class NeatPlayer : IPlayer
             {
                 // add two for buffer between first 4 inputs (builders)
                 int index = (i + (5 * j)) + 4;
-                inputSignalArray[index] = g.state[i, j]; 
+                inputSignalArray[index] = g.state[i, j];
             }
         }
     }
@@ -92,9 +92,7 @@ public class NeatPlayer : IPlayer
             // need to convert coordinate string (ex. "C2") into 0-24 location on board (C2 = 12);
             evalMove = Coordinate.stringToCoord(possim[i - 29]);
             inputSignalArray[i] = (evalMove.x * 5) + evalMove.y;
-
         }
-
     }
 
     private void setInputSignalArrayBuildLoc(ISignalArray inputSignalArray, List<string> possib, Game g)
