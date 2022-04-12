@@ -263,7 +263,6 @@ public class Game : MonoBehaviour
                 break;
             case GameSettings.GameType.Singleplayer:
                 Player1 = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
-                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
                 setAIDifficulty();
                 break;
             case GameSettings.GameType.Multiplayer:
@@ -277,9 +276,11 @@ public class Game : MonoBehaviour
         switch (GameSettings.difficulty)
         {
             case GameSettings.AIDifficulty.Easy:
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<NeatPlayer>();
                 Player2.loadNEATPlayer("coevolution_champion");
                 break;
             case GameSettings.AIDifficulty.Hard:
+                Player2 = GameObject.FindGameObjectWithTag("Player2").GetComponent<HardNeatPlayer>();
                 Player2.loadNEATPlayer("hardneat_champion");
                 break;
         }
