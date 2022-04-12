@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
 
-class HardNeatPlayer : IPlayer
+public class HardNeatPlayer
 {
     public class Transition
     {
@@ -34,7 +34,19 @@ class HardNeatPlayer : IPlayer
     public class CoroutineWithData
     {
         public Coroutine coroutine { get; private set; }
-        public List<
+        public List<Transition> result;
+        private IEnumerator target;
+        public CoroutineWithData(MonoBehaviour owner, IEnumerator target)
+        {
+            this.target = target;
+            coroutine = owner.StartCoroutine(Run());
+            result = new List<Transition>(target.Current as IEnumerable<Transition>);
+        }
+
+        private IEnumerator Run()
+        {
+            yield return target.MoveNext();
+        }
     }
 
     SantoriniCoevolutionExperiment _experiment = new SantoriniCoevolutionExperiment();
@@ -95,7 +107,7 @@ class HardNeatPlayer : IPlayer
         //Brain.ResetState();
         var tmpBoard = TranslateState(g);
         // map character array representing board state to inputs 0-24
-        inputSignalArray[0] = ReferenceEquals(g.curPlayer, g.Player1) ? 0 : 1;    // player 2 is represented by a {1}, and player 1 is represented by a {0}
+        inputSignalArray[0] = ReferenceEquals(g.CurrentPlayer, g.Player1) ? 0 : 1;    // player 2 is represented by a {1}, and player 1 is represented by a {0}
         int i, x, y;
         for (i = 1, x = 0; x < 5; x++)
         {
@@ -112,23 +124,18 @@ class HardNeatPlayer : IPlayer
 
     public override IEnumerator PlaceBuilder(int builder, int player, Game g)
     {
-        //Coordinate builder1 = new Coordinate(0, 0);
-        //Coordinate builder2 = new Coordinate(1, 1);
-        //if (builder == 1) { moveBuidler(builder, builder1, g); } else { moveBuidler(builder, builder2, g); }
-        // this player is now temporarily the current player
-        g.curPlayer = this;
-        // the rival is whichever player this isn't
-        g.rival = (ReferenceEquals(g.Player2, this)) ? g.Player1 : g.Player2;
-        System.Random rnd = new System.Random();
+        System.Random seed = new System.Random();
+        System.Random rnd1 = new System.Random(seed.Next(0, (int)(int.MaxValue / 2)));
+        System.Random rnd2 = new System.Random(seed.Next((int)(int.MaxValue / 2), int.MaxValue));
         Coordinate tmp = new Coordinate();
         int x, y;
-        if (g.rival.getBuilders().Item1.coord.x == -1 && g.rival.getBuilders().Item1.coord.y == -1)
+        if (g.Rival.getBuilders().Item1.coord.x == -1 && g.Rival.getBuilders().Item1.coord.y == -1)
         {
             if (builder == 1)
             {
-                tmp.x = rnd.Next(0, 4);
-                tmp.y = rnd.Next(0, 4);
-                moveBuidler(builder, tmp, g);
+                tmp.x = rnd2.Next() % 4;
+                tmp.y = rnd1.Next() % 4;
+                moveBuilder(builder, tmp, g);
             }
             else if (builder == 2)
             {
@@ -139,15 +146,15 @@ class HardNeatPlayer : IPlayer
         else
         {
             // opponent's first builder is defined, but not guaranteed the second is defined...
-            if (g.rival.getBuilders().Item2.coord.x == -1 && g.rival.getBuilders().Item2.coord.y == -1)
+            if (g.Rival.getBuilders().Item2.coord.x == -1 && g.Rival.getBuilders().Item2.coord.y == -1)
             {
                 // place a builder near the opponent's first builder.
-                findFreeSpots(g, g.rival.getBuilders().Item1.getLocation().x, g.rival.getBuilders().Item1.getLocation().y, builder);
+                findFreeSpots(g, g.Rival.getBuilders().Item1.getLocation().x, g.Rival.getBuilders().Item1.getLocation().y, builder);
             }
             else
             {
-                x = Math.Abs((g.rival.getBuilders().Item1.coord.x + g.rival.getBuilders().Item2.coord.x) / 2);
-                y = Math.Abs((g.rival.getBuilders().Item1.coord.y + g.rival.getBuilders().Item2.coord.y) / 2);
+                x = Math.Abs((g.Rival.getBuilders().Item1.coord.x + g.Rival.getBuilders().Item2.coord.x) / 2);
+                y = Math.Abs((g.Rival.getBuilders().Item1.coord.y + g.Rival.getBuilders().Item2.coord.y) / 2);
                 findFreeSpots(g, x, y, builder); // neat player places second builder close to opponent's builder averaged out
             }
         }
@@ -173,7 +180,7 @@ class HardNeatPlayer : IPlayer
 
                     if (found1)
                     {
-                        moveBuidler(builderID, tmp, g);
+                        moveBuilder(builderID, tmp, g);
                         return;
                     }
                 }
@@ -181,7 +188,7 @@ class HardNeatPlayer : IPlayer
         else
         {
             // place builder at x y
-            moveBuidler(builderID, tmp, g);
+            moveBuilder(builderID, tmp, g);
             return;
         }
     }
@@ -189,7 +196,8 @@ class HardNeatPlayer : IPlayer
     public override IEnumerator beginTurn(Game g)
     {
         currentTurn = new Turn();
-
+        CoroutineWithData co_dat = new CoroutineWithData(g, g.GetLegalTransitions());
+        
         
     }
 
