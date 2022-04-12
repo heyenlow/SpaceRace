@@ -350,8 +350,6 @@ public class Game : MonoBehaviour
 
     public IEnumerator PlayGameToEnd()
     {
-        IPlayer CurrentPlayer;
-        IPlayer othPlayer;
         IPlayer winner = null;
 
         yield return null;
@@ -359,16 +357,12 @@ public class Game : MonoBehaviour
         built = true;
 
         // Play until we have a winner or tie?
-        for (int moveNum = 0; winner == null; moveNum++)
+        for (; winner == null; moveNum++)
         {
 
             yield return StartCoroutine(waitForBuildersToMove());
             yield return StartCoroutine(waitForBuildersToBuild());
             while (PAUSED) { yield return new WaitForEndOfFrame(); }
-
-            // Determine who's turn it is.
-            CurrentPlayer = (moveNum % 2 == 0) ? Player1 : Player2;
-            othPlayer = (moveNum % 2 == 0) ? Player2 : Player1;
 
             if (GameSettings.netMode == GameSettings.NetworkMode.Local) { setTurnIndicator(CurrentPlayer); }
 
@@ -432,7 +426,7 @@ public class Game : MonoBehaviour
                         processTurnString(t, CurrentPlayer, this);
                     }
                 }
-                else { winner = othPlayer; }
+                else { winner = Rival; }
 
                 if (winner != null){
                     if (GameSettings.gameType == GameSettings.GameType.Multiplayer)
