@@ -70,7 +70,7 @@ public class HardNeatPlayer : IPlayer
         TextAsset textAsset = (TextAsset)Resources.Load("santorini.config");
         XmlDocument xmlConfig = new XmlDocument();
         xmlConfig.LoadXml(textAsset.text);
-        _experiment.Initialize("Santorini", xmlConfig.DocumentElement);
+        _experiment.Initialize("SantoriniHard", xmlConfig.DocumentElement);
 
         NeatGenome genome;
         NeatGenomeFactory fac = new NeatGenomeFactory(32, 1);

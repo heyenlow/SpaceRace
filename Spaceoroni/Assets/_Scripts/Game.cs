@@ -280,7 +280,7 @@ public class Game : MonoBehaviour
                 Player2.loadNEATPlayer("coevolution_champion");
                 break;
             case GameSettings.AIDifficulty.Hard:
-                Player2.loadNEATPlayer("uipevolution_champion");
+                Player2.loadNEATPlayer("hardneat_champion");
                 break;
         }
     }
